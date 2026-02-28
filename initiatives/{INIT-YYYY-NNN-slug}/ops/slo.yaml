@@ -1,0 +1,59 @@
+# FILE: ops/slo.yaml
+# OpenSLO v1 multi-document (разделитель ---)
+# Валидация: check-jsonschema --schemafile <openslo-schema> ops/slo.yaml
+# Ссылка спецификации: https://github.com/OpenSLO/OpenSLO
+
+---
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: "{prometheus-main}"
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: "https://prometheus.{example.local}"
+
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: "{initiative-slug}-{metric-name}"
+spec:
+  description: "SLI {metric description} for {endpoint/operation}"
+  thresholdMetric:
+    metricSource:
+      metricSourceRef: "{prometheus-main}"
+      type: Prometheus
+      spec:
+        promql: |
+          {
+            # Пример: p95 latency
+            # histogram_quantile(0.95,
+            #   sum(rate(http_request_duration_seconds_bucket{route="/{path}",method="{METHOD}"}[5m]))
+            #   by (le))
+          }
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "{initiative-slug}-{slo-name}"
+spec:
+  service: "{product}"
+  description: "{P95 latency / availability / error rate} for {operation}"
+  budgetingMethod: Occurrences   # Occurrences | Timeslices
+  objectives:
+    - displayName: "{P95 < 300ms | availability > 99.9%}"
+      target: 0.99
+      valueMetric:
+        metricSource:
+          metricSourceRef: "{prometheus-main}"
+          type: Prometheus
+          spec:
+            promql: |
+              {
+                # Дублирует SLI promql или ссылается на него
+              }
+  timeWindow:
+    - duration: 30d
+      isRolling: true
