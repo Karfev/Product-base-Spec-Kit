@@ -30,15 +30,15 @@ Narrative-документы (`prd.md`, `design.md`, `runbooks`) MUST ссыла
 ## Двухконтурный workflow (обязательная модель)
 
 ### Lifecycle-контур (L3 Initiative)
-```
+```text
 Discovery → Product → Architecture/Contracts → Ops/Readiness → Evidence
 ```
 
 ### Spec-Driven контур (L4 Feature)
-```
+```text
 spec → plan → tasks → implement
 ```
-Формат L4-файлов MUST быть совместим с `.specify/specs/` и шаблонами из этого репозитория.
+Формат L4-файлов MUST быть совместим с `.specify/specs/` и шаблонами из этого репозитория (см. `.specify/specs/{NNN}-{slug}/`).
 
 ---
 
@@ -75,7 +75,7 @@ spec → plan → tasks → implement
 
 ## ID-схемы
 
-```
+```text
 Initiative:    INIT-YYYY-NNN-<slug>      # INIT-2026-003-export-data
 Requirements:  REQ-<SCOPE>-NNN          # REQ-AUTH-042, REQ-PLAT-003
 Platform ADR:  PLAT-0001-<slug>
