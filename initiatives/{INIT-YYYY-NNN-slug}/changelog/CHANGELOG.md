@@ -1,0 +1,37 @@
+# Changelog
+
+All notable changes to this initiative will be documented in this file.
+Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+Versioning: [SemVer](https://semver.org/)
+
+## [Unreleased]
+
+### Added
+
+- {…}
+
+### Changed
+
+- {…}
+
+### Deprecated
+
+- {…}
+
+### Removed
+
+- {…}
+
+### Fixed
+
+- {…}
+
+### Security
+
+- {…}
+
+## [0.1.0] - {YYYY-MM-DD}
+
+### Added
+
+- Initial specification draft.
