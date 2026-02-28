@@ -1,0 +1,56 @@
+# FILE: requirements.yml
+# Реестр требований инициативы. Валидируется JSON Schema:
+#   tools/schemas/requirements.schema.json
+# Команда: check-jsonschema --schemafile ../../tools/schemas/requirements.schema.json requirements.yml
+
+metadata:
+  initiative: "{INIT-YYYY-NNN-slug}"
+  product: "{product}"
+  owner: "@{team}"
+  profile: "{minimal|standard|extended}"
+  version: "0.1.0"
+  last_updated: "{YYYY-MM-DD}"
+
+requirements:
+  - id: "REQ-{SCOPE}-001"
+    title: "{Краткое название требования}"
+    type: "functional"
+    priority: "P0"
+    status: "draft"
+    description: >
+      {Пользователь MUST иметь возможность … Полное описание требования.}
+    acceptance_criteria:
+      - "Given {context} When {action} Then {result}"
+      - "Given {context} When {action} Then {result}"
+    trace:
+      adr:
+        - "{INIT-YYYY-NNN-slug}-ADR-0001-{slug}"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1{path}/post"
+      schemas:
+        - "contracts/schemas/{entity}.schema.json"
+      tests:
+        - "tests/e2e/{test}.spec.ts::REQ-{SCOPE}-001"
+      components:
+        - "{service-name}"
+
+  - id: "REQ-{SCOPE}-002"
+    title: "{NFR-требование: latency / availability / …}"
+    type: "nfr"
+    priority: "P1"
+    status: "draft"
+    description: >
+      {API endpoint SHOULD отвечать быстро при нормальной нагрузке.}
+    metrics:
+      - name: "{metric_name_p95_ms}"
+        target: 300
+        measurement: "apm"
+      - name: "{metric_name_p95_seconds}"
+        target: 120
+        measurement: "job-metrics"
+    trace:
+      slo: "ops/slo.yaml#{slo-name}"
+      tests:
+        - "tests/perf/{test}.jmx::REQ-{SCOPE}-002"
+      components:
+        - "{service-name}"

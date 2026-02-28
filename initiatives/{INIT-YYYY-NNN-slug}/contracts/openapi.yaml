@@ -1,0 +1,117 @@
+# FILE: contracts/openapi.yaml
+# OpenAPI 3.1.1 — минимальный шаблон
+# Версия: major.minor.patch (SemVer). Breaking changes → increment MAJOR.
+# Линт: redocly lint contracts/openapi.yaml
+# Breaking diff: oasdiff breaking contracts/openapi.yaml <base>
+
+openapi: "3.1.1"
+info:
+  title: "{Product} API"
+  version: "1.0.0"
+  description: "{Краткое описание API}"
+  contact:
+    name: "{team-name}"
+    email: "{team@example.com}"
+
+servers:
+  - url: "https://api.example.com"
+    description: "Production"
+  - url: "https://api.staging.example.com"
+    description: "Staging"
+
+paths:
+  "/{resources}":
+    post:
+      operationId: "create{Resource}"
+      summary: "Create {resource}"
+      tags: ["{resource}"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Create{Resource}Request"
+      responses:
+        "202":
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{Resource}"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+
+  "/{resources}/{id}":
+    get:
+      operationId: "get{Resource}"
+      summary: "Get {resource} by ID"
+      tags: ["{resource}"]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/{Resource}"
+        "404":
+          description: Not Found
+
+components:
+  schemas:
+    Create{Resource}Request:
+      type: object
+      additionalProperties: false
+      required: ["{field1}", "{field2}"]
+      properties:
+        "{field1}":
+          type: string
+          description: "{description}"
+        "{field2}":
+          type: string
+          enum: ["{value1}", "{value2}"]
+
+    "{Resource}":
+      type: object
+      additionalProperties: false
+      required: [id, status, createdAt]
+      properties:
+        id:
+          type: string
+          description: "Unique identifier"
+        status:
+          type: string
+          enum: ["{status1}", "{status2}", "{status3}"]
+        createdAt:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []
