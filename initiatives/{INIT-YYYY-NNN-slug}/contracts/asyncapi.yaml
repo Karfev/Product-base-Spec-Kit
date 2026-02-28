@@ -1,0 +1,57 @@
+# FILE: contracts/asyncapi.yaml
+# AsyncAPI 3.0 — шаблон для event-driven интерфейсов
+# Версия: major.minor.patch (SemVer).
+# Валидация: asyncapi validate contracts/asyncapi.yaml
+# Breaking diff: @asyncapi/diff
+
+asyncapi: "3.0.0"
+info:
+  title: "{Product} Events"
+  version: "1.0.0"
+  description: "{Описание event-интерфейсов}"
+
+channels:
+  "{domain}.{entity}.{action}":
+    address: "{domain}.{entity}.{action}"
+    description: "{Когда публикуется и что означает}"
+    messages:
+      "{Entity}{Action}Event":
+        $ref: "#/components/messages/{Entity}{Action}Event"
+
+operations:
+  "publish{Entity}{Action}":
+    action: send
+    channel:
+      $ref: "#/channels/{domain}.{entity}.{action}"
+    summary: "Published when {entity} is {action}ed"
+
+components:
+  messages:
+    "{Entity}{Action}Event":
+      name: "{Entity}{Action}Event"
+      title: "{Entity} {Action}ed"
+      summary: "{Краткое описание события}"
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/{Entity}{Action}EventPayload"
+
+  schemas:
+    "{Entity}{Action}EventPayload":
+      type: object
+      additionalProperties: false
+      required: [eventId, occurredAt, data]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: false
+          required: ["{field1}"]
+          properties:
+            "{field1}":
+              type: string
+              description: "{description}"
