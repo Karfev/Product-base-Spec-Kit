@@ -12,6 +12,8 @@
 
 ## Contracts impact
 
+> Все пути ниже — относительно директории инициативы `initiatives/{INIT-YYYY-NNN-slug}/`.
+
 **OpenAPI** (`contracts/openapi.yaml`):
 - `POST /{path}` — {добавляем / изменяем / удаляем}
 
