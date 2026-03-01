@@ -30,14 +30,17 @@ Narrative-документы (`prd.md`, `design.md`, `runbooks`) MUST ссыла
 ## Двухконтурный workflow (обязательная модель)
 
 ### Lifecycle-контур (L3 Initiative)
+
 ```text
 Discovery → Product → Architecture/Contracts → Ops/Readiness → Evidence
 ```
 
 ### Spec-Driven контур (L4 Feature)
+
 ```text
 spec → plan → tasks → implement
 ```
+
 Формат L4-файлов MUST быть совместим с `.specify/specs/` и шаблонами из этого репозитория (см. `.specify/specs/{NNN}-{slug}/`).
 
 ---
@@ -104,6 +107,7 @@ API version:   SemVer (major.minor.patch)
 ## CI Gates — стратегия enforcement
 
 Любой gate вводится в 2 этапа:
+
 1. **Warning mode** на PR в течение 2 недель (с отчётами в PR/чат).
 2. **Blocking mode** на merge/release для профилей Standard/Extended.
 

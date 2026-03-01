@@ -11,7 +11,7 @@ You are generating a concrete task list for `.specify/specs/$ARGUMENTS/`.
 2. Read `.specify/specs/$ARGUMENTS/spec.md` for requirements and acceptance criteria
 3. Fill `.specify/specs/$ARGUMENTS/tasks.md`:
 
-```
+```text
 T1: Update/add contract (OpenAPI/AsyncAPI) + run make lint-contracts
 T2a: Write failing tests (unit + contract при Standard/Extended) — RED
 T2b: Implement — GREEN
@@ -24,6 +24,7 @@ T6: Complete PRR checklist items from ops/prr-checklist.md
 For each task, add specific file paths, test names, and metric names from the plan.
 
 ## Rules
+
 - T2a MUST come before T2b — failing tests first (Test-First / RED → GREEN)
 - T3 uses realistic environments (real DB, real services) — no mocks
 - After filling tasks.md, run: `make check-trace` to verify REQ-ID consistency

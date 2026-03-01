@@ -15,14 +15,17 @@
 > Все пути ниже — относительно директории инициативы `initiatives/INIT-2026-000-api-key-management/`.
 
 **OpenAPI** (`contracts/openapi.yaml`):
+
 - `GET /api-keys` — новый endpoint: листинг ключей аутентифицированного пользователя (REQ-AUTH-003)
 - `POST /api-keys` — новый endpoint: создание ключа, возвращает secret однократно (REQ-AUTH-001, REQ-AUTH-005)
 - `DELETE /api-keys/{id}` — новый endpoint: отзыв ключа (REQ-AUTH-002)
 
 **AsyncAPI** (`contracts/asyncapi.yaml`):
+
 - Не используется — sync-only API
 
 **Schemas** (`contracts/schemas/`):
+
 - `api-key.schema.json` — новая схема объекта ApiKey (без поля secret)
 
 ## Data changes

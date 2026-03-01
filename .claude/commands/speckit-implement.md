@@ -18,6 +18,7 @@ You are guiding implementation for `.specify/specs/$ARGUMENTS/`.
 4. Report what was done and stop — wait for user to continue to the next task
 
 ## Rules
+
 - Never skip T2a — write failing tests BEFORE implementing
 - Never mark a task complete if CI checks fail locally
 - Run `make check-all` before marking T5 complete

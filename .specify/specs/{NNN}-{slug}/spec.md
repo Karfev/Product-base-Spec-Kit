@@ -17,9 +17,11 @@
 ## Scope / Non-goals
 
 **In-scope:**
+
 - {…}
 
 **Non-goals:**
+
 - {…}
 
 ## User stories

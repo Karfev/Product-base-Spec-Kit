@@ -47,7 +47,7 @@ C4Context
 |---|---|---|---|---|
 | `AuthMiddleware` | Валидирует API-ключ в заголовке каждого запроса | Читает хэш из Redis-кэша (TTL 60s), fallback в PostgreSQL | Горизонтальное (stateless) | Cache stampede при инвалидации |
 | `KeyService` | CRUD операции: create, list, revoke | Пишет в PostgreSQL, инвалидирует Redis | Горизонтальное | — |
-| `KeyStorage (PostgreSQL)` | Долгосрочное хранение хэшей ключей | Таблица `api_keys`: id, name, secret_hash, user_id, created_at, expires_at, last_used_at | Вертикальное + read replicas | Нет plaintext — нельзя восстановить потерянный ключ |
+| `KeyStorage (PostgreSQL)` | Хранение хэшей ключей | Таблица `api_keys` (id, name, secret_hash, user_id, created_at, expires_at) | Верт. + read replicas | Нет plaintext — нельзя восстановить ключ |
 | `KeyCache (Redis)` | Кэш валидных key-хэшей для fast-path аутентификации | TTL 60s per key; явная инвалидация при revoke | Горизонтальное (cluster) | 60s window при компрометации до инвалидации |
 
 ## Контракты и данные
@@ -57,6 +57,7 @@ C4Context
 - **JSON Schema:** `contracts/schemas/api-key.schema.json` — схема объекта ApiKey (без secret)
 
 **Схема таблицы `api_keys`:**
+
 ```sql
 CREATE TABLE api_keys (
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),

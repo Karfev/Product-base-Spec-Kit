@@ -20,11 +20,13 @@ You are helping create a spec for feature `$ARGUMENTS` in this spec-driven repos
    - **Open Questions**: mark unknowns as `[NEEDS CLARIFICATION]`
 
 5. If new REQ-IDs are needed, add them to `requirements.yml` and run:
-   ```
+
+   ```text
    make validate
    ```
 
 ## Rules
+
 - Follow ID conventions in `.specify/memory/constitution.md`
 - Every REQ-ID referenced in spec.md MUST exist in `requirements.yml`
 - Mark every unresolved item with `[NEEDS CLARIFICATION]` in Open Questions

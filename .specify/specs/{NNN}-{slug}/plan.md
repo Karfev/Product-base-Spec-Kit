@@ -15,12 +15,15 @@
 > Все пути ниже — относительно директории инициативы `initiatives/{INIT-YYYY-NNN-slug}/`.
 
 **OpenAPI** (`contracts/openapi.yaml`):
+
 - `POST /{path}` — {добавляем / изменяем / удаляем}
 
 **AsyncAPI** (`contracts/asyncapi.yaml`):
+
 - Channel `{name}` — {…}
 
 **Schemas** (`contracts/schemas/`):
+
 - `{entity}.schema.json` — {новая / изменённая схема}
 
 ## Data changes

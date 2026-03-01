@@ -13,6 +13,7 @@ You are helping create an architecture plan for `.specify/specs/$ARGUMENTS/`.
 3. Read any existing ADRs in `initiatives/*/decisions/` relevant to this feature
 
 Fill `.specify/specs/$ARGUMENTS/plan.md` with:
+
 - **Architecture choices**: key decisions with links to ADRs (create new ADR stubs in `initiatives/{INIT}/decisions/` if needed)
 - **Contracts impact**: which OpenAPI paths / AsyncAPI channels are added or changed
 - **Data changes**: schema additions, migrations needed
@@ -21,6 +22,7 @@ Fill `.specify/specs/$ARGUMENTS/plan.md` with:
 - **Risks**: technical risks and mitigations
 
 ## Rules
+
 - Each architecture choice MUST reference or propose a new ADR
 - Breaking API changes require a note: "run `make lint-contracts` to check oasdiff"
 - Do not write implementation code — that belongs in T2b of `tasks.md`
