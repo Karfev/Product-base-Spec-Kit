@@ -1,0 +1,100 @@
+# Реестр требований инициативы.
+# Команда валидации: make validate
+metadata:
+  initiative: "INIT-2026-000-api-key-management"
+  product: "platform"
+  owner: "@platform-team"
+  profile: "standard"
+  version: "0.1.0"
+  last_updated: "2026-03-01"
+
+requirements:
+  - id: "REQ-AUTH-001"
+    title: "Create API key"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      An authenticated user MUST be able to create a named API key
+      that authenticates API requests on behalf of their account.
+      The plaintext secret is returned only once at creation.
+    acceptance_criteria:
+      - "Given an authenticated user, when they POST /api-keys with {name}, then a new key is created and the plaintext secret is returned once"
+      - "Given the key is created, when stored, then the secret is hashed (bcrypt) and never returned again in any subsequent response"
+    trace:
+      adr:
+        - "INIT-2026-000-ADR-0001-storage"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1api-keys/post"
+      schemas:
+        - "contracts/schemas/api-key.schema.json"
+      tests:
+        - "tests/api/api-keys.spec.ts::REQ-AUTH-001"
+
+  - id: "REQ-AUTH-002"
+    title: "Revoke API key"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      An authenticated user MUST be able to revoke any of their API keys,
+      rendering it immediately invalid for authentication within 60 seconds.
+    acceptance_criteria:
+      - "Given a valid API key, when the owner DELETEs /api-keys/{id}, then subsequent requests with that key return HTTP 401"
+      - "Given a DELETE request succeeds, then revocation propagates across all nodes within 60 seconds"
+    trace:
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1api-keys~1{id}/delete"
+      tests:
+        - "tests/api/api-keys.spec.ts::REQ-AUTH-002"
+
+  - id: "REQ-AUTH-003"
+    title: "List API keys"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      An authenticated user MUST be able to list all their API keys
+      (id, name, created_at, expires_at) without the plaintext secret ever appearing.
+    acceptance_criteria:
+      - "Given an authenticated user, when they GET /api-keys, then all their keys are returned with id, name, created_at, last_used_at, expires_at"
+      - "Given any list response, the 'secret' field MUST NOT be present"
+    trace:
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1api-keys/get"
+      tests:
+        - "tests/api/api-keys.spec.ts::REQ-AUTH-003"
+
+  - id: "REQ-AUTH-004"
+    title: "API key auth latency SLO"
+    type: "nfr"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      API key authentication SHOULD add no more than 10ms overhead at P95
+      compared to unauthenticated endpoints at standard load (1000 req/s).
+    metrics:
+      - name: "auth_overhead_p95_ms"
+        target: 10
+        measurement: "apm"
+    trace:
+      slo: "ops/slo.yaml#api-key-auth-latency"
+      tests:
+        - "tests/perf/auth-latency.jmx::REQ-AUTH-004"
+
+  - id: "REQ-AUTH-005"
+    title: "API key expiration"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      API keys MUST support optional expiration dates.
+      Expired keys MUST be rejected with HTTP 401 and error code KEY_EXPIRED.
+    acceptance_criteria:
+      - "Given a key with expires_at in the past, when used for auth, then HTTP 401 {code: KEY_EXPIRED} is returned"
+      - "Given POST /api-keys with expires_at in the past, then HTTP 422 is returned"
+    trace:
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1api-keys/post"
+      tests:
+        - "tests/api/api-keys.spec.ts::REQ-AUTH-005"

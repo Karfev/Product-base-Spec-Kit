@@ -73,6 +73,19 @@ spec → plan → tasks → implement
 
 ---
 
+## Feedback Loop: Ops → Spec
+
+Любое production-событие MUST быть рассмотрено на предмет обновления спецификаций.
+
+| Триггер | Действие | Кто |
+|---|---|---|
+| SLO breach (error budget < 20%) | Создать/обновить NFR-требование в `requirements.yml` + пересмотреть SLO target | On-call + Product |
+| Инцидент P0/P1 | Создать ADR о решении + обновить `threat-model.md` (Extended) | Tech Lead |
+| Прод-метрика отклоняется от SLI target | Пересмотреть `ops/slo.yaml` | SRE + Product |
+| Новое регуляторное требование | Обновить `compliance/regulatory-review.md` + добавить REQ | Compliance |
+
+**Процесс:** incident/metric review → PR с обновлением спеки → ревью команды → merge → новый L4 цикл (`spec → plan → tasks → implement`).
+
 ## ID-схемы
 
 ```text
