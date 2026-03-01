@@ -1,0 +1,69 @@
+name: Validate Contracts
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'initiatives/**/contracts/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'initiatives/**/contracts/**'
+
+jobs:
+  validate-openapi:
+    name: OpenAPI lint + breaking diff
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Redocly CLI
+        run: npm install -g @redocly/cli
+
+      - name: Lint OpenAPI specs (blocking on errors)
+        run: |
+          failed=0
+          for f in $(find initiatives -name openapi.yaml | grep -v '{'); do
+            echo "Linting $f..."
+            redocly lint "$f" || failed=1
+          done
+          exit $failed
+
+      - name: Check breaking changes with oasdiff (warning mode)
+        continue-on-error: true
+        run: |
+          go install github.com/oasdiff/oasdiff@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
+          for f in $(find initiatives -name openapi.yaml | grep -v '{'); do
+            base=$(git show origin/main:"$f" 2>/dev/null) || continue
+            echo "$base" > /tmp/base-openapi.yaml
+            echo "Checking breaking changes: $f"
+            oasdiff breaking /tmp/base-openapi.yaml "$f" || true
+          done
+
+  validate-asyncapi:
+    name: AsyncAPI validate (warning mode)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install AsyncAPI CLI
+        run: npm install -g @asyncapi/cli
+
+      - name: Validate AsyncAPI specs
+        run: |
+          for f in $(find initiatives -name asyncapi.yaml | grep -v '{'); do
+            echo "Validating $f..."
+            asyncapi validate "$f" || true
+          done
