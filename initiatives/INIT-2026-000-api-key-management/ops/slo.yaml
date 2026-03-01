@@ -1,0 +1,40 @@
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: platform-prometheus
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: http://prometheus.platform.internal
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: api-key-auth-latency-sli
+spec:
+  thresholdMetric:
+    source: platform-prometheus
+    queryType: promql
+    query: >
+      histogram_quantile(0.95,
+        sum(rate(http_request_duration_seconds_bucket{handler="/api-keys"}[5m]))
+        by (le)
+      ) * 1000
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: api-key-auth-latency
+  labels:
+    req: REQ-AUTH-004
+spec:
+  sli:
+    metadata:
+      name: api-key-auth-latency-sli
+  objectives:
+    - target: 0.95
+      value: 10
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences
