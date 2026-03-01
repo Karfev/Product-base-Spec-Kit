@@ -15,7 +15,7 @@ validate: ## Validate all requirements.yml against JSON Schema
 	@failed=0; \
 	for f in $$(find initiatives -name requirements.yml | grep -v '{'); do \
 	  echo "  Checking $$f"; \
-	  check-jsonschema --schemafile tools/schemas/requirements.schema.json "$$f" || failed=1; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/requirements.schema.json "$$f" || failed=1; \
 	done; \
 	exit $$failed
 
