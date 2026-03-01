@@ -6,9 +6,10 @@
 
 ## Task list
 
-- [ ] **T1:** Добавить/обновить контракт (OpenAPI/AsyncAPI) + прогнать линтеры локально
-- [ ] **T2:** Реализовать изменение (код) + unit tests
-- [ ] **T3:** Contract tests / интеграционные тесты (если применимо)
+- [ ] **T1:** Добавить/обновить контракт (OpenAPI/AsyncAPI) + прогнать линтеры локально (`make lint-contracts`)
+- [ ] **T2a:** Написать тесты (unit + contract при Standard/Extended) — убедиться что тесты **падают** (RED)
+- [ ] **T2b:** Реализовать изменение (код) — убедиться что тесты **зелёные** (GREEN)
+- [ ] **T3:** Интеграционные тесты в реальном окружении (если применимо)
 - [ ] **T4:** Observability — добавить метрики/алерты, обновить `ops/slo.yaml` (Standard/Extended)
 - [ ] **T5:** Обновить `trace.md` + `changelog/CHANGELOG.md`
 - [ ] **T6:** Пройти PRR пункты из `ops/prr-checklist.md` (Standard/Extended)

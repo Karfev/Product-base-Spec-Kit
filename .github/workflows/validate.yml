@@ -1,0 +1,60 @@
+name: Validate Specs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-requirements:
+    name: Validate requirements.yml (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install check-jsonschema pyyaml
+
+      - name: Validate requirements.yml against JSON Schema
+        run: |
+          failed=0
+          for f in $(find initiatives -name requirements.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/requirements.schema.json "$f" || failed=1
+          done
+          exit $failed
+
+      - name: Check REQ-ID traceability (L3 ↔ L4)
+        run: python tools/scripts/check-trace.py
+
+  lint-docs:
+    name: Lint docs (warning mode — will become blocking)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install yamllint
+        run: pip install yamllint
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install markdownlint
+        run: npm install -g markdownlint-cli2
+
+      - name: Lint YAML
+        run: yamllint -c .yamllint.yml .
+
+      - name: Lint Markdown
+        run: markdownlint-cli2 "**/*.md" "#node_modules"

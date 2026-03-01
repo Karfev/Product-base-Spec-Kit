@@ -38,3 +38,11 @@
 
 - Given {context} When {action} Then {result}
 - Given {context} When {action} Then {result}
+
+## Open Questions
+
+<!-- Маркер [NEEDS CLARIFICATION] — канонический тег для незакрытых вопросов.
+     Допустимые значения Статус: open | resolved -->
+| # | Вопрос | Владелец | Дедлайн | Статус |
+|---|--------|----------|---------|--------|
+| 1 | [NEEDS CLARIFICATION] {Вопрос, требующий уточнения до реализации} | @{owner} | {YYYY-MM-DD} | open |

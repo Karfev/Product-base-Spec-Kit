@@ -1,0 +1,10 @@
+# Redocly CLI config — used by make lint-contracts and CI
+apis:
+  all@latest:
+    root: initiatives/**/contracts/openapi.yaml
+
+rules:
+  no-unused-components: warn
+  operation-operationId: error
+  operation-summary: error
+  security-defined: error
