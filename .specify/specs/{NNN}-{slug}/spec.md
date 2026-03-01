@@ -38,3 +38,9 @@
 
 - Given {context} When {action} Then {result}
 - Given {context} When {action} Then {result}
+
+## Open Questions
+
+| # | Вопрос | Владелец | Дедлайн | Статус |
+|---|--------|----------|---------|--------|
+| 1 | [NEEDS CLARIFICATION] {Вопрос, требующий уточнения до реализации} | @{owner} | {YYYY-MM-DD} | open |
