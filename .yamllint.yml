@@ -3,5 +3,6 @@ rules:
   line-length:
     max: 200
   truthy:
-    allowed-values: ['true', 'false']
+    allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
+  document-start: disable
   comments-indentation: disable
