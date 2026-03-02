@@ -1,0 +1,132 @@
+# Реестр требований услуги ВЦОД-VMWR-VS.
+# Schema: tools/schemas/service-requirements.schema.json
+# Команда валидации: make validate-services
+
+metadata:
+  service_code: "ВЦОД-VMWR-VS"
+  product: "private-cloud"
+  owner: "@cherednichenco-a-g"
+  profile: "extended"
+  version: "0.1.0"
+  last_updated: "2026-03-02"
+
+requirements:
+  # ── ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ ────────────────────────────────────────────
+
+  - id: "REQ-SVC-001"
+    title: "Предоставление изолированной инфраструктуры ВЦОД"
+    type: "functional"
+    priority: "P0"
+    status: "approved"
+    description: >
+      Исполнитель MUST предоставить Потребителю логически выделенную инфраструктуру ЦОД
+      (Виртуальный ЦОД, ВЦОД) с заданными количественными характеристиками, включая
+      подключение к публичной сети Интернет с выделением публичного IP-адреса.
+    acceptance_criteria:
+      - "Given договор/бланк заказа подписан, When истекает срок выделения ресурсов (5 раб. дней), Then ВЦОД с заданными параметрами доступен для Потребителя"
+      - "Given ВЦОД создан, When Потребитель проверяет параметры, Then vCPU/vRAM/vHDD соответствуют договору"
+    trace:
+      external_spec: "external-spec.md#21-описание-функциональности-и-состава-услуги"
+      ops: []
+      tests: []
+
+  - id: "REQ-SVC-002"
+    title: "Доступ к консоли управления облачным ВЦОД"
+    type: "functional"
+    priority: "P0"
+    status: "approved"
+    description: >
+      Исполнитель MUST предоставить единый графический интерфейс (консоль) системы управления
+      облачной платформой ВЦОД и удалённый доступ к ней через публичную сеть Интернет
+      с использованием сертифицированного VPN-клиента и терминального(ых) сервера(ов).
+    acceptance_criteria:
+      - "Given учётные данные и VPN-клиент получены, When Потребитель подключается к терминальному серверу, Then консоль управления ВЦОД доступна"
+      - "Given консоль доступна, When Потребитель создаёт/изменяет ВМ, Then операция выполняется успешно"
+    trace:
+      external_spec: "external-spec.md#212-функциональные-характеристики-консоли-управления"
+      ops: []
+      tests: []
+
+  - id: "REQ-SVC-003"
+    title: "Межсетевое экранирование подсетей Потребителя"
+    type: "functional"
+    priority: "P1"
+    status: "approved"
+    description: >
+      Исполнитель MUST обеспечить межсетевое экранирование подсетей Потребителя
+      с гарантированной пропускной способностью МСЭ в режиме Stateful-Firewall
+      согласно тарифицируемым параметрам.
+    acceptance_criteria:
+      - "Given ВЦОД предоставлен, When Потребитель запрашивает создание правила МСЭ, Then правило применяется в течение SLT запроса REQ-TYPE-002"
+    trace:
+      external_spec: "external-spec.md#21-описание-функциональности-и-состава-услуги"
+      ops:
+        - "ops/request-catalog.yml#REQ-TYPE-002"
+      tests: []
+
+  # ── NFR: ДОСТУПНОСТЬ ─────────────────────────────────────────────────────
+
+  - id: "REQ-SVC-010"
+    title: "Доступность услуги 99.5%"
+    type: "nfr"
+    priority: "P0"
+    status: "approved"
+    description: >
+      Услуга MUST обеспечивать доступность не менее 99.5% в течение расчётного периода.
+      Разовый простой — не более 3 часов. Технологических окон — не более 1 в квартал,
+      продолжительностью не более 3 часов.
+    metrics:
+      - name: "service_availability_pct"
+        target: 99.5
+        measurement: "slo"
+    trace:
+      slo: "ops/slo.yaml#vtsod-vmwr-vs-availability"
+      ops:
+        - "ops/incident-catalog.yml"
+      tests: []
+
+  # ── NFR: SLT ИНЦИДЕНТОВ ──────────────────────────────────────────────────
+
+  - id: "REQ-SVC-011"
+    title: "SLT разрешения инцидентов"
+    type: "nfr"
+    priority: "P0"
+    status: "approved"
+    description: >
+      Исполнитель MUST обеспечивать время реакции и решения инцидентов:
+      P1 — реакция 10 мин / решение 1.5 ч (24x7),
+      P2 — реакция 15 мин / решение 2 ч (24x7),
+      P3 — реакция 15 мин / решение 4 ч (24x7).
+    metrics:
+      - name: "incident_p1_reaction_minutes"
+        target: 10
+        measurement: "servicedesk"
+      - name: "incident_p1_resolution_hours"
+        target: 1.5
+        measurement: "servicedesk"
+    trace:
+      ops:
+        - "ops/incident-catalog.yml"
+      slo: "ops/slo.yaml#vtsod-vmwr-vs-incident-p1-reaction"
+
+  # ── NFR: SLT ЗАПРОСОВ ────────────────────────────────────────────────────
+
+  - id: "REQ-SVC-012"
+    title: "SLT выполнения типовых запросов"
+    type: "nfr"
+    priority: "P1"
+    status: "approved"
+    description: >
+      Исполнитель MUST обеспечивать выполнение типовых запросов приоритета 4:
+      время реакции — 30 мин, время решения — 4 ч (запросы на обслуживание)
+      и 16 ч (запросы на информацию). Обработка в рабочие часы.
+    metrics:
+      - name: "service_request_reaction_minutes"
+        target: 30
+        measurement: "servicedesk"
+      - name: "service_request_resolution_hours"
+        target: 4
+        measurement: "servicedesk"
+    trace:
+      ops:
+        - "ops/request-catalog.yml"

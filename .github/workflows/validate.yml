@@ -32,6 +32,64 @@ jobs:
       - name: Check REQ-ID traceability (L3 ↔ L4)
         run: python tools/scripts/check-trace.py
 
+  validate-services:
+    name: Validate service artifacts (L2.5) — warning mode
+    runs-on: ubuntu-latest
+    continue-on-error: true   # warning mode → станет blocking после 2 недель (см. конституцию)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install check-jsonschema
+
+      - name: Validate service requirements.yml
+        run: |
+          failed=0
+          for f in $(find services -name requirements.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/service-requirements.schema.json "$f" || failed=1
+          done
+          exit $failed
+
+      - name: Validate incident-catalog.yml
+        run: |
+          for f in $(find services -name incident-catalog.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/incident-catalog.schema.json "$f"
+          done
+
+      - name: Validate request-catalog.yml
+        run: |
+          for f in $(find services -name request-catalog.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/request-catalog.schema.json "$f"
+          done
+
+      - name: Validate change-catalog.yml
+        run: |
+          for f in $(find services -name change-catalog.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/change-catalog.schema.json "$f"
+          done
+
+      - name: Validate billing/parameters.yml
+        run: |
+          for f in $(find services -path '*/billing/parameters.yml' | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/billing-parameters.schema.json "$f"
+          done
+
+      - name: Validate responsibilities.yml
+        run: |
+          for f in $(find services -name responsibilities.yml | grep -v '{'); do
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/responsibilities.schema.json "$f"
+          done
+
   lint-docs:
     name: Lint docs (warning mode — will become blocking)
     runs-on: ubuntu-latest

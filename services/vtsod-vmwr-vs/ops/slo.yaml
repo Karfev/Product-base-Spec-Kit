@@ -1,0 +1,100 @@
+# SLO услуги ВЦОД-VMWR-VS — формат OpenSLO v1.
+# Источник: Внешняя Спецификация Услуги v0.6, Таблицы 8, 10.
+
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "vtsod-vmwr-vs-availability"
+  displayName: "Доступность услуги ВЦОД-VMWR-VS"
+  labels:
+    service: "ВЦОД-VMWR-VS"
+    product: "private-cloud"
+
+spec:
+  description: "Уровень доступности услуги ВЦОД-VMWR-VS: не менее 99.5% в расчётном периоде. Время предоставления: 24x7x365."
+  service: "ВЦОД-VMWR-VS"
+  indicator:
+    metadata:
+      name: "vtsod-vmwr-vs-availability-sli"
+    spec:
+      ratioMetric:
+        counter: true
+        good:
+          metricSource:
+            type: "Custom"
+            spec:
+              query: "sum(service_up_minutes{service='vtsod-vmwr-vs'}) / sum(total_minutes)"
+        total:
+          metricSource:
+            type: "Custom"
+            spec:
+              query: "sum(total_minutes{service='vtsod-vmwr-vs'})"
+  objectives:
+    - displayName: "Доступность >= 99.5%"
+      target: 0.995
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "Occurrences"
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "vtsod-vmwr-vs-incident-p1-reaction"
+  displayName: "Время реакции на инциденты P1 — ВЦОД-VMWR-VS"
+  labels:
+    service: "ВЦОД-VMWR-VS"
+    priority: "P1"
+
+spec:
+  description: "95-й перцентиль времени реакции на инциденты приоритета 1 — не более 10 минут (24x7)."
+  service: "ВЦОД-VMWR-VS"
+  indicator:
+    metadata:
+      name: "vtsod-vmwr-vs-incident-p1-reaction-sli"
+    spec:
+      thresholdMetric:
+        metricSource:
+          type: "ServiceDesk"
+          spec:
+            query: "incident_reaction_time_minutes{service='vtsod-vmwr-vs', priority='P1'}"
+  objectives:
+    - displayName: "Время реакции P1 <= 10 мин (P95)"
+      target: 0.95
+      timeSliceTarget: 600
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "TimeSlices"
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "vtsod-vmwr-vs-incident-p1-resolution"
+  displayName: "Время решения инцидентов P1 — ВЦОД-VMWR-VS"
+  labels:
+    service: "ВЦОД-VMWR-VS"
+    priority: "P1"
+
+spec:
+  description: "95-й перцентиль времени решения инцидентов приоритета 1 — не более 1.5 ч (24x7)."
+  service: "ВЦОД-VMWR-VS"
+  indicator:
+    metadata:
+      name: "vtsod-vmwr-vs-incident-p1-resolution-sli"
+    spec:
+      thresholdMetric:
+        metricSource:
+          type: "ServiceDesk"
+          spec:
+            query: "incident_resolution_time_hours{service='vtsod-vmwr-vs', priority='P1'}"
+  objectives:
+    - displayName: "Время решения P1 <= 1.5 ч (P95)"
+      target: 0.95
+      timeSliceTarget: 5400
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "TimeSlices"

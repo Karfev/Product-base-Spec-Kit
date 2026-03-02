@@ -4,7 +4,7 @@
 PYTHON := python3
 SHELL  := /bin/bash
 
-.PHONY: help validate lint-docs lint-contracts check-trace check-all install-tools
+.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-all install-tools
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -16,6 +16,40 @@ validate: ## Validate all requirements.yml against JSON Schema
 	for f in $$(find initiatives -name requirements.yml | grep -v '{'); do \
 	  echo "  Checking $$f"; \
 	  python3 -m check_jsonschema --schemafile tools/schemas/requirements.schema.json "$$f" || failed=1; \
+	done; \
+	exit $$failed
+
+validate-services: ## Validate all machine-readable service artifacts against JSON Schema (L2.5)
+	@echo "==> Validating service requirements.yml files..."
+	@failed=0; \
+	for f in $$(find services -name requirements.yml | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/service-requirements.schema.json "$$f" || failed=1; \
+	done; \
+	echo "==> Validating incident-catalog.yml files..."; \
+	for f in $$(find services -name incident-catalog.yml | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/incident-catalog.schema.json "$$f" || failed=1; \
+	done; \
+	echo "==> Validating request-catalog.yml files..."; \
+	for f in $$(find services -name request-catalog.yml | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/request-catalog.schema.json "$$f" || failed=1; \
+	done; \
+	echo "==> Validating change-catalog.yml files..."; \
+	for f in $$(find services -name change-catalog.yml | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/change-catalog.schema.json "$$f" || failed=1; \
+	done; \
+	echo "==> Validating billing/parameters.yml files..."; \
+	for f in $$(find services -path '*/billing/parameters.yml' | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/billing-parameters.schema.json "$$f" || failed=1; \
+	done; \
+	echo "==> Validating responsibilities.yml files..."; \
+	for f in $$(find services -name responsibilities.yml | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/responsibilities.schema.json "$$f" || failed=1; \
 	done; \
 	exit $$failed
 
@@ -43,7 +77,7 @@ check-trace: ## Check REQ-ID consistency (L3 requirements.yml <-> L4 trace.md)
 	@echo "==> Checking REQ-ID consistency..."
 	@$(PYTHON) tools/scripts/check-trace.py
 
-check-all: validate lint-docs lint-contracts check-trace ## Run all validation checks
+check-all: validate validate-services lint-docs lint-contracts check-trace ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
 
