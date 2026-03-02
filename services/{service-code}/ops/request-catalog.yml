@@ -1,0 +1,50 @@
+# Каталог типовых запросов услуги.
+# Определяет типы запросов, их классификацию, состав работ и SLT.
+# Schema: tools/schemas/request-catalog.schema.json
+
+metadata:
+  service_code: "{service-code}"
+  version: "0.1.0"
+  last_updated: "{YYYY-MM-DD}"
+
+# Определение рабочих часов (для запросов приоритета 4)
+business_hours:
+  timezone: "{UTC+3|UTC+0|…}"
+  schedule: "{Пн–Пт 09:00–18:00}"
+
+requests:
+  - id: "REQ-TYPE-001"
+    category: "service_request"              # service_request | change_request | info_request
+    priority: 4
+    name: "{Наименование типового запроса 1}"
+    description: "{Зафиксированная потребность потребителя в обслуживании}"
+    scope_of_work:
+      - "{Состав работ 1}"
+      - "{Состав работ 2}"
+    slt:
+      reaction_minutes: {30}
+      resolution_hours: {4}
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-002"
+    category: "change_request"
+    priority: null                           # null — определяется порядком реализации изменений (§2.8)
+    name: "{Наименование запроса на изменение}"
+    description: "{Описание изменения состава/параметров услуги}"
+    scope_of_work:
+      - "{Состав работ}"
+    slt:
+      note: "SLT определяется разделом 2.8 внешней спецификации"
+      reference: "external-spec.md#28-порядок-реализации-изменений"
+
+  - id: "REQ-TYPE-003"
+    category: "info_request"
+    priority: 4
+    name: "{Наименование запроса на предоставление информации}"
+    description: "{Описание запрашиваемой информации}"
+    scope_of_work:
+      - "{Состав работ}"
+    slt:
+      reaction_minutes: {30}
+      resolution_hours: {16}
+      processing: "business_hours"

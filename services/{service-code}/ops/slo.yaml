@@ -1,0 +1,71 @@
+# SLO услуги — формат OpenSLO v1.
+# Определяет SLI/SLO/Error Budget для доступности и времени решения инцидентов.
+# Schema: OpenSLO v1 (https://github.com/OpenSLO/OpenSLO)
+# Валидация: make validate-services
+
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "{service-code}-availability"
+  displayName: "Доступность услуги {service-code}"
+  labels:
+    service: "{service-code}"
+    product: "{product}"
+
+spec:
+  description: "Доступность услуги за расчётный период"
+  service: "{service-code}"
+  indicator:
+    metadata:
+      name: "{service-code}-availability-sli"
+    spec:
+      ratioMetric:
+        counter: true
+        good:
+          metricSource:
+            type: "{Prometheus|Zabbix|Custom}"
+            spec:
+              query: "{запрос для хороших событий (например: сервис доступен)}"
+        total:
+          metricSource:
+            type: "{Prometheus|Zabbix|Custom}"
+            spec:
+              query: "{запрос для всех событий}"
+  objectives:
+    - displayName: "Доступность >= {99.X}%"
+      target: 0.{995}          # 99.5% = 0.995
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "Occurrences"
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "{service-code}-incident-p1-reaction"
+  displayName: "Время реакции на инциденты P1 — {service-code}"
+  labels:
+    service: "{service-code}"
+    priority: "P1"
+
+spec:
+  description: "P95 времени реакции на инциденты приоритета 1"
+  service: "{service-code}"
+  indicator:
+    metadata:
+      name: "{service-code}-incident-p1-reaction-sli"
+    spec:
+      thresholdMetric:
+        metricSource:
+          type: "{ServiceDesk|Custom}"
+          spec:
+            query: "{запрос для времени реакции P1 инцидентов}"
+  objectives:
+    - displayName: "Время реакции P1 <= {10} мин"
+      target: 0.95
+      timeSliceTarget: {600}    # {10} минут в секундах
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "TimeSlices"
