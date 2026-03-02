@@ -22,9 +22,10 @@ A spec-driven artifact kit for B2B SaaS teams, built around the **Spec Constitut
   memory/constitution.md          ← L0: Spec Constitution (principles, CI gates, ID schemes, profiles)
   specs/{NNN}-{slug}/             ← L4: Feature spec-kit (spec / plan / tasks / trace)
 
-domains/{domain}/                 ← L1: Glossary, canonical model, event catalog, NFR
-products/{product}/               ← L2: Architecture, product ADRs, NFR baseline
-initiatives/{INIT-YYYY-NNN-slug}/ ← L3: PRD, requirements.yml, contracts, ops, decisions
+domains/{domain}/            ← L1: Glossary, canonical model, event catalog, NFR
+products/{product}/          ← L2: Architecture, product ADR, NFR baseline
+services/{service-code}/     ← L2.5: External/Internal Service Spec, SLO, catalogs, billing, RSM
+initiatives/{INIT-slug}/     ← L3: PRD, requirements.yml, contracts, ops, decisions
 
 tools/
   init.sh                         ← Bootstrap: create new initiative + L4 spec from templates
@@ -80,188 +81,98 @@ All levels have dedicated `/speckit-*` commands. Use them instead of copying tem
 | `/speckit-prr-status <INIT-slug>` | Review PRR checklist — DONE / OPEN / BLOCKING |
 | `/speckit-evidence <INIT-slug>` | Generate full evidence report (RTM coverage, PRR status) |
 
-## Quick start
-
-1. **New initiative (L3):**
-   ```
-   /speckit-profile INIT-2026-042-my-feature
-   /speckit-init    INIT-2026-042-my-feature
-   /speckit-prd     INIT-2026-042-my-feature
-   /speckit-requirements INIT-2026-042-my-feature
-   ```
-
-2. **New feature spec (L4):**
-   ```
-   /speckit-specify  042-my-feature
-   /speckit-plan     042-my-feature
-   /speckit-tasks    042-my-feature
-   /speckit-implement 042-my-feature
-   /speckit-trace    042-my-feature
-   ```
-
-3. **Before release:**
-   ```
-   /speckit-rtm       INIT-2026-042-my-feature
-   /speckit-prr-status INIT-2026-042-my-feature
-   /speckit-evidence  INIT-2026-042-my-feature
-   ```
-
-4. **Validate manually:**
-   ```bash
-   make check-all
-   ```
-.github/workflows/
-  validate.yml                    ← Core validation: schema check, lint, trace check
-  contracts.yml                   ← Contract validation: OpenAPI lint + breaking diff, AsyncAPI
-
-Makefile                          ← Local task runner
+**How the levels connect:**
+```
+products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
+     L2                        L2.5                         L3
+(what we build)         (what we offer clients)      (how we improve it)
 ```
 
 ---
 
-## Level Hierarchy
+## Quick start
 
-| Level | Location | Contents |
-|---|---|---|
-| **L0** | `.specify/memory/constitution.md` | Governance, principles, CI gates, ID schemes |
-| **L1** | `domains/{domain}/` | Glossary, canonical model, event catalog, domain NFR |
-| **L2** | `products/{product}/` | Architecture overview, product ADRs, NFR baseline |
-| **L3** | `initiatives/{INIT}/` | PRD, requirements.yml, contracts, decisions, ops |
-| **L4** | `.specify/specs/{NNN}-{slug}/` | spec.md → plan.md → tasks.md → trace.md |
-| **L5** | `evidence/` | CI-generated: RTM, coverage reports, PRR results |
+### New initiative (L3)
+```bash
+cp -r "initiatives/{INIT-YYYY-NNN-slug}/" initiatives/INIT-2026-042-my-feature/
+# Edit all {placeholder} values
+make validate
+```
+
+### New service spec (L2.5)
+```bash
+cp -r "services/{service-code}/" services/my-service/
+# Fill README.md → external-spec.md → requirements.yml → ops/* → billing/*
+make validate-services
+```
+
+### New feature spec (L4)
+```bash
+cp -r ".specify/specs/{NNN}-{slug}/" .specify/specs/042-my-feature/
+# Fill spec.md → plan.md → tasks.md
+```
+
+### Validate everything
+```bash
+make check-all          # requirements + services + lint + contracts + trace
+make validate-services  # service artifacts only (billing, incidents, requests, SLO)
+make validate           # initiative requirements only
+make lint-docs          # YAML + Markdown hygiene
+make lint-contracts     # OpenAPI + AsyncAPI
+```
 
 ---
 
 ## Profiles
 
-Choose a profile based on risk, not team size:
+### Initiatives (L3)
 
-| Profile | When to use | Required artifacts |
+| Profile | When | Key artifacts |
 |---|---|---|
-| **Minimal** | Low-risk, internal changes | `prd.md`, `requirements.yml`, `README.md`, `CHANGELOG.md` |
-| **Standard** | Most product initiatives | + `design.md`, `contracts/`, ADR, `rollout.md`, `slo.yaml`, `prr-checklist.md` |
-| **Extended** | High-risk, regulated, public API | + `threat-model.md`, `nfr-validation.md`, `migration.md`, `compliance/` |
+| **Minimal** | Low-risk changes | `prd.md`, `requirements.yml`, `CHANGELOG.md` |
+| **Standard** | Most initiatives | + `design.md`, `contracts/`, ADR, `slo.yaml`, `prr-checklist.md` |
+| **Extended** | High-risk / regulated | + `threat-model.md`, `nfr-validation.md`, `migration.md`, `compliance/` |
 
----
+### Services (L2.5)
 
-## Quick Start
-
-### 1. Create a new initiative (L3)
-
-```bash
-./tools/init.sh INIT-2026-042-my-feature
-```
-
-This copies the template, substitutes all `{placeholder}` values, and prints next steps.
-To also create a linked L4 feature spec:
-
-```bash
-./tools/init.sh INIT-2026-042-my-feature 042-my-feature
-```
-
-### 2. Fill the spec with Claude Code
-
-```
-/speckit-specify 042-my-feature   # Fill spec.md (problem, user stories, REQ-IDs)
-/speckit-plan    042-my-feature   # Fill plan.md (architecture, contracts, SLO impact)
-/speckit-tasks   042-my-feature   # Fill tasks.md (T1–T6 implementation checklist)
-/speckit-implement 042-my-feature # Guide task-by-task implementation
-```
-
-### 3. Validate locally
-
-```bash
-make validate        # Validate all requirements.yml against JSON Schema (blocking)
-make lint-docs       # Lint YAML + Markdown (warning mode → will become blocking)
-make lint-contracts  # Lint OpenAPI/AsyncAPI contracts
-make check-trace     # Check REQ-ID consistency: L3 ↔ L4
-make check-all       # Run everything
-```
-
----
-
-## ID Conventions
-
-| Artifact | Format | Example |
+| Profile | When | Key artifacts |
 |---|---|---|
-| Initiative | `INIT-YYYY-NNN-{slug}` | `INIT-2026-000-api-key-management` |
-| Requirement | `REQ-{SCOPE}-NNN` | `REQ-AUTH-001`, `REQ-PLAT-003` |
-| Platform ADR | `PLAT-0001-{slug}` | `PLAT-0001-event-sourcing` |
-| Product ADR | `{PROD}-0001-{slug}` | `ANALYTICS-0003-cache-strategy` |
-| Initiative ADR | `{INIT}-ADR-0001-{slug}` | `INIT-2026-000-ADR-0001-storage` |
-| Feature spec | `NNN-{slug}` | `000-api-key-management` |
-| API version | SemVer | `1.0.0`, `2.0.0-beta` |
+| **Minimal** | Internal / draft service | `README.md`, `external-spec.md`, `requirements.yml` |
+| **Standard** | Client-facing service | + `internal-spec.md`, `rsm.md`, `responsibilities.yml`, `ops/slo.yaml`, `ops/incident-catalog.yml`, `ops/request-catalog.yml` |
+| **Extended** | Critical / regulated service | + `billing/parameters.yml`, `ops/change-catalog.yml`, `appendices/*` |
 
 ---
 
-## CI Gates
+## What's in a service (L2.5)
 
-Two workflows run on every push/PR:
-
-**`validate.yml`** — always runs:
-- Validates every `initiatives/*/requirements.yml` against `tools/schemas/requirements.schema.json`
-- Checks L3 ↔ L4 REQ-ID consistency via `tools/scripts/check-trace.py`
-- Lints all YAML and Markdown (warning mode, escalates to blocking)
-
-**`contracts.yml`** — runs when `initiatives/**/contracts/**` changes:
-- Lints all OpenAPI specs with Redocly CLI (blocking on errors)
-- Detects breaking changes with `oasdiff` (warning mode, escalates to blocking)
-- Validates AsyncAPI specs (warning mode)
-
-Enforcement follows a two-week warning → blocking escalation schedule defined in the constitution.
-
----
-
-## Claude Code Integration
-
-Four `/speckit.*` commands guide the full spec-to-implementation workflow:
-
-| Command | Input | Output |
-|---|---|---|
-| `/speckit-specify NNN-slug` | Feature description | `spec.md`: problem, stories, REQ-IDs, acceptance criteria |
-| `/speckit-plan NNN-slug` | Filled `spec.md` | `plan.md`: architecture choices, contracts impact, SLO, risks |
-| `/speckit-tasks NNN-slug` | Filled `plan.md` | `tasks.md`: T1–T6 checklist (contracts → tests → impl → ops → trace → PRR) |
-| `/speckit-implement NNN-slug` | Filled `tasks.md` | One task at a time, commit per task, stop and report |
-
-The T1–T6 task sequence enforces: contracts first → RED tests → GREEN implementation → integration → observability → traceability → production readiness.
-
----
-
-## Example Initiative
-
-`initiatives/INIT-2026-000-api-key-management/` — Standard profile, `platform` product.
-
-Demonstrates the full artifact set: `prd.md`, `requirements.yml` (5 REQ-IDs validated by schema), `design.md` (arc42-lite), `contracts/openapi.yaml` (OpenAPI 3.1.1), `contracts/schemas/api-key.schema.json`, `decisions/INIT-2026-000-ADR-0001-storage.md`, `ops/slo.yaml` (OpenSLO v1), `ops/prr-checklist.md`, `delivery/rollout.md`.
-
-Linked L4 spec: `.specify/specs/000-api-key-management/`.
-
----
-
-## Tools Required
-
-Install all validators:
-
-```bash
-make install-tools
+```
+services/{service-code}/
+├── README.md                   # Identity, links to product ↑ and initiatives ↓
+├── external-spec.md            # Client-facing specification (narrative → machine-readable anchors)
+├── internal-spec.md            # Internal delivery spec (architecture, RSM, responsibilities)
+├── rsm.md                      # Resource-Service Model (Mermaid diagrams)
+├── requirements.yml            # Machine-readable SLA/functional requirements (REQ-SVC-*)
+├── responsibilities.yml        # Responsibility matrix by architectural block
+├── billing/
+│   └── parameters.yml          # Billable parameters, change steps and limits
+└── ops/
+    ├── slo.yaml                 # OpenSLO v1: availability, SLI/SLO/Error Budget
+    ├── incident-catalog.yml     # Incident classification, thresholds, SLT
+    ├── request-catalog.yml      # Service request catalog, priorities, SLT
+    └── change-catalog.yml       # Standard/non-standard change parameters
 ```
 
-| Tool | Purpose |
-|---|---|
-| `yamllint` | YAML linting |
-| `check-jsonschema` | `requirements.yml` schema validation |
-| `markdownlint-cli2` | Markdown linting |
-| `@redocly/cli` | OpenAPI lint and validation |
-| `@asyncapi/cli` | AsyncAPI validation |
-| `oasdiff` | OpenAPI breaking change detection |
+See [`services/README.md`](./services/README.md) for full details and profile table.
+
+**Example:** [`services/vtsod-vmwr-vs/`](./services/vtsod-vmwr-vs/) — Private Cloud VMware vDC (Extended profile, fully populated).
 
 ---
 
 ## Governance
 
-Full principles, CI gates strategy, ID conventions, source-of-truth matrix, and enforcement roadmap:
-
-→ `.specify/memory/constitution.md`
+Full principles, CI gates strategy, ID conventions, levels (L0–L5), and enforcement roadmap:
+→ [`.specify/memory/constitution.md`](./.specify/memory/constitution.md)
 
 ## Design Document
 
-→ `docs/plans/2026-02-28-spec-kit-file-structure-design.md`
+→ [`docs/plans/2026-02-28-spec-kit-file-structure-design.md`](./docs/plans/2026-02-28-spec-kit-file-structure-design.md)
