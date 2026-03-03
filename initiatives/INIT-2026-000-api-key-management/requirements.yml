@@ -7,6 +7,12 @@ metadata:
   profile: "standard"
   version: "0.1.0"
   last_updated: "2026-03-01"
+  # Классификационные коды подсистемы по онтологии АИС (необязательно, Standard+)
+  classification:
+    system_scale: "С.М.М"
+    subsystem_type: "ПС.Т.П"
+    subsystem_owner: "@platform-team"
+    activity_domain: "Управление доступом / API-аутентификация"
 
 requirements:
   - id: "REQ-AUTH-001"
@@ -77,10 +83,14 @@ requirements:
       - name: "auth_overhead_p95_ms"
         target: 10
         measurement: "apm"
+        iso_characteristic: "performance_efficiency"
+        iso_sub_characteristic: "time_behaviour"
     trace:
       slo: "ops/slo.yaml#api-key-auth-latency"
       tests:
         - "tests/perf/auth-latency.jmx::REQ-AUTH-004"
+      architecture_views:
+        - "design.md#т-1"
 
   - id: "REQ-AUTH-005"
     title: "API key expiration"
