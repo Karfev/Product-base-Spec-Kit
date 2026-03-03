@@ -1,0 +1,27 @@
+# Классификация подсистемы по онтологии АИС
+# Валидация: make validate (при profile=enterprise)
+# Схема: tools/schemas/subsystem-classification.schema.json
+initiative: "INIT-2026-001-ontology-demo"
+classification:
+  system_scale: "С.М.С"
+  subsystem_type: "ПС.Т.ПТ"
+  subsystem_owner: "@platform-team"
+  activity_domain: "Управление спецификациями / Архитектурная документация"
+architecture_views:
+  - type: "Д-1"
+    status: "заполнено"
+    path: "design.md#д-1"
+  - type: "Д-3"
+    status: "заполнено"
+    path: "design.md#д-3"
+  - type: "П-1"
+    status: "заполнено"
+    path: "design.md#п-1"
+  - type: "Т-1"
+    status: "заполнено"
+    path: "design.md#т-1"
+  - type: "П-2"
+    status: "н/п"
+  - type: "О-1"
+    status: "н/п"
+ontology_ref: "domains/is-ontology/canonical-model/model.md"
