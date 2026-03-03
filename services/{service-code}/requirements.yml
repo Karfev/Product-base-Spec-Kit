@@ -1,0 +1,88 @@
+# Реестр требований услуги (L2.5 Service).
+# Идентификаторы: REQ-SVC-NNN (scope = код услуги).
+# Команда валидации: make validate-services
+# Schema: tools/schemas/service-requirements.schema.json
+
+metadata:
+  service_code: "{service-code}"
+  product: "{product}"
+  owner: "@{owner}"
+  profile: "{minimal|standard|extended}"
+  version: "0.1.0"
+  last_updated: "{YYYY-MM-DD}"
+
+requirements:
+  # ── ФУНКЦИОНАЛЬНЫЕ ТРЕБОВАНИЯ (Functional) ──────────────────────────────
+  - id: "REQ-SVC-001"
+    title: "{Краткий заголовок}"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      {Описание: что MUST/SHOULD обеспечивать услуга для потребителя.}
+    acceptance_criteria:
+      - "{Given … When … Then …}"
+    trace:
+      external_spec: "external-spec.md#21-описание-функциональности-и-состава-услуги"
+      ops: []
+      tests: []
+
+  - id: "REQ-SVC-002"
+    title: "{Краткий заголовок}"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      {Описание требования.}
+    acceptance_criteria:
+      - "{Given … When … Then …}"
+    trace:
+      external_spec: "external-spec.md#21-описание-функциональности-и-состава-услуги"
+      ops: []
+      tests: []
+
+  # ── NFR: ДОСТУПНОСТЬ ─────────────────────────────────────────────────────
+  - id: "REQ-SVC-010"
+    title: "Доступность услуги"
+    type: "nfr"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Услуга MUST обеспечивать доступность не менее {99.X%} в течение расчётного периода.
+      Разовый простой — не более {N} часов. Технологических окон — не более {N} в квартал.
+    metrics:
+      - name: "service_availability_pct"
+        target: "{99.X}"
+        measurement: "slo"
+    trace:
+      slo: "ops/slo.yaml#availability"
+      ops:
+        - "ops/incident-catalog.yml"
+      tests: []
+
+  # ── NFR: SLT ИНЦИДЕНТОВ ──────────────────────────────────────────────────
+  - id: "REQ-SVC-011"
+    title: "SLT разрешения инцидентов"
+    type: "nfr"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Исполнитель MUST обеспечивать время реакции и решения инцидентов
+      в соответствии с классификацией и приоритетами.
+    trace:
+      ops:
+        - "ops/incident-catalog.yml"
+      slo: "ops/slo.yaml#incident-slt"
+
+  # ── NFR: SLT ЗАПРОСОВ ────────────────────────────────────────────────────
+  - id: "REQ-SVC-012"
+    title: "SLT выполнения типовых запросов"
+    type: "nfr"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      Исполнитель MUST обеспечивать выполнение типовых запросов потребителей
+      в соответствии с каталогом запросов.
+    trace:
+      ops:
+        - "ops/request-catalog.yml"

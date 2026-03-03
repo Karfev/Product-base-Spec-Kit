@@ -1,0 +1,45 @@
+# Параметры стандартных и нестандартных изменений услуги.
+# Определяет допустимые разовые изменения тарифицируемых параметров.
+# Schema: tools/schemas/change-catalog.schema.json
+
+metadata:
+  service_code: "{service-code}"
+  version: "0.1.0"
+  last_updated: "{YYYY-MM-DD}"
+
+# Условный период для стандартных изменений
+change_period_months: {4}            # Длительность условного периода (месяцев)
+non_standard_review_workdays: {20}   # Срок рассмотрения нестандартных изменений (рабочих дней)
+non_standard_max_months: {4}         # Максимальный срок реализации нестандартного изменения
+
+# Правила учёта изменений в тарификации
+billing_rules:
+  increase_in_period: "Объём за весь период принимается равным увеличенным параметрам"
+  decrease_in_period: "Уменьшение учитывается со следующего отчётного периода"
+  deferred_allowed: true             # Допускается отсрочка изменений до начала следующего периода
+
+# Таблица стандартных разовых изменений параметров
+parameters:
+  - name: "{Параметр 1}"            # Должен соответствовать billing/parameters.yml
+    standard_change:
+      type: "percent"               # percent | absolute
+      value: {10}                   # Размер стандартного изменения (% или абс. значение)
+      max_limit: {N}                # Предельное значение параметра
+      max_limit_unit: "{ед. изм.}"
+
+  - name: "{Параметр 2}"
+    standard_change:
+      type: "percent"
+      value: {15}
+      max_limit: {N}
+      max_limit_unit: "{ед. изм.}"
+
+  - name: "{Параметр 3 (штучный)}"
+    standard_change:
+      type: "absolute"
+      value: {5}                    # Максимальное количество единиц за одно изменение
+      max_limit: null               # Нет предельного значения
+
+  - name: "{Параметр 4 (неограниченный)}"
+    standard_change:
+      unlimited: true               # Неограниченное стандартное изменение

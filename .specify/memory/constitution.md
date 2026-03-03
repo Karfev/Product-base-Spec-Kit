@@ -22,6 +22,11 @@
 | Интерфейсы событий | `contracts/asyncapi.yaml` |
 | SLO | `ops/slo.yaml` |
 | Архитектурные решения | `decisions/*.md` |
+| Тарифицируемые параметры (L2.5) | `services/<code>/billing/parameters.yml` |
+| Матрица ответственности (L2.5) | `services/<code>/responsibilities.yml` |
+| Каталог инцидентов (L2.5) | `services/<code>/ops/incident-catalog.yml` |
+| Каталог запросов (L2.5) | `services/<code>/ops/request-catalog.yml` |
+| Параметры изменений (L2.5) | `services/<code>/ops/change-catalog.yml` |
 
 Narrative-документы (`prd.md`, `design.md`, `runbooks`) MUST ссылаться на anchors выше и НЕ дублировать их.
 
@@ -49,6 +54,7 @@ spec → plan → tasks → implement
 | L0 | — | Governance: эта конституция, platform templates, platform ADR |
 | L1 | Domain | `domains/<domain>/` — глоссарий, canonical model, event catalog |
 | L2 | Product | `products/<product>/` — архитектура, product ADR, NFR baseline |
+| L2.5 | Service | `services/<service-code>/` — внешняя/внутренняя спека, SLO, каталоги инцидентов/запросов/изменений, тарификация, РСМ, матрица ответственности |
 | L3 | Initiative | Инициатива: prd.md, requirements.yml, contracts/, ops/, decisions/ |
 | L4 | Feature | Фича: .specify/specs/{NNN}-{slug}/ spec/plan/tasks |
 | L5 | Evidence | CI-генерируемые отчёты: RTM, coverage, PRR status |
@@ -68,9 +74,10 @@ spec → plan → tasks → implement
 
 1. **Machine-readable first (MUST):** всё, влияющее на интеграции/совместимость/эксплуатацию, фиксируется в machine-readable anchors и валидируется CI.
 2. **Single source of truth (MUST):** один объект знания — один канонический файл.
-3. **Traceability by construction (MUST):** каждый `REQ-ID` имеет ссылки минимум на 1 подтверждение (тест / contract-тест / измерение SLO).
+3. **Traceability by construction (MUST):** каждый `REQ-ID` имеет ссылки минимум на 1 подтверждение (тест / contract-тест / измерение SLO). `REQ-SVC-*` (Service-уровень) MUST ссылаться на `ops/slo.yaml`, `ops/incident-catalog.yml` или `ops/request-catalog.yml`.
 4. **ADR-as-PR (SHOULD):** решения оформляются ADR и ревьюятся в PR.
 5. **Контракты обратимо-совместимы по умолчанию (MUST):** breaking changes требуют отдельного deprecation-процесса и major-сдвига.
+6. **Сервисы порождаются продуктами (MUST):** каждый `services/<code>/` MUST иметь ссылку на родительский `products/<product>/`; каждая `initiatives/{INIT}/` SHOULD ссылаться на `services/<code>/`, если реализует изменение сервиса.
 
 ---
 
@@ -90,12 +97,14 @@ spec → plan → tasks → implement
 ## ID-схемы
 
 ```text
-Initiative:    INIT-YYYY-NNN-<slug>      # INIT-2026-003-export-data
-Requirements:  REQ-<SCOPE>-NNN          # REQ-AUTH-042, REQ-PLAT-003
-Platform ADR:  PLAT-0001-<slug>
-Product ADR:   <PROD>-0001-<slug>       # ANALYTICS-0003-cache-strategy
-Initiative ADR:<INIT>-ADR-0001-<slug>   # INIT-2026-003-ADR-0002-event-schema
-API version:   SemVer (major.minor.patch)
+Initiative:       INIT-YYYY-NNN-<slug>      # INIT-2026-003-export-data
+Requirements:     REQ-<SCOPE>-NNN          # REQ-AUTH-042, REQ-PLAT-003
+Service Req:      REQ-SVC-NNN             # REQ-SVC-001 (scope = код услуги)
+Service code:     <PRODUCT>-<TYPE>-<ID>   # ВЦОД-VMWR-VS (по нотации владельца)
+Platform ADR:     PLAT-0001-<slug>
+Product ADR:      <PROD>-0001-<slug>       # ANALYTICS-0003-cache-strategy
+Initiative ADR:   <INIT>-ADR-0001-<slug>   # INIT-2026-003-ADR-0002-event-schema
+API version:      SemVer (major.minor.patch)
 ```
 
 Все ID MUST быть короткими, стабильными, ASCII-совместимыми и сортируемыми.
