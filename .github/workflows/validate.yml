@@ -32,6 +32,9 @@ jobs:
       - name: Check REQ-ID traceability (L3 ↔ L4)
         run: python tools/scripts/check-trace.py
 
+  validate-enterprise:
+    name: Validate Enterprise IS classification (blocking)
+    runs-on: ubuntu-latest
   validate-services:
     name: Validate service artifacts (L2.5) — warning mode
     runs-on: ubuntu-latest
@@ -44,6 +47,32 @@ jobs:
           python-version: '3.12'
 
       - name: Install tools
+        run: pip install check-jsonschema pyyaml
+
+      - name: Check Enterprise profile — subsystem-classification.yaml presence and validity
+        run: |
+          failed=0
+          for req in $(find initiatives -name requirements.yml | grep -v '{'); do
+            dir=$(dirname "$req")
+            profile=$(python3 -c "
+          import yaml, sys
+          with open('$req') as f:
+              data = yaml.safe_load(f)
+          print(data.get('metadata', {}).get('profile', ''))
+          " 2>/dev/null)
+            if [ "$profile" = "enterprise" ]; then
+              classfile="$dir/subsystem-classification.yaml"
+              if [ ! -f "$classfile" ]; then
+                echo "ERROR: $req has profile=enterprise but $classfile is missing" >&2
+                failed=1
+              else
+                echo "Validating $classfile..."
+                python3 -m check_jsonschema --schemafile tools/schemas/subsystem-classification.schema.json "$classfile" || failed=1
+              fi
+            fi
+          done
+          exit $failed
+
         run: pip install check-jsonschema
 
       - name: Validate service requirements.yml

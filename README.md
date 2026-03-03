@@ -92,6 +92,28 @@ products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
 
 ## Quick start
 
+1. **New initiative (L3):**
+   ```bash
+   ./tools/init.sh INIT-2026-042-my-feature [042-my-feature]
+   # или с профилем enterprise:
+   ./tools/init.sh INIT-2026-042-my-feature 042-my-feature --profile enterprise
+   ```
+
+2. **New feature spec (L4):**
+   ```bash
+   cp -r .specify/specs/{NNN}-{slug}/ .specify/specs/042-my-feature/
+   # Fill spec.md → plan.md → tasks.md
+   ```
+
+3. **Validate all requirements.yml:**
+   ```bash
+   make validate
+   ```
+
+4. **Lint OpenAPI contract:**
+   ```bash
+   redocly lint initiatives/INIT-2026-042-my-feature/contracts/openapi.yaml
+   ```
 ### New initiative (L3)
 ```bash
 cp -r "initiatives/{INIT-YYYY-NNN-slug}/" initiatives/INIT-2026-042-my-feature/
@@ -137,36 +159,32 @@ make lint-contracts     # OpenAPI + AsyncAPI
 
 | Profile | When | Key artifacts |
 |---|---|---|
-| **Minimal** | Internal / draft service | `README.md`, `external-spec.md`, `requirements.yml` |
-| **Standard** | Client-facing service | + `internal-spec.md`, `rsm.md`, `responsibilities.yml`, `ops/slo.yaml`, `ops/incident-catalog.yml`, `ops/request-catalog.yml` |
-| **Extended** | Critical / regulated service | + `billing/parameters.yml`, `ops/change-catalog.yml`, `appendices/*` |
+| **Minimal** | Low-risk changes | prd.md, requirements.yml, CHANGELOG.md |
+| **Standard** | Most initiatives | + design.md, contracts/, ADR, slo.yaml, prr-checklist.md |
+| **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
+| **Enterprise** | Large IS-class systems | + design.md (3-layer АИС ontology), architecture-views/, subsystem-classification.yaml |
 
----
+## Enterprise IS Profile
 
-## What's in a service (L2.5)
+For large information systems following the АИС methodology (ArchiMate 3.2 / ГОСТ Р ИСО/МЭК 25020):
 
-```
-services/{service-code}/
-├── README.md                   # Identity, links to product ↑ and initiatives ↓
-├── external-spec.md            # Client-facing specification (narrative → machine-readable anchors)
-├── internal-spec.md            # Internal delivery spec (architecture, RSM, responsibilities)
-├── rsm.md                      # Resource-Service Model (Mermaid diagrams)
-├── requirements.yml            # Machine-readable SLA/functional requirements (REQ-SVC-*)
-├── responsibilities.yml        # Responsibility matrix by architectural block
-├── billing/
-│   └── parameters.yml          # Billable parameters, change steps and limits
-└── ops/
-    ├── slo.yaml                 # OpenSLO v1: availability, SLI/SLO/Error Budget
-    ├── incident-catalog.yml     # Incident classification, thresholds, SLT
-    ├── request-catalog.yml      # Service request catalog, priorities, SLT
-    └── change-catalog.yml       # Standard/non-standard change parameters
+```bash
+# Bootstrap enterprise initiative
+./tools/init.sh INIT-2026-NNN-my-system --profile enterprise
+
+# Fill architecture layers interactively (15 questions → Mermaid stubs)
+/speckit-architecture INIT-2026-NNN-my-system
 ```
 
-See [`services/README.md`](./services/README.md) for full details and profile table.
+**What you get:**
+- `design.md` — three-layer architecture (Activity / Application / Technology layer)
+- `subsystem-classification.yaml` — machine-readable classification codes (system scale, subsystem type, owner)
+- `architecture-views/` — stubs for all 11 view types (Д-1…О-1)
+- CI gate `validate-enterprise` — blocks PR if classification file is missing or invalid
 
-**Example:** [`services/vtsod-vmwr-vs/`](./services/vtsod-vmwr-vs/) — Private Cloud VMware vDC (Extended profile, fully populated).
+**Ontology domain:** `domains/is-ontology/` — glossary (~34 terms), canonical model, relationship taxonomy, NFR profile (ГОСТ 25020)
 
----
+**Demo:** `initiatives/INIT-2026-001-ontology-demo/` — complete Enterprise IS profile example
 
 ## Governance
 

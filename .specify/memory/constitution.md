@@ -64,8 +64,9 @@ spec → plan → tasks → implement
 - **Minimal** — prd.md, requirements.yml, README.md, CHANGELOG.md
 - **Standard** — Minimal + design.md, ADR, contracts/*, rollout.md, slo.yaml, prr-checklist.md
 - **Extended** — Standard + threat-model.md, nfr-validation.md, migration.md, compliance/
+- **Enterprise** — Extended + `design.md` (трёхслойная онтология АИС), `architecture-views/` (11 типов представлений), `subsystem-classification.yaml` (машиночитаемая классификация). Для крупных ИС-проектов (С.М.С/Б). Требует полной трёхслойной архитектуры по методологии АИС: `domains/is-ontology/canonical-model/model.md`.
 
-Профиль выбирается **по риску**, а не «по размеру фичи».
+Профиль выбирается **по риску и масштабу**, а не «по размеру фичи».
 
 ---
 
@@ -128,6 +129,7 @@ API version:      SemVer (major.minor.patch)
 | SLO format | local JSON Schema + check-jsonschema | warning→blocking | blocking | Standard/Extended |
 | PRR gate | чек-лист + парсер | warning (PR) | blocking (release) | Standard/Extended |
 | Changelog discipline | Keep a Changelog + SemVer | warning→blocking | blocking | все |
+| Enterprise IS classification | check-jsonschema (subsystem-classification.schema.json) | blocking | blocking | Enterprise |
 
 ---
 
