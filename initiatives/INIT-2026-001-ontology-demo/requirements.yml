@@ -7,12 +7,7 @@ metadata:
   profile: "enterprise"
   version: "0.1.0"
   last_updated: "2026-03-03"
-  # Демонстрация профиля Enterprise IS — классификация подсистемы по онтологии АИС
-  classification:
-    system_scale: "С.М.С"
-    subsystem_type: "ПС.Т.ПТ"
-    subsystem_owner: "@platform-team"
-    activity_domain: "Управление спецификациями / Архитектурная документация"
+  # Классификация подсистемы — см. subsystem-classification.yaml (единственный источник истины)
 
 requirements:
   - id: "REQ-PLAT-001"

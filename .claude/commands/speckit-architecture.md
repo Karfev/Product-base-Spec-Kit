@@ -9,7 +9,7 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 
 - Словарь терминов: `domains/is-ontology/glossary.md`
 - Трёхслойная модель и элементы: `domains/is-ontology/canonical-model/model.md`
-- Типы взаимосвязей: `domains/is-ontology/event-catalog/events.md`
+- Типы взаимосвязей: `domains/is-ontology/relationship-catalog/relationships.md`
 - NFR-профиль ГОСТ 25020: `domains/is-ontology/nfr/domain-nfr.md`
 
 ## Твоя последовательность действий
@@ -20,6 +20,11 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 2. Прочитай `initiatives/$ARGUMENTS/design.md` — посмотреть, что уже заполнено
 3. Прочитай `domains/is-ontology/canonical-model/model.md` — освежить типы элементов
 4. Если design.md содержит незаполненные `{placeholder}`, продолжай заполнять их
+5. Проверь поле `metadata.profile` в `initiatives/$ARGUMENTS/requirements.yml`
+
+> **Ветвление по профилю:**
+> - `enterprise` — выполни все шаги 1–6 включая классификацию и полные таблицы слоёв
+> - `standard` / `extended` / `minimal` — выполни шаги 1–3 и 5–6 (шаг 4 пропусти; таблицы элементов не генерируй; вопросы об архитектурных представлениях предложи по умолчанию: Д-1, Д-3, П-1, Т-1)
 
 ### Шаг 1 — Слой деятельности (жёлтый)
 
@@ -68,7 +73,7 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
     (примеры: Docker-образ api-keys-service:latest, migration_001.sql, Helm chart)
 ```
 
-### Шаг 4 — Классификация подсистемы
+### Шаг 4 — Классификация подсистемы _(только для Enterprise; для других профилей пропусти)_
 
 ```
 12. Масштаб системы (выбери одно):
@@ -106,7 +111,8 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 
 ```
 16. Какие представления нужны для этой подсистемы?
-    (по умолчанию для Standard: Д-1, Д-3, П-1, Т-1)
+    - Standard/Extended: по умолчанию Д-1, Д-3, П-1, Т-1 — уточни, если нужно добавить или убрать
+    - Enterprise: выбери из полного списка выше; минимум Д-1, Д-3, П-1, Т-1
 ```
 
 ### Шаг 6 — Сгенерировать и записать результат
@@ -114,8 +120,8 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 На основе всех ответов:
 
 1. **Заполни раздел «Архитектурные слои»** в `initiatives/$ARGUMENTS/design.md`:
-   - Таблицу классификации подсистемы
-   - Таблицы элементов для каждого слоя (используй правильные типы из `canonical-model/model.md`)
+   - _Только для Enterprise:_ Таблицу классификации подсистемы + таблицы элементов для каждого слоя (используй правильные типы из `canonical-model/model.md`)
+   - _Для Standard/Extended:_ Добавь краткое текстовое описание ключевых компонентов каждого слоя без детальных таблиц элементов
 
 2. **Обнови таблицу «Архитектурные представления»** — проставь статусы `заполнено` / `н/п`
 
@@ -195,7 +201,7 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 ## Правила
 
 - Используй **только типы элементов** из `canonical-model/model.md` (Таблица элементов)
-- Используй **только типы взаимосвязей** из `event-catalog/events.md`
+- Используй **только типы взаимосвязей** из `relationship-catalog/relationships.md`
 - Диаграммы — **только Mermaid** (graph LR / graph TB / C4Context)
 - Не изобретай новые типы — если не подходит, уточни у архитектора
 - После заполнения: `make validate` должен пройти без ошибок

@@ -8,6 +8,7 @@
   "properties": {
     "metadata": {
       "type": "object",
+      "$comment": "Классификация подсистемы (system_scale, subsystem_type, subsystem_owner, activity_domain) хранится в subsystem-classification.yaml — единственном источнике истины. Схема: tools/schemas/subsystem-classification.schema.json",
       "required": ["initiative", "product", "owner", "profile", "version", "last_updated"],
       "additionalProperties": true,
       "properties": {
@@ -16,34 +17,7 @@
         "owner":      { "type": "string", "minLength": 1 },
         "profile":    { "type": "string", "enum": ["minimal", "standard", "extended", "enterprise"] },
         "version":    { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$" },
-        "last_updated": { "type": "string", "format": "date" },
-        "classification": {
-          "type": "object",
-          "description": "Классификационные коды подсистемы по онтологии АИС (domains/is-ontology/canonical-model/model.md)",
-          "additionalProperties": false,
-          "properties": {
-            "system_scale": {
-              "type": "string",
-              "enum": ["С.М.М", "С.М.С", "С.М.Б"],
-              "description": "Масштаб системы: М — малая (<10M LOC), С — средняя (10–100M LOC), Б — большая (>100M LOC)"
-            },
-            "subsystem_type": {
-              "type": "string",
-              "enum": ["ПС.Т.И", "ПС.Т.ПТ", "ПС.Т.П"],
-              "description": "Тип подсистемы: И — инфраструктурная, ПТ — программно-технологическая, П — прикладная"
-            },
-            "subsystem_owner": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Владелец подсистемы (team или person handle)"
-            },
-            "activity_domain": {
-              "type": "string",
-              "minLength": 1,
-              "description": "Вид деятельности / предметная область подсистемы"
-            }
-          }
-        }
+        "last_updated": { "type": "string", "format": "date" }
       }
     },
     "requirements": {
@@ -98,7 +72,17 @@
               },
               "iso_sub_characteristic": {
                 "type": "string",
-                "description": "Подхарактеристика качества (например: time_behaviour, availability, confidentiality)"
+                "enum": [
+                  "functional_completeness", "functional_correctness", "functional_appropriateness",
+                  "time_behaviour", "resource_utilisation", "capacity",
+                  "co_existence", "interoperability",
+                  "appropriateness_recognisability", "learnability", "operability", "user_error_protection", "user_interface_aesthetics", "accessibility",
+                  "maturity", "availability", "fault_tolerance", "recoverability",
+                  "confidentiality", "integrity", "non_repudiation", "accountability", "authenticity",
+                  "modularity", "reusability", "analysability", "modifiability", "testability",
+                  "adaptability", "installability", "replaceability"
+                ],
+                "description": "Подхарактеристика качества по ГОСТ Р ИСО/МЭК 25020-2023 / ISO 25010:2023. Допустимые значения соответствуют подхарактеристикам родительской iso_characteristic."
               }
             }
           }
