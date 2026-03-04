@@ -164,6 +164,8 @@ make lint-contracts     # OpenAPI + AsyncAPI
 | **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
 | **Enterprise** | Large IS-class systems | + design.md (3-layer АИС ontology), architecture-views/, subsystem-classification.yaml |
 
+> Full profile artifact requirements and CI gate rules → `.specify/memory/constitution.md`
+
 ## Enterprise IS Profile
 
 For large information systems following the АИС methodology (ArchiMate 3.2 / ГОСТ Р ИСО/МЭК 25020):

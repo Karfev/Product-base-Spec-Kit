@@ -14,7 +14,7 @@ You are scaffolding a new initiative in this spec-driven repository.
    - What is the initiative's one-line title?
    - Which product does it belong to?
    - Who is the PM/owner (`@handle`)?
-   - What profile is needed? Run `/speckit-profile $ARGUMENTS` if unsure.
+   - What profile is needed? Run `/speckit-profile $ARGUMENTS` if unsure. Options: `minimal | standard | extended | enterprise`
 
 3. Create the initiative folder `initiatives/$ARGUMENTS/` by copying from `initiatives/{INIT-YYYY-NNN-slug}/`
    and replacing all `{placeholder}` values with real data.
@@ -55,13 +55,21 @@ You are scaffolding a new initiative in this spec-driven repository.
        regulatory-review.md     ← stub
    ```
 
+   **Enterprise** (add to Extended):
+   ```
+     architecture-views/
+       README.md                ← table of 11 view types with status (н/п by default)
+     subsystem-classification.yaml  ← machine-readable classification stubs
+     # design.md includes 3-layer section stubs (Activity / Application / Technology)
+   ```
+
 5. Fill `requirements.yml` metadata block:
    ```yaml
    metadata:
      initiative: "$ARGUMENTS"
      product: "<user answer>"
      owner: "<user answer>"
-     profile: "<minimal|standard|extended>"
+     profile: "<minimal|standard|extended|enterprise>"
      version: "0.1.0"
      last_updated: "<today YYYY-MM-DD>"
    requirements: []
@@ -76,9 +84,11 @@ You are scaffolding a new initiative in this spec-driven repository.
 7. Report: list all created files and the next recommended command:
    - `Run /speckit-prd $ARGUMENTS to write the PRD`
    - `Run /speckit-requirements $ARGUMENTS to add requirements`
+   - If Enterprise: `Run /speckit-architecture $ARGUMENTS to fill the 3-layer architecture (15 guided questions → Mermaid stubs)`
 
 ## Rules
 - MUST NOT overwrite an existing initiative folder — abort if `initiatives/$ARGUMENTS/` already exists
 - `requirements.yml` MUST pass `make validate` after creation
 - All stub files MUST contain `{placeholder}` markers where real content is expected
 - Follow ID scheme: `INIT-YYYY-NNN-<slug>` — ASCII, lowercase slug, zero-padded NNN
+- For Enterprise profile: `subsystem-classification.yaml` must be valid against `tools/schemas/subsystem-classification.schema.json` before finishing

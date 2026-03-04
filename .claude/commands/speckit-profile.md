@@ -1,5 +1,5 @@
 ---
-description: Select initiative profile (Minimal / Standard / Extended) via risk assessment
+description: Select initiative profile (Minimal / Standard / Extended / Enterprise) via risk assessment
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
@@ -28,16 +28,22 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
    - [ ] Could a bug in this initiative cause revenue loss or customer data exposure?
    - [ ] Is this a P0/P1 initiative on the roadmap with executive visibility?
 
+   **Scale & Architecture (Enterprise indicator):**
+   - [ ] Is this a large information system (IS-class) requiring ArchiMate / АИС 3-layer architecture documentation?
+   - [ ] Does the system need machine-readable subsystem classification (system scale, type, owner)?
+
 4. **Score and recommend profile:**
 
-   | Score (YES answers) | Recommended Profile | Override allowed? |
-   |---|---|---|
-   | 0–1 | **Minimal** | No |
-   | 2–4 | **Standard** | Yes (up to Extended) |
-   | 5–8 | **Extended** | No (downgrade requires Tech Lead sign-off) |
+   | Score (YES on questions 1–8) | Enterprise indicators (Q9–Q10) | Recommended Profile | Override allowed? |
+   |---|---|---|---|
+   | 0–1 | — | **Minimal** | No |
+   | 2–4 | — | **Standard** | Yes (up to Extended) |
+   | 5–8 | — | **Extended** | No (downgrade requires Tech Lead sign-off) |
+   | Any | ≥1 YES | **Enterprise** | Yes (requires explicit team decision) |
 
    Security/compliance questions answered YES → MUST be at least **Standard**.
    Any compliance YES → MUST be **Extended**.
+   Enterprise indicators YES → recommend **Enterprise** (confirm with architect).
 
 5. Show the user the **artifact checklist** for the recommended profile:
 
@@ -62,18 +68,25 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
    - [ ] `delivery/migration.md` filled (if DB changes)
    - [ ] `compliance/regulatory-review.md` filled
 
+   **Enterprise checklist** (adds to Extended):
+   - [ ] `design.md` — three-layer architecture (Activity / Application / Technology layer) filled via `/speckit-architecture`
+   - [ ] `architecture-views/` — at least Д-1, Д-3, П-1, Т-1 diagrams
+   - [ ] `subsystem-classification.yaml` valid (`make validate`)
+
 6. Write the selected profile into `requirements.yml` metadata:
    ```yaml
    metadata:
-     profile: "<minimal|standard|extended>"
+     profile: "<minimal|standard|extended|enterprise>"
    ```
    Run `make validate` to confirm.
 
 7. Report the selected profile and the next recommended action:
    - `Run /speckit-init $ARGUMENTS to scaffold missing artifact stubs`
+   - If Enterprise: `Run /speckit-architecture $ARGUMENTS to fill the 3-layer architecture`
 
 ## Rules
 - Profile is selected **by risk**, not by initiative size or team preference
 - Profile can only be UPGRADED during development, not downgraded after Standard is reached without Tech Lead sign-off
 - If the user is unsure about any question, default to YES (conservative)
 - Document the profile rationale as a comment in `requirements.yml` metadata
+- Enterprise profile requires explicit team/architect confirmation — it adds significant documentation overhead

@@ -7,12 +7,6 @@ metadata:
   profile: "standard"
   version: "0.1.0"
   last_updated: "2026-03-01"
-  # Классификационные коды подсистемы по онтологии АИС (необязательно, Standard+)
-  classification:
-    system_scale: "С.М.М"
-    subsystem_type: "ПС.Т.П"
-    subsystem_owner: "@platform-team"
-    activity_domain: "Управление доступом / API-аутентификация"
 
 requirements:
   - id: "REQ-AUTH-001"
