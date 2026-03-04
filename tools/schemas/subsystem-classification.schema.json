@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/subsystem-classification.schema.json",
+  "title": "subsystem-classification.yaml schema",
+  "description": "Машиночитаемая классификация подсистемы по онтологии АИС (domains/is-ontology/canonical-model/model.md). Обязательна для profile=enterprise.",
+  "type": "object",
+  "required": ["initiative", "classification", "architecture_views"],
+  "additionalProperties": false,
+  "properties": {
+    "initiative": {
+      "type": "string",
+      "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$",
+      "description": "ID инициативы, к которой относится классификация"
+    },
+    "classification": {
+      "type": "object",
+      "required": ["system_scale", "subsystem_type", "subsystem_owner", "activity_domain"],
+      "additionalProperties": false,
+      "properties": {
+        "system_scale": {
+          "type": "string",
+          "enum": ["С.М.М", "С.М.С", "С.М.Б"],
+          "description": "Масштаб системы: М — малая (<10M LOC), С — средняя (10–100M LOC), Б — большая (>100M LOC)"
+        },
+        "subsystem_type": {
+          "type": "string",
+          "enum": ["ПС.Т.И", "ПС.Т.ПТ", "ПС.Т.П"],
+          "description": "Тип подсистемы: И — инфраструктурная, ПТ — программно-технологическая, П — прикладная"
+        },
+        "subsystem_owner": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Владелец подсистемы (team или person handle)"
+        },
+        "activity_domain": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Вид деятельности / предметная область подсистемы"
+        }
+      }
+    },
+    "architecture_views": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Статус архитектурных представлений. Для Standard+ обязательны: Д-1, Д-3, П-1, Т-1.",
+      "items": {
+        "type": "object",
+        "required": ["type", "status"],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["Д-1", "Д-2", "Д-3", "Д-4а", "Д-4б", "Д-5", "Д-6", "П-1", "П-2", "Т-1", "О-1"],
+            "description": "Тип архитектурного представления по классификатору АИС"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["заполнено", "н/п", "в работе"],
+            "description": "Статус: заполнено — готово, н/п — не применимо, в работе — в процессе"
+          },
+          "path": {
+            "type": "string",
+            "description": "Путь к диаграмме или раздел в design.md (например: design.md#д-1)"
+          }
+        }
+      },
+      "contains": {
+        "properties": {
+          "type": { "enum": ["Д-1"] },
+          "status": { "const": "заполнено" }
+        },
+        "required": ["type", "status"]
+      }
+    },
+    "ontology_ref": {
+      "type": "string",
+      "description": "Ссылка на версию онтологии (необязательно)",
+      "default": "domains/is-ontology/canonical-model/model.md"
+    }
+  },
+  "allOf": [
+    {
+      "description": "Представления Д-1, Д-3, П-1, Т-1 MUST быть перечислены для profile=enterprise",
+      "if": { "required": ["architecture_views"] },
+      "then": {
+        "properties": {
+          "architecture_views": {
+            "contains": { "properties": { "type": { "enum": ["Д-1"] } }, "required": ["type"] }
+          }
+        }
+      }
+    }
+  ]
+}

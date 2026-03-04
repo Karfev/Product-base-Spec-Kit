@@ -77,10 +77,14 @@ requirements:
       - name: "auth_overhead_p95_ms"
         target: 10
         measurement: "apm"
+        iso_characteristic: "performance_efficiency"
+        iso_sub_characteristic: "time_behaviour"
     trace:
       slo: "ops/slo.yaml#api-key-auth-latency"
       tests:
         - "tests/perf/auth-latency.jmx::REQ-AUTH-004"
+      architecture_views:
+        - "design.md#т-1"
 
   - id: "REQ-AUTH-005"
     title: "API key expiration"

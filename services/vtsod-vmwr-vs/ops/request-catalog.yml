@@ -1,0 +1,121 @@
+# Каталог типовых запросов услуги ВЦОД-VMWR-VS.
+# Schema: tools/schemas/request-catalog.schema.json
+# Источник: Внешняя Спецификация Услуги v0.6, Таблицы 6, 7 и 10.
+
+metadata:
+  service_code: "ВЦОД-VMWR-VS"
+  version: "0.1.0"
+  last_updated: "2026-03-02"
+
+business_hours:
+  timezone: "UTC+3"
+  schedule: "Пн–Пт 09:00–18:00 МСК (рабочие дни по трудовому законодательству РФ)"
+
+requests:
+  - id: "REQ-TYPE-001"
+    category: "service_request"
+    priority: 4
+    name: "Создание/изменение шлюза доступа по умолчанию"
+    description: "Создание или изменение на выделенном МСЭ интерфейса и шлюза доступа по умолчанию для требуемой подсети Потребителя"
+    scope_of_work:
+      - "Создание/изменение на выделенном МСЭ интерфейса и шлюза доступа по умолчанию для требуемой подсети"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 4
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-002"
+    category: "service_request"
+    priority: 4
+    name: "Создание/изменение правила доступа (межсетевого экранирования)"
+    description: "Создание или изменение на выделенном МСЭ правила доступа в соответствии с запрошенными параметрами"
+    scope_of_work:
+      - "Создание/изменение на выделенном МСЭ правила доступа в соответствии с запрошенными параметрами"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 4
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-003"
+    category: "service_request"
+    priority: 4
+    name: "Создание/изменение учётной записи"
+    description: "Создание или изменение учётной записи для доступа к консоли управления и терминальному серверу"
+    scope_of_work:
+      - "Создание/изменение учётной записи для доступа к консоли управления"
+      - "Создание/изменение учётной записи для доступа к терминальному серверу"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 4
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-004"
+    category: "service_request"
+    priority: 4
+    name: "Создание/изменение правила трансляции сетевых адресов"
+    description: "Создание или изменение на выделенном МСЭ правила трансляции сетевых адресов (NAT)"
+    scope_of_work:
+      - "Создание/изменение на выделенном МСЭ правила трансляции сетевых адресов"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 4
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-005"
+    category: "change_request"
+    priority: null
+    name: "Изменение параметров предоставляемой услуги"
+    description: "Изменение количественных характеристик тарифицируемых параметров услуги"
+    scope_of_work:
+      - "Изменение количественных характеристик тарифицируемых параметров услуги согласно billing/parameters.yml"
+    slt:
+      note: "Время реакции и приоритет определяются порядком реализации изменений (external-spec.md §2.8)"
+      reference: "external-spec.md#28-порядок-реализации-изменений"
+
+  - id: "REQ-TYPE-006"
+    category: "change_request"
+    priority: 4
+    name: "Создание/изменение виртуальной подсети (VLAN)"
+    description: "Создание виртуальной подсети (VLAN) либо изменение её номера"
+    scope_of_work:
+      - "Создание виртуальной подсети (VLAN) или изменение её номера"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 4
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-007"
+    category: "info_request"
+    priority: 4
+    name: "Предоставление отчёта об использовании"
+    description: "Формирование отчёта о текущем использовании вычислительных ресурсов"
+    scope_of_work:
+      - "Формирование отчёта о текущем использовании вычислительных ресурсов"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 16
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-008"
+    category: "info_request"
+    priority: 4
+    name: "Предоставление отчёта о правилах доступа"
+    description: "Формирование отчёта по используемым правилам межсетевого экранирования"
+    scope_of_work:
+      - "Формирование отчёта по используемым правилам межсетевого экранирования"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 16
+      processing: "business_hours"
+
+  - id: "REQ-TYPE-009"
+    category: "info_request"
+    priority: 4
+    name: "Предоставление нетипового отчёта"
+    description: "Формирование нетипового отчёта при наличии технической возможности"
+    scope_of_work:
+      - "Формирование нетипового отчёта при условии наличия технической возможности"
+    slt:
+      reaction_minutes: 30
+      resolution_hours: 16
+      processing: "business_hours"

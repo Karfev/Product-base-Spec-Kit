@@ -20,6 +20,18 @@ Fill `.specify/specs/$ARGUMENTS/plan.md` with:
 - **Rollout & rollback strategy**: reference `delivery/rollout.md`
 - **Risks**: technical risks and mitigations
 
+## Enterprise IS profile check
+
+If `requirements.yml` has `profile: enterprise`:
+
+4. Read `initiatives/*/decisions/` for ADRs related to IS ontology classification
+5. Check that `design.md` contains filled **«Архитектурные слои»** section (three layers: деятельности / приложений / технологический). If section is missing or has `{placeholders}`, suggest running `/speckit-architecture $ARGUMENTS_INITIATIVE` first.
+6. Check that `subsystem-classification.yaml` exists in the initiative directory. If missing, note it in the plan as a required action (needed for CI gate).
+7. Add to the plan a **IS Classification** section:
+   - Current classification codes (from `requirements.yml` metadata.classification or `subsystem-classification.yaml`)
+   - List of architecture views that need to be completed (status: `в работе` or missing)
+   - Reference: `domains/is-ontology/canonical-model/model.md`
+
 ## Rules
 - Each architecture choice MUST reference or propose a new ADR
 - Breaking API changes require a note: "run `make lint-contracts` to check oasdiff"

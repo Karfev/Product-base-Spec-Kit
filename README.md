@@ -67,6 +67,12 @@ For `oasdiff` (breaking change detection): see <https://github.com/oasdiff/oasdi
 ```bash
 ./tools/init.sh INIT-2026-042-my-feature 042-my-feature
 ```
+products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
+     L2                        L2.5                         L3
+(what we build)         (what we offer clients)      (how we improve it)
+```
+
+---
 
 This creates:
 
@@ -105,6 +111,31 @@ Choose a profile **by risk, not by size**.
 | **Minimal** | Low-risk / internal changes | prd.md, requirements.yml, CHANGELOG.md |
 | **Standard** | Most initiatives | + design.md, contracts/, decisions/, slo.yaml, prr-checklist.md |
 | **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
+| **Enterprise** | Large IS-class systems | + design.md (3-layer АИС ontology), architecture-views/, subsystem-classification.yaml |
+
+> Full profile artifact requirements and CI gate rules → `.specify/memory/constitution.md`
+
+## Enterprise IS Profile
+
+For large information systems following the АИС methodology (ArchiMate 3.2 / ГОСТ Р ИСО/МЭК 25020):
+
+```bash
+# Bootstrap enterprise initiative
+./tools/init.sh INIT-2026-NNN-my-system --profile enterprise
+
+# Fill architecture layers interactively (15 questions → Mermaid stubs)
+/speckit-architecture INIT-2026-NNN-my-system
+```
+
+**What you get:**
+- `design.md` — three-layer architecture (Activity / Application / Technology layer)
+- `subsystem-classification.yaml` — machine-readable classification codes (system scale, subsystem type, owner)
+- `architecture-views/` — stubs for all 11 view types (Д-1…О-1)
+- CI gate `validate-enterprise` — blocks PR if classification file is missing or invalid
+
+**Ontology domain:** `domains/is-ontology/` — glossary (~34 terms), canonical model, relationship taxonomy, NFR profile (ГОСТ 25020)
+
+**Demo:** `initiatives/INIT-2026-001-ontology-demo/` — complete Enterprise IS profile example
 
 The demo initiative (`INIT-2026-000-api-key-management`) uses the **Standard** profile.
 
@@ -202,8 +233,8 @@ Requirements run through standard CI gates at every step.
 
 ## Governance
 
-Full principles, CI gates strategy, ID conventions, and enforcement roadmap:
-→ `.specify/memory/constitution.md`
+Full principles, CI gates strategy, ID conventions, levels (L0–L5), and enforcement roadmap:
+→ [`.specify/memory/constitution.md`](./.specify/memory/constitution.md)
 
 **Ops → Spec feedback loop:** production incidents and SLO breaches trigger a spec update cycle —
 see the Feedback Loop section in the constitution.

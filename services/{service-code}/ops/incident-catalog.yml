@@ -1,0 +1,52 @@
+# Каталог инцидентов услуги.
+# Определяет классификацию, пороговые значения и SLT (время реакции/решения).
+# Schema: tools/schemas/incident-catalog.schema.json
+
+metadata:
+  service_code: "{service-code}"
+  version: "0.1.0"
+  last_updated: "{YYYY-MM-DD}"
+
+# Определение рабочих часов Исполнителя
+business_hours:
+  timezone: "{UTC+3|UTC+0|…}"
+  schedule: "{Пн–Пт 09:00–18:00}"
+
+incidents:
+  - priority: 1
+    description: "Критический инцидент — полная или частичная недоступность услуги"
+    thresholds:
+      # Перечислите пороговые значения, превышение которых квалифицирует инцидент как P1
+      - metric: "{метрика 1}"
+        condition: "{условие: > N мин / < N% / > N мс}"
+      - metric: "{метрика 2}"
+        condition: "{условие}"
+    slt:
+      reaction_minutes: {10}       # Максимальное время реакции (мин)
+      resolution_hours: {1.5}      # Максимальное время решения (ч)
+      processing: "24x7"           # Режим обработки
+
+  - priority: 2
+    description: "Значительное ухудшение качества услуги"
+    thresholds:
+      - metric: "{метрика 1}"
+        condition: "{условие}"
+    slt:
+      reaction_minutes: {15}
+      resolution_hours: {2}
+      processing: "24x7"
+
+  - priority: 3
+    description: "Незначительное ухудшение качества услуги"
+    thresholds:
+      - metric: "{метрика 1}"
+        condition: "{условие}"
+    slt:
+      reaction_minutes: {15}
+      resolution_hours: {4}
+      processing: "24x7"
+
+# Недоступность услуги фиксируется при наступлении одного или нескольких событий:
+unavailability_conditions:
+  - "{условие 1 наступления недоступности}"
+  - "{условие 2 — превышение времени решения инцидента P1}"

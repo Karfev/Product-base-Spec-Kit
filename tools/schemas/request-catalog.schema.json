@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/request-catalog.schema.json",
+  "title": "ops/request-catalog.yml schema (L2.5 Service)",
+  "description": "Validates ops/request-catalog.yml — каталог типовых запросов, приоритеты и SLT",
+  "type": "object",
+  "required": ["metadata", "requests"],
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["service_code", "version", "last_updated"],
+      "additionalProperties": true,
+      "properties": {
+        "service_code": { "type": "string", "minLength": 1 },
+        "version":      { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+        "last_updated": { "type": "string", "format": "date" }
+      }
+    },
+    "business_hours": {
+      "type": "object",
+      "properties": {
+        "timezone": { "type": "string" },
+        "schedule": { "type": "string" }
+      }
+    },
+    "requests": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/request_type" }
+    }
+  },
+  "$defs": {
+    "request_type": {
+      "type": "object",
+      "required": ["id", "category", "name", "description", "scope_of_work", "slt"],
+      "additionalProperties": false,
+      "properties": {
+        "id":          { "type": "string", "pattern": "^REQ-TYPE-[0-9]{3}$" },
+        "category":    { "type": "string", "enum": ["service_request", "change_request", "info_request"] },
+        "priority":    { "type": ["integer", "null"], "minimum": 1 },
+        "name":        { "type": "string", "minLength": 3 },
+        "description": { "type": "string", "minLength": 5 },
+        "scope_of_work": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "type": "string", "minLength": 3 }
+        },
+        "slt": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "reaction_minutes": { "type": "number", "minimum": 0 },
+            "resolution_hours": { "type": "number", "minimum": 0 },
+            "processing":       { "type": "string", "enum": ["24x7", "business_hours"] },
+            "note":             { "type": "string" },
+            "reference":        { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

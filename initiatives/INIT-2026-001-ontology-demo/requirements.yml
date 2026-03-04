@@ -1,0 +1,86 @@
+# Реестр требований инициативы.
+# Команда валидации: make validate
+metadata:
+  initiative: "INIT-2026-001-ontology-demo"
+  product: "platform"
+  owner: "@platform-team"
+  profile: "enterprise"
+  version: "0.1.0"
+  last_updated: "2026-03-03"
+  # Классификация подсистемы — см. subsystem-classification.yaml (единственный источник истины)
+
+requirements:
+  - id: "REQ-PLAT-001"
+    title: "Трёхслойная архитектурная документация"
+    type: "functional"
+    priority: "P1"
+    status: "approved"
+    description: >
+      Команды, разрабатывающие крупные ИС-подсистемы, ДОЛЖНЫ иметь возможность
+      описать архитектуру в трёх слоях (деятельности, приложений, технологическом)
+      с использованием стандартизированного словаря элементов и типов взаимосвязей.
+    acceptance_criteria:
+      - "Дано: инициатива с profile=enterprise, когда архитектор запускает /speckit-architecture, тогда создаются заготовки трёх слоёв и четырёх Mermaid-схем (Д-1, Д-3, П-1, Т-1)"
+      - "Дано: design.md с заполненными слоями, когда выполняется make validate, тогда нет ошибок"
+    trace:
+      adr:
+        - "PLAT-0002-is-ontology-integration"
+      architecture_views:
+        - "design.md#д-1"
+        - "design.md#п-1"
+
+  - id: "REQ-PLAT-002"
+    title: "Machine-readable классификация подсистемы"
+    type: "functional"
+    priority: "P0"
+    status: "approved"
+    description: >
+      Для инициатив с profile=enterprise ДОЛЖЕН существовать файл
+      subsystem-classification.yaml, валидируемый JSON Schema в CI,
+      содержащий коды классификации по онтологии АИС и статусы архитектурных представлений.
+    acceptance_criteria:
+      - "Дано: инициатива с profile=enterprise, когда отсутствует subsystem-classification.yaml, тогда CI job validate-enterprise падает с ошибкой"
+      - "Дано: subsystem-classification.yaml с корректными данными, когда запускается make validate, тогда валидация проходит"
+    trace:
+      schemas:
+        - "tools/schemas/subsystem-classification.schema.json"
+      architecture_views:
+        - "design.md#т-1"
+
+  - id: "REQ-PLAT-003"
+    title: "NFR: задержка валидации схемы"
+    type: "nfr"
+    priority: "P2"
+    status: "proposed"
+    description: >
+      Валидация requirements.yml + subsystem-classification.yaml в CI ДОЛЖНА
+      завершаться в течение 30 секунд для инициатив с до 100 требований.
+    metrics:
+      - name: "ci_validate_duration_s"
+        target: 30
+        measurement: "GitHub Actions job duration (seconds)"
+        iso_characteristic: "performance_efficiency"
+        iso_sub_characteristic: "time_behaviour"
+    trace:
+      slo: "ops/slo.yaml#ci-validation-latency"
+
+  - id: "REQ-PLAT-004"
+    title: "Качество: совместимость онтологии с SpecKit"
+    type: "quality"
+    priority: "P1"
+    status: "approved"
+    description: >
+      Онтологические артефакты (glossary.md, canonical-model/model.md, nfr/domain-nfr.md)
+      ДОЛЖНЫ обеспечивать функциональную совместимость со всеми существующими
+      initiatives и не нарушать существующую CI-валидацию.
+    metrics:
+      - name: "existing_requirements_validation_pass_rate"
+        target: 100
+        measurement: "make validate exit code 0 на всех initiatives/"
+        iso_characteristic: "compatibility"
+        iso_sub_characteristic: "interoperability"
+    trace:
+      adr:
+        - "PLAT-0002-is-ontology-integration"
+      architecture_views:
+        - "design.md#д-3"
