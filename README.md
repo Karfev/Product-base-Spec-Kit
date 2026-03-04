@@ -1,87 +1,71 @@
 # Product-base-Spec-Kit
 
-Build high-quality products faster.
+> A spec-driven artifact kit for B2B SaaS teams — machine-readable requirements,
+> CI-validated contracts, and a five-layer governance model from principles to evidence.
 
-A spec-driven artifact kit for B2B SaaS teams, built around the **Spec Constitution** — a governance system where machine-readable anchors (requirements, contracts, SLOs) are validated by CI gates.
-
----
-
-## What This Kit Does
-
-- Provides a **five-level hierarchy** (L0–L5) of templates for all product artifacts
-- Enforces **traceability by construction**: every requirement links to ADR, contract, schema, tests, and SLO
-- Validates artifacts automatically via **CI gates** (requirements schema, OpenAPI lint, breaking change diff, markdown lint)
-- Integrates with **Claude Code** via `/speckit.*` commands to guide spec authoring and task-based implementation
+![Validate Specs](https://github.com/Karfev/Product-base-Spec-Kit/actions/workflows/validate.yml/badge.svg)
+![Validate Contracts](https://github.com/Karfev/Product-base-Spec-Kit/actions/workflows/contracts.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
 ---
 
-## Structure
+## Why this kit?
+
+B2B SaaS teams accumulate disconnected specs — PRDs in Notion, contracts in Confluence,
+requirements in Jira, ADRs scattered across markdown. When any of these drift, integration
+bugs, compliance gaps, and slow onboarding follow.
+
+Product-base-Spec-Kit gives a team:
+
+- **One canonical place** for every artifact type (prd, requirements, contracts, ADRs, SLOs)
+- **Machine-readable requirements** (`requirements.yml`) validated by CI on every PR
+- **Traceability by construction** — REQ-IDs link L3 requirements to L4 specs to tests
+- **Risk-calibrated depth** — three profiles so low-risk changes stay lightweight
+- **Bootstrap in one command** — `./tools/init.sh` scaffolds a full initiative in seconds
+- **Claude Code integration** — `/speckit-*` commands guide spec → plan → tasks → implement
+
+---
+
+## Architecture — Five Layers
 
 ```text
-.specify/
-  memory/constitution.md          ← L0: Spec Constitution (principles, CI gates, ID schemes, profiles)
-  specs/{NNN}-{slug}/             ← L4: Feature spec-kit (spec / plan / tasks / trace)
+Layer  Location                          Purpose
+─────  ────────────────────────────────  ──────────────────────────────────────────────────
+L0     .specify/memory/constitution.md   Governance: principles, CI gates, ID conventions
+L1     domains/{domain}/                 Domain: glossary, canonical model, event catalog, NFR
+L2     products/{product}/               Product: architecture, product ADRs, NFR baseline
+L3     initiatives/{INIT-slug}/          Initiative: prd.md, requirements.yml, contracts/, ops/
+L4     .specify/specs/{NNN}-{slug}/      Feature: spec → plan → tasks → implement → trace
+L5     evidence/                         Evidence: CI-generated RTMs, reports (auto-populated)
+```
 
-domains/{domain}/            ← L1: Glossary, canonical model, event catalog, NFR
-products/{product}/          ← L2: Architecture, product ADR, NFR baseline
-services/{service-code}/     ← L2.5: External/Internal Service Spec, SLO, catalogs, billing, RSM
-initiatives/{INIT-slug}/     ← L3: PRD, requirements.yml, contracts, ops, decisions
+Supporting tooling:
 
-tools/
-  init.sh                         ← Bootstrap: create new initiative + L4 spec from templates
-  schemas/                        ← JSON Schema validators for requirements.yml
-  scripts/check-trace.py          ← REQ-ID consistency check: L3 ↔ L4
+```text
+tools/schemas/          JSON Schema validators for requirements.yml
+tools/scripts/          check-trace.py — REQ-ID consistency checker
+tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
+.github/workflows/      CI: validate.yml + contracts.yml
+Makefile                Local task runner (make check-all)
+```
 
-evidence/                         ← L5: CI-generated artifacts (RTM, coverage, PRR status)
+---
 
-## Claude Code commands
+## Quick Start
 
-All levels have dedicated `/speckit-*` commands. Use them instead of copying templates manually.
+### 1. Install tools
 
-### L0 — Governance
-| Command | What it does |
-|---|---|
-| `/speckit-constitution-review` | Audit all L1–L5 artifacts for compliance with the Spec Constitution |
+```bash
+make install-tools
+```
 
-### L1 — Domain
-| Command | What it does |
-|---|---|
-| `/speckit-domain-init <domain>` | Scaffold glossary, canonical model, event catalog, NFR |
-| `/speckit-domain-update <domain>` | Add terms, entities, or events with conflict detection |
+Installs: `yamllint`, `check-jsonschema`, `pyyaml`, `markdownlint-cli2`, `@redocly/cli`, `@asyncapi/cli`.
+For `oasdiff` (breaking change detection): see <https://github.com/oasdiff/oasdiff>
 
-### L2 — Product
-| Command | What it does |
-|---|---|
-| `/speckit-product-init <product>` | Scaffold arc42 architecture, NFR baseline, decisions/ |
-| `/speckit-adr-product <product>` | Create a Product ADR in MADR format via guided questions |
-| `/speckit-nfr-baseline <product>` | Define NFR targets and surface conflicts with L3 requirements |
+### 2. Bootstrap a new initiative
 
-### L3 — Initiative
-| Command | What it does |
-|---|---|
-| `/speckit-profile <INIT-slug>` | Select Minimal / Standard / Extended via risk assessment |
-| `/speckit-init <INIT-slug>` | Scaffold full initiative folder for the chosen profile |
-| `/speckit-prd <INIT-slug>` | Write the PRD with structured questions |
-| `/speckit-requirements <INIT-slug>` | Fill requirements.yml, assign REQ-IDs, run `make validate` |
-| `/speckit-contracts <INIT-slug>` | Generate OpenAPI 3.1 / AsyncAPI 3.0 stubs from requirements.yml |
-
-### L4 — Feature spec
-| Command | What it does |
-|---|---|
-| `/speckit-specify <NNN>-<slug>` | Create or update spec.md |
-| `/speckit-plan <NNN>-<slug>` | Generate plan.md from filled spec.md |
-| `/speckit-tasks <NNN>-<slug>` | Generate tasks.md from filled plan.md |
-| `/speckit-implement <NNN>-<slug>` | Guide task-by-task implementation (RED → GREEN) |
-| `/speckit-trace <NNN>-<slug>` | Build trace.md RTM and verify with `make check-trace` |
-
-### L5 — Evidence
-| Command | What it does |
-|---|---|
-| `/speckit-rtm <INIT-slug>` | Build the Requirements Traceability Matrix for an initiative |
-| `/speckit-prr-status <INIT-slug>` | Review PRR checklist — DONE / OPEN / BLOCKING |
-| `/speckit-evidence <INIT-slug>` | Generate full evidence report (RTM coverage, PRR status) |
-
-**How the levels connect:**
+```bash
+./tools/init.sh INIT-2026-042-my-feature 042-my-feature
 ```
 products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
      L2                        L2.5                         L3
@@ -90,77 +74,42 @@ products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
 
 ---
 
-## Quick start
+This creates:
 
-1. **New initiative (L3):**
-   ```bash
-   ./tools/init.sh INIT-2026-042-my-feature [042-my-feature]
-   # или с профилем enterprise:
-   ./tools/init.sh INIT-2026-042-my-feature 042-my-feature --profile enterprise
-   ```
+- `initiatives/INIT-2026-042-my-feature/` — full L3 scaffold (prd.md, requirements.yml, contracts/, ops/, decisions/)
+- `.specify/specs/042-my-feature/` — L4 spec scaffold (spec.md, plan.md, tasks.md, trace.md)
 
-2. **New feature spec (L4):**
-   ```bash
-   cp -r .specify/specs/{NNN}-{slug}/ .specify/specs/042-my-feature/
-   # Fill spec.md → plan.md → tasks.md
-   ```
+### 3. Edit requirements and validate
 
-3. **Validate all requirements.yml:**
-   ```bash
-   make validate
-   ```
-
-4. **Lint OpenAPI contract:**
-   ```bash
-   redocly lint initiatives/INIT-2026-042-my-feature/contracts/openapi.yaml
-   ```
-### New initiative (L3)
 ```bash
-cp -r "initiatives/{INIT-YYYY-NNN-slug}/" initiatives/INIT-2026-042-my-feature/
-# Edit all {placeholder} values
-make validate
+# Edit initiatives/INIT-2026-042-my-feature/requirements.yml
+make validate        # blocks on schema errors
+make check-trace     # checks REQ-ID consistency L3 ↔ L4
 ```
 
-### New service spec (L2.5)
-```bash
-cp -r "services/{service-code}/" services/my-service/
-# Fill README.md → external-spec.md → requirements.yml → ops/* → billing/*
-make validate-services
+### 4. (Optional) Use Claude Code to fill the spec
+
+```text
+/speckit-specify 042-my-feature
 ```
 
-### New feature spec (L4)
-```bash
-cp -r ".specify/specs/{NNN}-{slug}/" .specify/specs/042-my-feature/
-# Fill spec.md → plan.md → tasks.md
-```
+See [Claude Code Integration](#claude-code-integration) for the full workflow.
 
-### Validate everything
-```bash
-make check-all          # requirements + services + lint + contracts + trace
-make validate-services  # service artifacts only (billing, incidents, requests, SLO)
-make validate           # initiative requirements only
-make lint-docs          # YAML + Markdown hygiene
-make lint-contracts     # OpenAPI + AsyncAPI
-```
+### See the demo
+
+A fully worked Standard-profile initiative lives at:
+`initiatives/INIT-2026-000-api-key-management/`
 
 ---
 
 ## Profiles
 
-### Initiatives (L3)
+Choose a profile **by risk, not by size**.
 
-| Profile | When | Key artifacts |
+| Profile | When to use | Required artifacts |
 |---|---|---|
-| **Minimal** | Low-risk changes | `prd.md`, `requirements.yml`, `CHANGELOG.md` |
-| **Standard** | Most initiatives | + `design.md`, `contracts/`, ADR, `slo.yaml`, `prr-checklist.md` |
-| **Extended** | High-risk / regulated | + `threat-model.md`, `nfr-validation.md`, `migration.md`, `compliance/` |
-
-### Services (L2.5)
-
-| Profile | When | Key artifacts |
-|---|---|---|
-| **Minimal** | Low-risk changes | prd.md, requirements.yml, CHANGELOG.md |
-| **Standard** | Most initiatives | + design.md, contracts/, ADR, slo.yaml, prr-checklist.md |
+| **Minimal** | Low-risk / internal changes | prd.md, requirements.yml, CHANGELOG.md |
+| **Standard** | Most initiatives | + design.md, contracts/, decisions/, slo.yaml, prr-checklist.md |
 | **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
 | **Enterprise** | Large IS-class systems | + design.md (3-layer АИС ontology), architecture-views/, subsystem-classification.yaml |
 
@@ -188,11 +137,110 @@ For large information systems following the АИС methodology (ArchiMate 3.2 / 
 
 **Demo:** `initiatives/INIT-2026-001-ontology-demo/` — complete Enterprise IS profile example
 
+The demo initiative (`INIT-2026-000-api-key-management`) uses the **Standard** profile.
+
+---
+
+## CI Gates
+
+Two GitHub Actions workflows run on every PR and push to `main`.
+
+### validate.yml — Core
+
+| Check | Tool | Mode |
+|---|---|---|
+| `requirements.yml` JSON Schema | `check-jsonschema` | Blocking |
+| REQ-ID traceability (L3 ↔ L4) | `check-trace.py` | Blocking |
+| YAML hygiene | `yamllint` | Warning → blocking |
+| Markdown hygiene | `markdownlint-cli2` | Warning → blocking |
+
+### contracts.yml — Contracts (on `initiatives/**/contracts/**` changes)
+
+| Check | Tool | Mode |
+|---|---|---|
+| OpenAPI lint | `redocly lint` | Blocking on errors |
+| OpenAPI breaking change diff | `oasdiff` | Warning → blocking |
+| AsyncAPI validation | `asyncapi validate` | Warning → blocking |
+
+Run all checks locally:
+
+```bash
+make check-all
+```
+
+---
+
+## Local Commands
+
+```bash
+make help            # List all commands
+make validate        # Validate all requirements.yml against JSON Schema
+make lint-docs       # Lint YAML and Markdown files (warning mode)
+make lint-contracts  # Validate OpenAPI and AsyncAPI contracts
+make check-trace     # Check REQ-ID consistency (L3 requirements.yml ↔ L4 trace.md)
+make check-all       # Run all validation checks
+make install-tools   # Install all required validation tools
+```
+
+---
+
+## Claude Code Integration
+
+This repository ships four Claude Code slash commands (`.claude/commands/`).
+They guide you through the L4 spec-driven workflow step by step.
+
+| Command | What it does |
+|---|---|
+| `/speckit-specify <NNN>-<slug>` | Create or update `spec.md` — scope, user stories, acceptance criteria |
+| `/speckit-plan <NNN>-<slug>` | Generate `plan.md` — technical approach from spec |
+| `/speckit-tasks <NNN>-<slug>` | Generate `tasks.md` — implementation tasks with test-first order |
+| `/speckit-implement <NNN>-<slug>` | Guide task-by-task implementation, update `trace.md` |
+
+### Typical L4 workflow with Claude Code
+
+```bash
+./tools/init.sh INIT-2026-042-my-feature 042-my-feature   # scaffold
+```
+
+Then in Claude Code:
+
+```text
+/speckit-specify 042-my-feature   # fill spec.md
+/speckit-plan 042-my-feature      # fill plan.md
+/speckit-tasks 042-my-feature     # fill tasks.md
+/speckit-implement 042-my-feature # implement + trace
+```
+
+Requirements run through standard CI gates at every step.
+
+---
+
+## Key Artifacts
+
+| Artifact | Format | Purpose |
+|---|---|---|
+| `requirements.yml` | YAML (JSON Schema validated) | Machine-readable requirements with REQ-IDs, priority, status, trace |
+| `prd.md` | Markdown | Product Requirements Document (narrative) |
+| `design.md` | Markdown (arc42-lite) | Architecture document |
+| `contracts/openapi.yaml` | OpenAPI 3.1.1 | REST API contract |
+| `contracts/asyncapi.yaml` | AsyncAPI 3.0 | Event / message contract |
+| `decisions/*.md` | MADR | Architecture Decision Records |
+| `ops/slo.yaml` | OpenSLO v1 | Service Level Objectives |
+| `ops/prr-checklist.md` | Markdown | Production Readiness Review checklist |
+| `.specify/specs/{N}/trace.md` | Markdown table | REQ-ID traceability matrix (L3 ↔ L4) |
+
+---
+
 ## Governance
 
 Full principles, CI gates strategy, ID conventions, levels (L0–L5), and enforcement roadmap:
 → [`.specify/memory/constitution.md`](./.specify/memory/constitution.md)
 
-## Design Document
+**Ops → Spec feedback loop:** production incidents and SLO breaches trigger a spec update cycle —
+see the Feedback Loop section in the constitution.
 
-→ [`docs/plans/2026-02-28-spec-kit-file-structure-design.md`](./docs/plans/2026-02-28-spec-kit-file-structure-design.md)
+To contribute a change to the kit itself, open a PR with:
+
+1. Updated artifact(s)
+2. `make check-all` passing
+3. An ADR in `decisions/` if the change affects architecture or conventions
