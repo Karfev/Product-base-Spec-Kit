@@ -38,10 +38,6 @@ jobs:
   validate-enterprise:
     name: Validate Enterprise IS classification (blocking)
     runs-on: ubuntu-latest
-  validate-services:
-    name: Validate service artifacts (L2.5) — warning mode
-    runs-on: ubuntu-latest
-    continue-on-error: true   # warning mode → станет blocking после 2 недель (см. конституцию)
     steps:
       - uses: actions/checkout@v4
 
@@ -76,7 +72,19 @@ jobs:
           done
           exit $failed
 
-        run: pip install check-jsonschema
+  validate-services:
+    name: Validate service artifacts (L2.5) — warning mode
+    runs-on: ubuntu-latest
+    continue-on-error: true   # warning mode → станет blocking после 2 недель (см. конституцию)
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install check-jsonschema pyyaml
 
       - name: Validate service requirements.yml
         run: |
