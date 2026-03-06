@@ -1,3 +1,4 @@
+---
 apiVersion: openslo/v1
 kind: DataSource
 metadata:
@@ -34,6 +35,37 @@ spec:
   objectives:
     - target: 0.95
       value: 10
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: api-key-auth-availability-sli
+spec:
+  thresholdMetric:
+    source: platform-prometheus
+    queryType: promql
+    query: >
+      1 - (
+        sum(rate(http_requests_total{handler="/api-keys",status=~"5.."}[5m]))
+        /
+        sum(rate(http_requests_total{handler="/api-keys"}[5m]))
+      )
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: api-key-auth-availability
+spec:
+  sli:
+    metadata:
+      name: api-key-auth-availability-sli
+  objectives:
+    - target: 0.999
+      value: 0.999
   timeWindow:
     - duration: 30d
       isRolling: true

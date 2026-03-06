@@ -1,6 +1,6 @@
 # Rollout Plan: INIT-2026-000-api-key-management
 
-**Профиль:** Standard
+**Профиль:** Extended
 **Последнее обновление:** 2026-03-01
 
 ## Стратегия развёртывания
@@ -24,6 +24,7 @@
   - `auth_p95_ms > 50ms` за 5 минут → critical (triager PagerDuty)
   - `key_creation_error_rate > 1%` за 5 минут → critical
 - SLO: `ops/slo.yaml#api-key-auth-latency`
+- SLO: `ops/slo.yaml#api-key-auth-availability`
 
 ## Rollback
 
