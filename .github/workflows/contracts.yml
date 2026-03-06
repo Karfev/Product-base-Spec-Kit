@@ -14,6 +14,8 @@ jobs:
   validate-openapi:
     name: OpenAPI lint + breaking diff
     runs-on: ubuntu-latest
+    env:
+      CONTRACTS_ENFORCEMENT_MODE: ${{ github.event_name == 'pull_request' && 'pr' || 'release' }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -35,22 +37,25 @@ jobs:
           done
           exit $failed
 
-      - name: Check breaking changes with oasdiff (warning mode)
-        continue-on-error: true
+      - name: Check breaking changes with oasdiff (blocking)
         run: |
+          echo "Contracts enforcement mode: ${CONTRACTS_ENFORCEMENT_MODE}"
           go install github.com/oasdiff/oasdiff@latest
           export PATH=$PATH:$(go env GOPATH)/bin
+          failed=0
           for f in $(find initiatives -name openapi.yaml | grep -v '{'); do
             base=$(git show origin/main:"$f" 2>/dev/null) || continue
             echo "$base" > /tmp/base-openapi.yaml
             echo "Checking breaking changes: $f"
-            oasdiff breaking /tmp/base-openapi.yaml "$f" || true
+            oasdiff breaking /tmp/base-openapi.yaml "$f" || failed=1
           done
+          exit $failed
 
   validate-asyncapi:
-    name: AsyncAPI validate (warning mode)
+    name: AsyncAPI validate (PR warning / release blocking)
     runs-on: ubuntu-latest
-    continue-on-error: true
+    env:
+      ASYNCAPI_ENFORCEMENT_MODE: ${{ github.event_name == 'pull_request' && 'warning' || 'blocking' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -63,7 +68,15 @@ jobs:
 
       - name: Validate AsyncAPI specs
         run: |
+          echo "AsyncAPI enforcement mode: ${ASYNCAPI_ENFORCEMENT_MODE}"
+          failed=0
           for f in $(find initiatives -name asyncapi.yaml | grep -v '{'); do
             echo "Validating $f..."
-            asyncapi validate "$f" || true
+            if ! asyncapi validate "$f"; then
+              failed=1
+            fi
           done
+
+          if [ "$ASYNCAPI_ENFORCEMENT_MODE" = "blocking" ]; then
+            exit $failed
+          fi

@@ -158,11 +158,15 @@ Two GitHub Actions workflows run on every PR and push to `main`.
 
 ### contracts.yml — Contracts (on `initiatives/**/contracts/**` changes)
 
-| Check | Tool | Mode |
-|---|---|---|
-| OpenAPI lint | `redocly lint` | Blocking on errors |
-| OpenAPI breaking change diff | `oasdiff` | Warning → blocking |
-| AsyncAPI validation | `asyncapi validate` | Warning → blocking |
+| Check | Tool | PR mode | Release mode |
+|---|---|---|---|
+| OpenAPI lint | `redocly lint` | Blocking on errors | Blocking |
+| OpenAPI breaking change diff | `oasdiff` | Blocking | Blocking |
+| AsyncAPI validation | `asyncapi validate` | Warning (non-blocking via `ASYNCAPI_ENFORCEMENT_MODE=warning`) | Blocking (`ASYNCAPI_ENFORCEMENT_MODE=blocking`) |
+
+`contracts.yml` sets an explicit enforcement switch from GitHub event context:
+- `CONTRACTS_ENFORCEMENT_MODE=pr|release` (transparency for OpenAPI gates)
+- `ASYNCAPI_ENFORCEMENT_MODE=warning|blocking` (PR warning vs release blocking)
 
 Run all checks locally:
 
