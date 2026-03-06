@@ -35,6 +35,9 @@ jobs:
       - name: Check .specify docs structure (blocking)
         run: python tools/scripts/check-spec-structure.py
 
+      - name: Check .specify docs quality (policy-driven)
+        run: python tools/scripts/check-spec-quality.py --needs-clarification-policy blocking
+
   validate-enterprise:
     name: Validate Enterprise IS classification (blocking)
     runs-on: ubuntu-latest
