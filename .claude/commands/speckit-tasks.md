@@ -9,22 +9,26 @@ You are generating a concrete task list for `.specify/specs/$ARGUMENTS/`.
 
 1. Read `.specify/specs/$ARGUMENTS/plan.md` (must be filled — no `{placeholders}`)
 2. Read `.specify/specs/$ARGUMENTS/spec.md` for requirements and acceptance criteria
-3. Fill `.specify/specs/$ARGUMENTS/tasks.md`:
+3. Read `docs/testing/test-strategy.md` and use its matrix when writing test tasks.
+4. Fill `.specify/specs/$ARGUMENTS/tasks.md`:
 
 ```
 T1: Update/add contract (OpenAPI/AsyncAPI) + run make lint-contracts
-T2a: Write failing tests (unit + contract при Standard/Extended) — RED
+T2a: Write failing tests per test-strategy matrix — RED (run: make test-unit + make test-contract for Standard/Extended)
 T2b: Implement — GREEN
-T3: Integration tests in real environment (если применимо)
+T3: Integration tests in real environment (если применимо) — run make test-integration
 T4: Observability — add metrics/alerts, update ops/slo.yaml
-T5: Update trace.md + changelog/CHANGELOG.md, run make check-trace
+T5: Update trace.md + changelog/CHANGELOG.md, run make check-trace (and keep links to executed test commands)
 T6: Complete PRR checklist items from ops/prr-checklist.md
 ```
 
-For each task, add specific file paths, test names, and metric names from the plan.
+For each task, add specific file paths, test names, metric names, and exact commands from `docs/testing/test-strategy.md`.
 
 ## Rules
 - T2a MUST come before T2b — failing tests first (Test-First / RED → GREEN)
 - T3 uses realistic environments (real DB, real services) — no mocks
+- T2a must include explicit commands (`make test-unit`, `make test-contract` when applicable)
+- T3 must include explicit command `make test-integration` when applicable
+- T5 must include explicit command `make check-trace`
 - After filling tasks.md, run: `make check-trace` to verify REQ-ID consistency
 - Check the DoD table at the bottom — fill the profile column for this feature

@@ -4,7 +4,12 @@
 PYTHON := python3
 SHELL  := /bin/bash
 
-.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-all install-tools
+TEST_UNIT_CMD ?= echo "Set TEST_UNIT_CMD, e.g. 'pytest -m unit'" && exit 1
+TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && exit 1
+TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
+TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
+
+.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-all install-tools test-unit test-contract test-integration test-perf
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -76,6 +81,19 @@ lint-contracts: ## Validate OpenAPI and AsyncAPI contracts
 check-trace: ## Check REQ-ID consistency (L3 requirements.yml <-> L4 trace.md)
 	@echo "==> Checking REQ-ID consistency..."
 	@$(PYTHON) tools/scripts/check-trace.py
+
+
+test-unit: ## Run unit tests (override TEST_UNIT_CMD)
+	@bash -lc '$(TEST_UNIT_CMD)'
+
+test-contract: ## Run contract tests (override TEST_CONTRACT_CMD)
+	@bash -lc '$(TEST_CONTRACT_CMD)'
+
+test-integration: ## Run integration tests (override TEST_INTEGRATION_CMD)
+	@bash -lc '$(TEST_INTEGRATION_CMD)'
+
+test-perf: ## Run performance tests (override TEST_PERF_CMD)
+	@bash -lc '$(TEST_PERF_CMD)'
 
 check-all: validate validate-services lint-docs lint-contracts check-trace ## Run all validation checks
 	@echo ""
