@@ -4,14 +4,16 @@
 **Initiative:** {INIT-YYYY-NNN-slug}
 **Owner:** @{engineer-or-team}
 
+> Test strategy matrix: `docs/testing/test-strategy.md`
+
 ## Task list
 
 - [ ] **T1:** Добавить/обновить контракт (OpenAPI/AsyncAPI) + прогнать линтеры локально (`make lint-contracts`)
-- [ ] **T2a:** Написать тесты (unit + contract при Standard/Extended) — убедиться что тесты **падают** (RED)
+- [ ] **T2a:** Написать тесты по матрице из `docs/testing/test-strategy.md` (unit + contract при Standard/Extended) — убедиться что тесты **падают** (RED), выполнить: `make test-unit` (+ `make test-contract` при необходимости)
 - [ ] **T2b:** Реализовать изменение (код) — убедиться что тесты **зелёные** (GREEN)
-- [ ] **T3:** Интеграционные тесты в реальном окружении (если применимо)
+- [ ] **T3:** Интеграционные тесты в реальном окружении (если применимо), выполнить: `make test-integration`
 - [ ] **T4:** Observability — добавить метрики/алерты, обновить `ops/slo.yaml` (Standard/Extended)
-- [ ] **T5:** Обновить `trace.md` + `changelog/CHANGELOG.md`
+- [ ] **T5:** Обновить `trace.md` + `changelog/CHANGELOG.md`, выполнить: `make check-trace`
 - [ ] **T6:** Пройти PRR пункты из `ops/prr-checklist.md` (Standard/Extended)
 
 ## Definition of done (по профилю)
