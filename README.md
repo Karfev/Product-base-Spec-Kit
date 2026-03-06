@@ -85,6 +85,7 @@ This creates:
 # Edit initiatives/INIT-2026-042-my-feature/requirements.yml
 make validate        # blocks on schema errors
 make check-trace     # checks REQ-ID consistency L3 ↔ L4
+make check-release-rollout # Validate rollout/migration consistency vs ops/slo.yaml + ops/prr-checklist.md
 ```
 
 ### 4. (Optional) Use Claude Code to fill the spec
@@ -178,6 +179,7 @@ make validate        # Validate all requirements.yml against JSON Schema
 make lint-docs       # Lint YAML and Markdown files (warning mode)
 make lint-contracts  # Validate OpenAPI and AsyncAPI contracts
 make check-trace     # Check REQ-ID consistency (L3 requirements.yml ↔ L4 trace.md)
+make check-release-rollout # Validate rollout/migration consistency vs ops/slo.yaml + ops/prr-checklist.md
 make check-all       # Run all validation checks
 make install-tools   # Install all required validation tools
 ```
@@ -186,7 +188,7 @@ make install-tools   # Install all required validation tools
 
 ## Claude Code Integration
 
-This repository ships four Claude Code slash commands (`.claude/commands/`).
+This repository ships Claude Code slash commands (`.claude/commands/`) including a release-rollout gate helper.
 They guide you through the L4 spec-driven workflow step by step.
 
 | Command | What it does |
@@ -195,6 +197,7 @@ They guide you through the L4 spec-driven workflow step by step.
 | `/speckit-plan <NNN>-<slug>` | Generate `plan.md` — technical approach from spec |
 | `/speckit-tasks <NNN>-<slug>` | Generate `tasks.md` — implementation tasks with test-first order |
 | `/speckit-implement <NNN>-<slug>` | Guide task-by-task implementation, update `trace.md` |
+| `/speckit-release-rollout <INIT-YYYY-NNN-slug>` | Build release rollout package (`delivery/rollout.md`, migration for Extended/Enterprise), validate SLO/PRR consistency |
 
 ### Typical L4 workflow with Claude Code
 
@@ -209,6 +212,7 @@ Then in Claude Code:
 /speckit-plan 042-my-feature      # fill plan.md
 /speckit-tasks 042-my-feature     # fill tasks.md
 /speckit-implement 042-my-feature # implement + trace
+/speckit-release-rollout INIT-2026-042-my-feature # finalize rollout/migration + consistency checks before release
 ```
 
 Requirements run through standard CI gates at every step.

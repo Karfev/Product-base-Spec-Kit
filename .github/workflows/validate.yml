@@ -32,6 +32,9 @@ jobs:
       - name: Check REQ-ID traceability (L3 ↔ L4)
         run: python tools/scripts/check-trace.py
 
+      - name: Check .specify docs structure (blocking)
+        run: python tools/scripts/check-spec-structure.py
+
   validate-enterprise:
     name: Validate Enterprise IS classification (blocking)
     runs-on: ubuntu-latest
