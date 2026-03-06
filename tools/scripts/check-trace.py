@@ -46,12 +46,15 @@ def parse_requirements_yml(path: Path) -> dict:
 
 def parse_trace_md(path: Path) -> list:
     """Parse trace.md table. Returns list of REQ-IDs found."""
-    pattern = re.compile(r'\|\s*(REQ-[A-Z0-9]{2,16}-[0-9]{3})\s*\|')
+    pattern = re.compile(r'\|\s*`?(REQ-[A-Z0-9]{2,16}-[0-9]{3})`?\s*\|')
     req_ids = []
     for line in path.read_text().splitlines():
         m = pattern.search(line)
         if m:
-            req_ids.append(m.group(1))
+            req_id = m.group(1)
+            if '{' in req_id or '}' in req_id:
+                continue
+            req_ids.append(req_id)
     return req_ids
 
 
@@ -63,6 +66,7 @@ def main():
 
     errors = []
     warnings = []
+    total_l4_req_refs = 0
 
     # Build L3 registry: {req_id: has_evidence}
     all_req_ids = {}
@@ -87,6 +91,7 @@ def main():
             continue
         try:
             l4_req_ids = parse_trace_md(trace_file)
+            total_l4_req_refs += len(l4_req_ids)
             for req_id in l4_req_ids:
                 if req_id not in all_req_ids:
                     errors.append(
@@ -102,12 +107,21 @@ def main():
         print(e)
 
     if errors:
-        print(f"\n❌ check-trace: {len(errors)} error(s), {len(warnings)} warning(s)")
+        print(
+            f"\n❌ check-trace: {len(errors)} error(s), {len(warnings)} warning(s), "
+            f"{total_l4_req_refs} REQ-ID(s) found in L4"
+        )
         sys.exit(1)
     elif warnings:
-        print(f"\n⚠️  check-trace: 0 errors, {len(warnings)} warning(s)")
+        print(
+            f"\n⚠️  check-trace: 0 errors, {len(warnings)} warning(s), "
+            f"{total_l4_req_refs} REQ-ID(s) found in L4"
+        )
     else:
-        print("✅ check-trace: all REQ-ID references are consistent")
+        print(
+            "✅ check-trace: all REQ-ID references are consistent "
+            f"({total_l4_req_refs} REQ-ID(s) found in L4)"
+        )
 
 
 if __name__ == '__main__':
