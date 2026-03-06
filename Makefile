@@ -4,7 +4,7 @@
 PYTHON := python3
 SHELL  := /bin/bash
 
-.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-all install-tools
+.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-spec-structure check-all install-tools
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -77,7 +77,11 @@ check-trace: ## Check REQ-ID consistency (L3 requirements.yml <-> L4 trace.md)
 	@echo "==> Checking REQ-ID consistency..."
 	@$(PYTHON) tools/scripts/check-trace.py
 
-check-all: validate validate-services lint-docs lint-contracts check-trace ## Run all validation checks
+check-spec-structure: ## Check required headings in .specify spec/plan/tasks files
+	@echo "==> Checking spec docs structure..."
+	@$(PYTHON) tools/scripts/check-spec-structure.py
+
+check-all: validate validate-services lint-docs lint-contracts check-trace check-spec-structure ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
 
