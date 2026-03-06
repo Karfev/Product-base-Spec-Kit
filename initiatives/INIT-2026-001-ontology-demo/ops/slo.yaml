@@ -1,0 +1,22 @@
+---
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: platform-prometheus
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: http://prometheus.platform.internal
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: ci-validation-latency
+spec:
+  objectives:
+    - target: 0.95
+      value: 30
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences

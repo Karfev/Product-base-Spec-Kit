@@ -4,9 +4,10 @@
 from __future__ import annotations
 
 import argparse
-import re
 import sys
 from pathlib import Path
+
+import yaml
 
 
 def parse_args() -> argparse.Namespace:
@@ -37,10 +38,22 @@ def parse_profile(requirements_file: Path) -> str:
     if not requirements_file.exists():
         return "standard"
 
-    for line in requirements_file.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"\s*profile:\s*\"?([a-zA-Z]+)\"?", line)
-        if m:
-            return m.group(1).strip().lower()
+    try:
+        requirements_doc = yaml.safe_load(requirements_file.read_text(encoding="utf-8"))
+    except yaml.YAMLError:
+        return "standard"
+
+    if not isinstance(requirements_doc, dict):
+        return "standard"
+
+    metadata = requirements_doc.get("metadata")
+    if not isinstance(metadata, dict):
+        return "standard"
+
+    profile = metadata.get("profile")
+    if isinstance(profile, str) and profile.strip():
+        return profile.strip().lower()
+
     return "standard"
 
 
@@ -48,15 +61,24 @@ def extract_slo_ids(slo_file: Path) -> list[str]:
     if not slo_file.exists():
         return []
 
-    text = slo_file.read_text(encoding="utf-8")
-    docs = re.split(r"\n---\n", text)
     ids: list[str] = []
+    try:
+        docs = yaml.safe_load_all(slo_file.read_text(encoding="utf-8"))
+    except yaml.YAMLError:
+        return []
+
     for doc in docs:
-        if re.search(r"^kind:\s*SLO\s*$", doc, flags=re.MULTILINE) is None:
+        if not isinstance(doc, dict) or doc.get("kind") != "SLO":
             continue
-        m = re.search(r"^\s*name:\s*([a-zA-Z0-9_.-]+)\s*$", doc, flags=re.MULTILINE)
-        if m:
-            ids.append(m.group(1))
+
+        metadata = doc.get("metadata")
+        if not isinstance(metadata, dict):
+            continue
+
+        name = metadata.get("name")
+        if isinstance(name, str) and name.strip():
+            ids.append(name.strip())
+
     return ids
 
 
