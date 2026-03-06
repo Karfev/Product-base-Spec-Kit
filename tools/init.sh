@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Bootstrap a new initiative + L4 spec from templates.
+# Bootstrap a new initiative + L4 spec from canonical templates.
 # Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise]
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --profile enterprise
 set -euo pipefail
@@ -143,6 +143,7 @@ if [[ -n "$FEATURE_SLUG" ]]; then
       echo "Warning: $TARGET_SPEC already exists, skipping"
     else
       cp -r "$TEMPLATE_SPEC" "$TARGET_SPEC"
+      # Copy canonical L4 template as-is; only substitute placeholders.
       find "$TARGET_SPEC" -type f | while read -r f; do
         sed -i.bak "s|{INIT-YYYY-NNN-slug}|$INITIATIVE_ID|g" "$f"
         sed -i.bak "s|{NNN}-{slug}|$FEATURE_SLUG|g" "$f"

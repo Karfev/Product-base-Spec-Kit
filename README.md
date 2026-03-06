@@ -78,6 +78,7 @@ This creates:
 
 - `initiatives/INIT-2026-042-my-feature/` — full L3 scaffold (prd.md, requirements.yml, contracts/, ops/, decisions/)
 - `.specify/specs/042-my-feature/` — L4 spec scaffold (spec.md, plan.md, tasks.md, trace.md)
+- `.specify/specs/{NNN}-{slug}/spec.md` follows canonical sections: Scope, Non-goals, API/Contracts, Test strategy, Rollout (plus Summary, Requirements, Acceptance criteria).
 
 ### 3. Edit requirements and validate
 
@@ -191,7 +192,7 @@ They guide you through the L4 spec-driven workflow step by step.
 
 | Command | What it does |
 |---|---|
-| `/speckit-specify <NNN>-<slug>` | Create or update `spec.md` — scope, user stories, acceptance criteria |
+| `/speckit-specify <NNN>-<slug>` | Create or update `spec.md` in canonical format (Scope, Non-goals, API/Contracts, Test strategy, Rollout) |
 | `/speckit-plan <NNN>-<slug>` | Generate `plan.md` — technical approach from spec |
 | `/speckit-tasks <NNN>-<slug>` | Generate `tasks.md` — implementation tasks with test-first order |
 | `/speckit-implement <NNN>-<slug>` | Guide task-by-task implementation, update `trace.md` |

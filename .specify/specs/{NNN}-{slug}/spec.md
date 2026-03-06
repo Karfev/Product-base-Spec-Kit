@@ -14,13 +14,30 @@
 
 {Почему нужно; ссылка на PRD: `../../../initiatives/{INIT}/prd.md`}
 
-## Scope / Non-goals
+## Scope
 
-**In-scope:**
 - {…}
 
-**Non-goals:**
+## Non-goals
+
 - {…}
+
+## API/Contracts
+
+- {Какие API/события/схемы затронуты; ссылки на `initiatives/{INIT}/contracts/*`}
+- {Если изменений нет — явно указать `No contract changes`}
+
+## Test strategy
+
+- Unit: {…}
+- Integration/contract: {…}
+- E2E/acceptance: {…}
+
+## Rollout
+
+- Flag/guardrail: {…}
+- Migration/backfill: {…}
+- Monitoring/rollback: {…}
 
 ## User stories
 
