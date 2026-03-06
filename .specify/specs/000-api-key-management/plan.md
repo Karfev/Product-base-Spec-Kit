@@ -41,6 +41,13 @@
 - Трейсы: span `auth.api_key.validate` с атрибутами `cache.hit`, `key.expired`
 - SLO: `ops/slo.yaml#api-key-auth-latency` — новый SLO, создаём (REQ-AUTH-004)
 
+## Test strategy
+
+- Unit: покрыть `KeyService` и `AuthMiddleware` happy-path и edge-кейсы (revoked/expired/not_found)
+- Contract: проверить соответствие OpenAPI по `GET/POST/DELETE /api-keys`
+- Integration: проверить revocation propagation < 60s на PostgreSQL + Redis
+- Performance: smoke-нагрузка auth-path с подтверждением P95 < 10ms
+
 ## Rollout & rollback
 
 - Feature flag: `platform.api_keys.enabled` — поэтапное включение через LaunchDarkly
