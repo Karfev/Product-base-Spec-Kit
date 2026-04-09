@@ -18,32 +18,36 @@ products/{product}/          ← L2: Architecture, product ADR, NFR baseline
 initiatives/{INIT-slug}/     ← L3: PRD, requirements.yml, contracts, ops, decisions
 
 tools/schemas/               ← CI validators (JSON Schema)
+tools/scripts/               ← CI scripts (check-trace, collect-evidence)
 evidence/                    ← L5: CI-generated artifacts (RTM, reports)
 ```
 
 ## Quick start
 
-1. **New initiative (L3):**
+1. **Bootstrap a new initiative + feature spec:**
    ```bash
-   cp -r initiatives/{INIT-YYYY-NNN-slug}/ initiatives/INIT-2026-042-my-feature/
-   # Edit all {placeholder} values
+   ./tools/init.sh INIT-2026-042-my-feature 042-my-feature
    ```
 
-2. **New feature spec (L4):**
+2. **With GSD execution engine (optional):**
    ```bash
-   cp -r .specify/specs/{NNN}-{slug}/ .specify/specs/042-my-feature/
-   # Fill spec.md → plan.md → tasks.md
+   ./tools/init.sh INIT-2026-042-my-feature 042-my-feature --with-gsd
    ```
 
-3. **Validate requirements.yml:**
+3. **Spec cycle (Claude Code slash commands):**
    ```bash
-   check-jsonschema --schemafile tools/schemas/requirements.schema.json \
-     initiatives/INIT-2026-042-my-feature/requirements.yml
+   /speckit-specify 042-my-feature   # fill spec.md
+   /speckit-plan    042-my-feature   # fill plan.md
+   /speckit-tasks   042-my-feature   # generate tasks.md
+   /speckit-implement 042-my-feature # implement task-by-task
    ```
 
-4. **Lint OpenAPI contract:**
+4. **Validate:**
    ```bash
-   redocly lint initiatives/INIT-2026-042-my-feature/contracts/openapi.yaml
+   make validate        # requirements.yml schema
+   make lint-contracts  # OpenAPI + AsyncAPI
+   make check-trace     # REQ-ID consistency
+   make check-all       # everything
    ```
 
 ## Profiles
@@ -53,6 +57,26 @@ evidence/                    ← L5: CI-generated artifacts (RTM, reports)
 | **Minimal** | Low-risk changes | prd.md, requirements.yml, CHANGELOG.md |
 | **Standard** | Most initiatives | + design.md, contracts/, ADR, slo.yaml, prr-checklist.md |
 | **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
+
+## GSD Integration (optional)
+
+[GSD](https://github.com/gsd-build/get-shit-done) can replace the linear `/speckit-implement` with wave-based parallel execution and fresh context per agent.
+
+```text
+tasks.md → [/speckit-gsd-bridge] → .planning/PLAN.md
+         → [/gsd-execute-phase]  → .planning/SUMMARY.md
+         → [/speckit-gsd-verify] → evidence/
+```
+
+| Scenario | Command |
+|---|---|
+| Simple feature, < 1 day | `/speckit-implement` (linear) |
+| Complex feature, > 1 day | `/speckit-gsd-bridge` + `/gsd-execute-phase` |
+| Brownfield codebase | `/speckit-gsd-map` before spec cycle |
+
+Install GSD into an existing project: `make init` with `--with-gsd`, or `npx get-shit-done-cc@latest --claude --local`.
+
+Full policy: `.specify/memory/constitution.md` → section "GSD-интеграция".
 
 ## Governance
 
