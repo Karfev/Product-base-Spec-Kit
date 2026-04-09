@@ -4,7 +4,7 @@
 PYTHON := python3
 SHELL  := /bin/bash
 
-.PHONY: help validate lint-docs lint-contracts check-trace check-all install-tools
+.PHONY: help validate lint-docs lint-contracts check-trace check-all collect-evidence install-tools
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -42,6 +42,10 @@ lint-contracts: ## Validate OpenAPI and AsyncAPI contracts
 check-trace: ## Check REQ-ID consistency (L3 requirements.yml <-> L4 trace.md)
 	@echo "==> Checking REQ-ID consistency..."
 	@$(PYTHON) tools/scripts/check-trace.py
+
+collect-evidence: ## Collect GSD execution evidence into RTM report
+	@echo "==> Collecting evidence from .planning/ SUMMARY files..."
+	@$(PYTHON) tools/scripts/collect-evidence.py
 
 check-all: validate lint-docs lint-contracts check-trace ## Run all validation checks
 	@echo ""

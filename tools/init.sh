@@ -4,8 +4,19 @@
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth
 set -euo pipefail
 
-INITIATIVE_ID="${1:-}"
-FEATURE_SLUG="${2:-}"
+# Separate flags from positional arguments
+positional_args=()
+WITH_GSD=false
+for arg in "$@"; do
+  if [[ "$arg" == "--with-gsd" ]]; then
+    WITH_GSD=true
+  else
+    positional_args+=("$arg")
+  fi
+done
+
+INITIATIVE_ID="${positional_args[0]:-}"
+FEATURE_SLUG="${positional_args[1]:-}"
 
 if [[ -z "$INITIATIVE_ID" ]]; then
   echo "Usage: $0 INIT-YYYY-NNN-slug [NNN-feature-slug]"
@@ -73,4 +84,50 @@ echo "  1. Edit initiatives/$INITIATIVE_ID/requirements.yml (add your REQ-IDs)"
 echo "  2. Run: make validate"
 if [[ -n "$FEATURE_SLUG" ]]; then
   echo "  3. Open Claude Code and run: /speckit-specify $FEATURE_SLUG"
+fi
+
+# GSD integration (optional)
+if [[ "$WITH_GSD" == true ]]; then
+  echo ""
+  echo "==> Installing GSD execution engine..."
+  npx get-shit-done-cc@latest --claude --local
+
+  # Create .planning directory
+  mkdir -p "$REPO_ROOT/.planning"
+  touch "$REPO_ROOT/.planning/.gitkeep"
+
+  # Add .planning patterns to .gitignore
+  if [[ ! -f "$REPO_ROOT/.gitignore" ]]; then
+    touch "$REPO_ROOT/.gitignore"
+  fi
+
+  if ! grep -q '.planning/' "$REPO_ROOT/.gitignore" 2>/dev/null; then
+    cat >> "$REPO_ROOT/.gitignore" << 'GITIGNORE'
+
+# GSD planning artifacts (transient session state)
+.planning/STATE.md
+.planning/codebase/
+.planning/phases/*/CONTEXT.md
+.planning/todos/
+.planning/threads/
+.planning/seeds/
+.planning/debug/
+.planning/intel/
+.planning/quick/
+.planning/backlog/
+.planning/config.json
+# Keep SUMMARY.md and PLAN.md — they feed evidence/
+!.planning/phases/*/*-SUMMARY.md
+!.planning/phases/*/*-PLAN.md
+GITIGNORE
+  fi
+
+  echo "  Created .planning/ directory"
+  echo "  Updated .gitignore for GSD artifacts"
+  echo ""
+  SLUG_HINT="${FEATURE_SLUG:-<NNN-slug>}"
+  echo "GSD commands available:"
+  echo "  /speckit-gsd-bridge $SLUG_HINT  — Convert tasks.md to GSD phase plans"
+  echo "  /speckit-gsd-verify $SLUG_HINT  — Post-execution verification"
+  echo "  /speckit-gsd-map <product>      — Map existing codebase (brownfield)"
 fi
