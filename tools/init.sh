@@ -7,6 +7,7 @@ set -euo pipefail
 INITIATIVE_ID="${1:-}"
 FEATURE_SLUG=""
 PROFILE="standard"
+WITH_GSD=false
 
 # Parse remaining arguments
 shift || true
@@ -18,6 +19,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --profile=*)
       PROFILE="${1#--profile=}"
+      shift
+      ;;
+    --with-gsd)
+      WITH_GSD=true
       shift
       ;;
     *)
@@ -167,4 +172,50 @@ if [[ "$PROFILE" = "enterprise" ]]; then
   fi
 elif [[ -n "$FEATURE_SLUG" ]]; then
   echo "  3. Open Claude Code and run: /speckit-specify $FEATURE_SLUG"
+fi
+
+# GSD integration (optional)
+if [[ "$WITH_GSD" == true ]]; then
+  echo ""
+  echo "==> Installing GSD execution engine..."
+  npx get-shit-done-cc@latest --claude --local
+
+  # Create .planning directory
+  mkdir -p "$REPO_ROOT/.planning"
+  touch "$REPO_ROOT/.planning/.gitkeep"
+
+  # Add .planning patterns to .gitignore
+  if [[ ! -f "$REPO_ROOT/.gitignore" ]]; then
+    touch "$REPO_ROOT/.gitignore"
+  fi
+
+  if ! grep -q '.planning/' "$REPO_ROOT/.gitignore" 2>/dev/null; then
+    cat >> "$REPO_ROOT/.gitignore" << 'GITIGNORE'
+
+# GSD planning artifacts (transient session state)
+.planning/STATE.md
+.planning/codebase/
+.planning/phases/*/CONTEXT.md
+.planning/todos/
+.planning/threads/
+.planning/seeds/
+.planning/debug/
+.planning/intel/
+.planning/quick/
+.planning/backlog/
+.planning/config.json
+# Keep SUMMARY.md and PLAN.md — they feed evidence/
+!.planning/phases/*/*-SUMMARY.md
+!.planning/phases/*/*-PLAN.md
+GITIGNORE
+  fi
+
+  echo "  Created .planning/ directory"
+  echo "  Updated .gitignore for GSD artifacts"
+  echo ""
+  SLUG_HINT="${FEATURE_SLUG:-<NNN-slug>}"
+  echo "GSD commands available:"
+  echo "  /speckit-gsd-bridge $SLUG_HINT  — Convert tasks.md to GSD phase plans"
+  echo "  /speckit-gsd-verify $SLUG_HINT  — Post-execution verification"
+  echo "  /speckit-gsd-map <product>      — Map existing codebase (brownfield)"
 fi

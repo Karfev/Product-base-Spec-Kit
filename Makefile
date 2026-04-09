@@ -9,7 +9,7 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-spec-quality check-all install-tools test-unit test-contract test-integration test-perf
+.PHONY: help validate validate-services lint-docs lint-contracts check-trace check-spec-quality check-all collect-evidence install-tools test-unit test-contract test-integration test-perf
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -86,6 +86,9 @@ check-spec-quality: ## Check .specify specs quality gates
 	@echo "==> Checking .specify specs quality..."
 	@$(PYTHON) tools/scripts/check-spec-quality.py
 
+collect-evidence: ## Collect GSD execution evidence into RTM report
+	@echo "==> Collecting evidence from .planning/ SUMMARY files..."
+	@$(PYTHON) tools/scripts/collect-evidence.py
 
 test-unit: ## Run unit tests (override TEST_UNIT_CMD)
 	@bash -lc '$(TEST_UNIT_CMD)'
