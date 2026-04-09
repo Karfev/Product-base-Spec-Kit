@@ -240,6 +240,26 @@ Requirements run through standard CI gates at every step.
 
 ---
 
+## GSD Integration (optional)
+
+[GSD](https://github.com/gsd-build/get-shit-done) can replace the linear `/speckit-implement` with wave-based parallel execution and fresh context per agent.
+
+```text
+tasks.md → [/speckit-gsd-bridge] → .planning/PLAN.md
+         → [/gsd-execute-phase]  → .planning/SUMMARY.md
+         → [/speckit-gsd-verify] → evidence/
+```
+
+| Scenario | Command |
+|---|---|
+| Simple feature, < 1 day | `/speckit-implement` (linear) |
+| Complex feature, > 1 day | `/speckit-gsd-bridge` + `/gsd-execute-phase` |
+| Brownfield codebase | `/speckit-gsd-map` before spec cycle |
+
+Install: `./tools/init.sh INIT-... slug --with-gsd`, or `npx get-shit-done-cc@latest --claude --local`.
+
+---
+
 ## Governance
 
 Full principles, CI gates strategy, ID conventions, levels (L0–L5), and enforcement roadmap:
