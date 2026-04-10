@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Bootstrap a new initiative + L4 spec from canonical templates.
-# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise]
+# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise] [--with-gsd] [--preset archkom]
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --profile enterprise
+# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-gsd
 set -euo pipefail
 
 INITIATIVE_ID="${1:-}"
