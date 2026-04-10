@@ -37,7 +37,14 @@ You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUM
    ```
    These are blockers for Standard/Extended profile DoD.
 
-8. Run check:
+8. **Sync trace links back to requirements.yml**: For each REQ-ID in trace.md, update the corresponding `trace:` section in `initiatives/{INIT}/requirements.yml` with:
+   - `adr:` links (if ADR column is non-`—`)
+   - `contracts:` links (if Contract column is non-`—`)
+   - `schemas:` links (if Schema column is non-`—`)
+   - `slo:` link (if SLO column is non-`—`)
+   Then run `make validate` to confirm requirements.yml is still schema-valid.
+
+9. Run check:
    ```
    make check-trace
    ```

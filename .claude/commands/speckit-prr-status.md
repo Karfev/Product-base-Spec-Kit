@@ -12,7 +12,18 @@ You are reviewing the Production Readiness Review for initiative `$ARGUMENTS`.
 3. Read `initiatives/$ARGUMENTS/ops/slo.yaml` (if exists).
 4. Read `initiatives/$ARGUMENTS/trace.md` (if exists).
 
-5. **Parse checklist items** and classify each:
+5. **Artifact existence check**: Before classifying checklist items, verify backing artifacts for key MUST items:
+   - SLO: check if `ops/slo.yaml` exists AND contains at least one `kind: SLO` block without `{placeholders}`
+   - Rollout: check if `delivery/rollout.md` exists AND does NOT contain `{placeholders}`
+   - Feature flags: check if `delivery/rollout.md` contains "feature flag" or "Feature flag"
+   
+   For items where the artifact exists and appears filled but the checkbox is unchecked, annotate with ⚡:
+   ```
+   🔴 BLOCKING: [SLO] SLO defined in ops/slo.yaml — checkbox unchecked ⚡ artifact exists and appears filled
+   ```
+   This helps distinguish "need to create artifact" from "need to verify and check the box".
+
+6. **Parse checklist items** and classify each:
    - ✅ `DONE` — `[x]` checked
    - ❌ `OPEN` — `[ ]` unchecked, non-critical
    - 🔴 `BLOCKING` — `[ ]` unchecked AND marked as MUST in the checklist category

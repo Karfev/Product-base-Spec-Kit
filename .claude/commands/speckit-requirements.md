@@ -46,13 +46,15 @@ You are managing the requirements registry for initiative `$ARGUMENTS`.
        prd: "prd.md#<section-anchor>"
    ```
 
-9. Run validation:
-   ```
-   make validate
-   ```
-   Fix ALL schema errors before finishing.
+9. **For NFR requirements with metrics**: Fill the corresponding SLO stub in `initiatives/$ARGUMENTS/ops/slo.yaml` with target values from the requirement's `metrics:` section. This ensures SLO is defined early, not deferred to the rollout phase.
 
-10. Report:
+10. Run validation:
+    ```
+    make validate
+    ```
+    Fix ALL schema errors before finishing.
+
+11. Report:
     - Count of new REQ-IDs added
     - Count of existing REQ-IDs updated
     - Any REQ-IDs that now need traces (contracts/tests/SLO) — these are gaps to close later

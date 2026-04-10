@@ -1,0 +1,69 @@
+# FILE: contracts/asyncapi.yaml
+# AsyncAPI 3.0.0 — Audit Log Events
+# Validation: asyncapi validate contracts/asyncapi.yaml
+
+asyncapi: "3.0.0"
+info:
+  title: "Audit Log Events"
+  version: "0.1.0"
+  description: "Event interface for the audit log subsystem. The audit service subscribes to domain events from other services and publishes audit.event.recorded for downstream consumers."
+
+channels:
+  audit.event.recorded:
+    address: "audit.event.recorded"
+    description: "Published when an audit event is successfully recorded in the audit log store. Downstream consumers (e.g., analytics, alerting) can subscribe."
+    messages:
+      AuditEventRecorded:
+        $ref: "#/components/messages/AuditEventRecorded"
+
+operations:
+  publishAuditEventRecorded:
+    action: send
+    channel:
+      $ref: "#/channels/audit.event.recorded"
+    summary: "REQ-AUDIT-001 Published when a user action is recorded in the audit log"
+
+components:
+  messages:
+    AuditEventRecorded:
+      name: "AuditEventRecorded"
+      title: "Audit Event Recorded"
+      summary: "An audit event was successfully persisted"
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/AuditEventRecordedPayload"
+
+  schemas:
+    AuditEventRecordedPayload:
+      type: object
+      additionalProperties: false
+      required: [eventId, occurredAt, data]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          additionalProperties: false
+          required: [audit_event_id, user_id, action_type, resource_type, resource_id, timestamp]
+          properties:
+            audit_event_id:
+              type: string
+              format: uuid
+              description: "ID of the persisted audit event"
+            user_id:
+              type: string
+              description: "User who performed the action"
+            action_type:
+              type: string
+              enum: ["create", "update", "delete", "access", "auth"]
+            resource_type:
+              type: string
+            resource_id:
+              type: string
+            timestamp:
+              type: string
+              format: date-time

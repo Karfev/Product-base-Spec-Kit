@@ -11,7 +11,15 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 2. Read `initiatives/$ARGUMENTS/requirements.yml` to understand existing REQ-IDs.
 3. Read `.specify/memory/constitution.md` for principles and profile definitions.
 
-4. Ask the user **5 structured questions** (skip if already answered in existing prd.md):
+4. **Scan for cross-initiative dependencies**: Read `initiatives/*/requirements.yml` (skip template dirs with `{`). Look for REQ-IDs that reference similar domains, resources, or capabilities. If found, present to the user:
+   ```
+   Found potentially related requirements in other initiatives:
+   - REQ-NOTIF-004 (auditable opt-out) in INIT-2026-002
+   - REQ-AUTH-001 (API key creation) in INIT-2026-000
+   Consider referencing these in the Motivation or Scope sections.
+   ```
+
+5. Ask the user **5 structured questions** (skip if already answered in existing prd.md):
 
    - **Problem:** What specific problem does this solve? Who experiences it and what is the measurable impact?
    - **Why now:** What is the urgency driver — deadline, revenue risk, regulatory, competitive?
@@ -40,3 +48,4 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 - Mark unresolved questions as `[NEEDS CLARIFICATION: <question>]`
 - Do not invent success metrics — ask the user for baseline and source
 - Keep PRD focused: 1–2 pages maximum; link, don't embed
+- Cross-initiative REQ-IDs SHOULD be mentioned in Motivation or Scope with initiative ID context (e.g., "REQ-NOTIF-004 from INIT-2026-002 requires auditable opt-out")

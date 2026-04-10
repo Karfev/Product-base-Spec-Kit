@@ -86,6 +86,19 @@ def collect_yaml_req_ids(path: Path) -> set[str]:
     return req_ids
 
 
+def collect_all_yaml_req_ids(root: Path) -> set[str]:
+    """Collect REQ-IDs from ALL initiatives' requirements.yml files."""
+    all_ids: set[str] = set()
+    initiatives_dir = root / "initiatives"
+    if not initiatives_dir.exists():
+        return all_ids
+    for req_file in sorted(initiatives_dir.glob("*/requirements.yml")):
+        if "{" in str(req_file):
+            continue
+        all_ids |= collect_yaml_req_ids(req_file)
+    return all_ids
+
+
 def parse_initiative_id(spec_text: str) -> str | None:
     match = re.search(r"^\*\*Initiative:\*\*\s*([^\s]+)", spec_text, re.MULTILINE)
     if match:
@@ -143,27 +156,35 @@ def main() -> int:
         if not spec_req_ids:
             errors.append(f"[ERROR] {spec_md}: no REQ-ID references found")
 
-        initiative_id = parse_initiative_id(spec_text)
-        candidate_requirements = [spec_dir / "requirements.yml"]
-        if initiative_id:
-            candidate_requirements.append(
-                root / "initiatives" / initiative_id / "requirements.yml"
-            )
-
-        req_yml = next((p for p in candidate_requirements if p.exists()), None)
-        if req_yml is None:
+        # Collect REQ-IDs from ALL initiatives to support cross-initiative references.
+        all_yaml_req_ids = collect_all_yaml_req_ids(root)
+        missing = sorted(spec_req_ids - all_yaml_req_ids)
+        if missing:
             errors.append(
-                f"[ERROR] {spec_md}: requirements.yml not found (checked: {', '.join(str(p) for p in candidate_requirements)})"
+                f"[ERROR] {spec_md}: REQ-ID(s) missing in any initiatives/*/requirements.yml: {', '.join(missing)}"
             )
-        else:
-            yaml_req_ids = collect_yaml_req_ids(req_yml)
-            missing = sorted(spec_req_ids - yaml_req_ids)
-            if missing:
-                errors.append(
-                    f"[ERROR] {spec_md}: REQ-ID(s) missing in {req_yml}: {', '.join(missing)}"
-                )
 
-        # 4) RED -> GREEN sequence in tasks.md: T2a before T2b.
+        # 4) Check contract files for unfilled placeholders (warning only).
+        initiative_id = parse_initiative_id(spec_text)
+        if initiative_id:
+            initiative_dir = root / "initiatives" / initiative_id
+            contracts_dir = initiative_dir / "contracts"
+            if contracts_dir.exists():
+                for contract_file in sorted(contracts_dir.glob("*.yaml")):
+                    if is_template(contract_file):
+                        continue
+                    contract_text = contract_file.read_text(encoding="utf-8")
+                    for line_no, line in enumerate(contract_text.splitlines(), start=1):
+                        if "<!--" in line and "-->" in line:
+                            continue
+                        for match in PLACEHOLDER_PATTERN.finditer(line):
+                            token = match.group(1)
+                            if is_unfilled_placeholder(token):
+                                warnings.append(
+                                    f"[WARNING] {contract_file}:{line_no}: unfilled placeholder '{{{token}}}' in contract"
+                                )
+
+        # 5) RED -> GREEN sequence in tasks.md: T2a before T2b.
         tasks_text = tasks_md.read_text(encoding="utf-8")
         t2a_match = re.search(r"\bT2a\b", tasks_text)
         t2b_match = re.search(r"\bT2b\b", tasks_text)

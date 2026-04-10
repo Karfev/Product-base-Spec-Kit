@@ -16,6 +16,13 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
    - [ ] Does this initiative handle authentication, authorization, or access tokens?
    - [ ] Does this involve PII, financial data, or data regulated by GDPR/SOC2/HIPAA?
 
+   > **Edge case guidance for Q2:**
+   > - `user_id` alone (without name/email) in logs/metadata → usually **NO** (indirect identifier, not PII per se)
+   > - `user_id` + action context revealing behavior patterns → consider **YES** if regulators may classify as behavioral data
+   > - Action metadata with IP addresses → **YES** (IP is PII under GDPR)
+   > - GDPR retention requirements (e.g., 2-year audit trail) → this is an NFR constraint, not a PII question; answer **NO**, add NFR requirement instead
+   > - SOC2 audit trail requirement → drives initiative existence, not profile; answer **NO** unless the data itself is regulated
+
    **API & Integration:**
    - [ ] Does this add or change public/external-facing API contracts (REST or events)?
    - [ ] Will other teams/services consume these APIs within 30 days?

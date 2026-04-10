@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 # Bootstrap a new initiative + L4 spec from canonical templates.
-# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise] [--with-gsd] [--preset archkom]
-# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --profile enterprise
+# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise] [--product name] [--owner @team] [--with-gsd] [--preset archkom]
+# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --profile enterprise --product platform --owner @platform-team
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-gsd
 set -euo pipefail
 
 INITIATIVE_ID="${1:-}"
 FEATURE_SLUG=""
 PROFILE="standard"
+PRODUCT=""
+OWNER=""
 WITH_GSD=false
 PRESET=""
 
@@ -21,6 +23,22 @@ while [[ $# -gt 0 ]]; do
       ;;
     --profile=*)
       PROFILE="${1#--profile=}"
+      shift
+      ;;
+    --product)
+      PRODUCT="${2:-}"
+      shift 2
+      ;;
+    --product=*)
+      PRODUCT="${1#--product=}"
+      shift
+      ;;
+    --owner)
+      OWNER="${2:-}"
+      shift 2
+      ;;
+    --owner=*)
+      OWNER="${1#--owner=}"
       shift
       ;;
     --with-gsd)
@@ -81,6 +99,15 @@ cp -r "$TEMPLATE_INIT" "$TARGET_INIT"
 find "$TARGET_INIT" -type f | while read -r f; do
   sed -i.bak "s|{INIT-YYYY-NNN-slug}|$INITIATIVE_ID|g" "$f"
   sed -i.bak "s|{YYYY-MM-DD}|$(date +%Y-%m-%d)|g" "$f"
+  if [[ -n "$PRODUCT" ]]; then
+    sed -i.bak "s|{product}|$PRODUCT|g" "$f"
+  fi
+  if [[ -n "$OWNER" ]]; then
+    # Strip leading @ to avoid duplication (templates already have @{team})
+    OWNER_BARE="${OWNER#@}"
+    sed -i.bak "s|{team}|$OWNER_BARE|g" "$f"
+    sed -i.bak "s|{team-or-person}|$OWNER|g" "$f"
+  fi
   rm -f "${f}.bak"
 done
 
@@ -91,8 +118,10 @@ if [[ -f "$REQ_FILE" ]]; then
   rm -f "${REQ_FILE}.bak"
 fi
 
-# Remove placeholder-named files
+# Remove placeholder-named files and ensure schemas/ directory exists
 rm -f "$TARGET_INIT/contracts/schemas/{entity}.schema.json" 2>/dev/null || true
+mkdir -p "$TARGET_INIT/contracts/schemas" 2>/dev/null || true
+touch "$TARGET_INIT/contracts/schemas/.gitkeep" 2>/dev/null || true
 
 # Replace placeholder requirements with empty array
 if [[ -f "$REQ_FILE" ]]; then
@@ -131,6 +160,10 @@ import re, sys
 text = open(sys.argv[1]).read()
 # Remove Security & privacy section (Extended-only)
 text = re.sub(r'## Security & privacy.*?(?=\n## |\Z)', '', text, flags=re.DOTALL)
+# Remove individual Extended-only items marked with (Extended)
+text = re.sub(r'^- \[[ x]\].*\(Extended\).*\n?', '', text, flags=re.MULTILINE)
+# Remove Security row from summary table (section was removed)
+text = re.sub(r'\| Security \|[^\n]*\n', '', text)
 open(sys.argv[1], 'w').write(text)
 " "$PRR"
   fi
@@ -203,13 +236,27 @@ if [[ -n "$FEATURE_SLUG" ]]; then
       echo "Warning: $TARGET_SPEC already exists, skipping"
     else
       cp -r "$TEMPLATE_SPEC" "$TARGET_SPEC"
-      # Copy canonical L4 template as-is; only substitute placeholders.
+      # Copy canonical L4 template as-is; substitute placeholders.
       find "$TARGET_SPEC" -type f | while read -r f; do
         sed -i.bak "s|{INIT-YYYY-NNN-slug}|$INITIATIVE_ID|g" "$f"
         sed -i.bak "s|{NNN}-{slug}|$FEATURE_SLUG|g" "$f"
         sed -i.bak "s|{YYYY-MM-DD}|$(date +%Y-%m-%d)|g" "$f"
+        if [[ -n "$OWNER" ]]; then
+          OWNER_BARE="${OWNER#@}"
+          sed -i.bak "s|{engineer-or-team}|$OWNER_BARE|g" "$f"
+          sed -i.bak "s|@{owner}|@$OWNER_BARE|g" "$f"
+        fi
         rm -f "${f}.bak"
       done
+      # Replace profile placeholder using python (contains pipe chars)
+      python3 -c "
+import sys
+path = sys.argv[1]
+profile = sys.argv[2]
+text = open(path).read()
+text = text.replace('{Minimal|Standard|Extended}', profile.capitalize())
+open(path, 'w').write(text)
+" "$TARGET_SPEC/spec.md" "$PROFILE"
       echo "✅ Created L4 spec: .specify/specs/$FEATURE_SLUG"
     fi
   fi
