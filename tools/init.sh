@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 # Bootstrap a new initiative + L4 spec from templates.
-# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--with-gsd]
+# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--with-gsd] [--preset archkom]
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-gsd
+# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --preset archkom
 set -euo pipefail
 
 # Separate flags from positional arguments
 positional_args=()
 WITH_GSD=false
+PRESET=""
+SKIP_NEXT=false
 for arg in "$@"; do
-  if [[ "$arg" == "--with-gsd" ]]; then
+  if [[ "$SKIP_NEXT" == true ]]; then
+    PRESET="$arg"
+    SKIP_NEXT=false
+  elif [[ "$arg" == "--with-gsd" ]]; then
     WITH_GSD=true
+  elif [[ "$arg" == "--preset" ]]; then
+    SKIP_NEXT=true
   else
     positional_args+=("$arg")
   fi
@@ -77,6 +85,40 @@ if [[ -n "$FEATURE_SLUG" ]]; then
       echo "✅ Created L4 spec: .specify/specs/$FEATURE_SLUG"
     fi
   fi
+fi
+
+# Archkom preset (optional)
+if [[ "$PRESET" == "archkom" ]]; then
+  echo ""
+  echo "==> Applying archkom preset..."
+
+  # Uncomment archkom-specific sections in templates
+  TARGET_INIT="$REPO_ROOT/initiatives/$INITIATIVE_ID"
+  for f in "$TARGET_INIT/prd.md" "$TARGET_INIT/decisions/ADR-template.md"; do
+    if [[ -f "$f" ]]; then
+      # Uncomment archkom sections: remove <!-- and --> around archkom blocks
+      sed -i.bak '/<!-- optional: archkom/d; /<!-- ## /{s/<!-- //;s/ -->//;}; /^-->$/d' "$f"
+      rm -f "${f}.bak"
+    fi
+  done
+
+  # For HLD: uncomment archkom sections
+  if [[ -f "$TARGET_INIT/hld.md" ]]; then
+    sed -i.bak '/<!-- archkom:/d; /<!-- ## /{s/<!-- //;s/ -->//;}; /<!-- |/d; /^-->$/d' "$TARGET_INIT/hld.md"
+    rm -f "${TARGET_INIT}/hld.md.bak"
+  fi
+
+  # Update profile to Extended by default
+  if [[ -f "$TARGET_INIT/prd.md" ]]; then
+    sed -i.bak 's|{Minimal|Standard|Extended}|Extended|g' "$TARGET_INIT/prd.md"
+    rm -f "${TARGET_INIT}/prd.md.bak"
+  fi
+
+  echo "  Archkom sections enabled in prd.md, hld.md, ADR-template.md"
+  echo "  Profile set to Extended"
+  echo ""
+  echo "Archkom artifact chain:"
+  echo "  brd.md → prd.md → hld.md → decisions/АТР → design.md"
 fi
 
 echo ""

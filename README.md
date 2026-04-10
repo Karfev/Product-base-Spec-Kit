@@ -15,7 +15,7 @@ A spec-driven artifact kit for B2B SaaS teams, based on the **Spec Constitution*
 
 domains/{domain}/            ← L1: Glossary, canonical model, event catalog, NFR
 products/{product}/          ← L2: Architecture, product ADR, NFR baseline
-initiatives/{INIT-slug}/     ← L3: PRD, requirements.yml, contracts, ops, decisions
+initiatives/{INIT-slug}/     ← L3: BRD, PRD, HLD, requirements.yml, contracts, ops, decisions
 
 tools/schemas/               ← CI validators (JSON Schema)
 tools/scripts/               ← CI scripts (check-trace, collect-evidence)
@@ -29,12 +29,17 @@ evidence/                    ← L5: CI-generated artifacts (RTM, reports)
    ./tools/init.sh INIT-2026-042-my-feature 042-my-feature
    ```
 
-2. **With GSD execution engine (optional):**
+2. **With Archkom preset (extended artifact chain):**
+   ```bash
+   ./tools/init.sh INIT-2026-042-my-feature 042-my-feature --preset archkom
+   ```
+
+3. **With GSD execution engine (optional):**
    ```bash
    ./tools/init.sh INIT-2026-042-my-feature 042-my-feature --with-gsd
    ```
 
-3. **Spec cycle (Claude Code slash commands):**
+4. **Spec cycle (Claude Code slash commands):**
    ```bash
    /speckit-specify 042-my-feature   # fill spec.md
    /speckit-plan    042-my-feature   # fill plan.md
@@ -42,7 +47,7 @@ evidence/                    ← L5: CI-generated artifacts (RTM, reports)
    /speckit-implement 042-my-feature # implement task-by-task
    ```
 
-4. **Validate:**
+5. **Validate:**
    ```bash
    make validate        # requirements.yml schema
    make lint-contracts  # OpenAPI + AsyncAPI
@@ -56,7 +61,25 @@ evidence/                    ← L5: CI-generated artifacts (RTM, reports)
 |---|---|---|
 | **Minimal** | Low-risk changes | prd.md, requirements.yml, CHANGELOG.md |
 | **Standard** | Most initiatives | + design.md, contracts/, ADR, slo.yaml, prr-checklist.md |
-| **Extended** | High-risk / regulated | + threat-model.md, nfr-validation.md, migration.md, compliance/ |
+| **Extended** | High-risk / regulated | + brd.md, hld.md, threat-model.md, nfr-validation.md, migration.md, compliance/ |
+
+## Archkom Preset (optional)
+
+For organizations with formal architecture governance, the `--preset archkom` flag enables an extended artifact chain:
+
+```text
+brd.md → prd.md → hld.md → ADR/АТР → design.md
+```
+
+Each artifact is the single source of truth for its domain. No duplication down the chain.
+
+| Archkom Level | Trigger | Required Artifacts |
+|---|---|---|
+| У0 | Local change, no integration impact | Internal note (no Archkom) |
+| У1 | New API / contract change / integration | HLD + ADR + domain reviews |
+| У2 | Cross-cutting / high-risk / security | BRD + PRD + HLD + ADR + all domain reviews + TCO |
+
+Full policy: `.specify/memory/constitution.md` → section "Архитектурный комитет".
 
 ## GSD Integration (optional)
 
