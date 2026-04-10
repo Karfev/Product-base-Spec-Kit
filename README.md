@@ -34,6 +34,7 @@ Layer  Location                          Purpose
 L0     .specify/memory/constitution.md   Governance: principles, CI gates, ID conventions
 L1     domains/{domain}/                 Domain: glossary, canonical model, event catalog, NFR
 L2     products/{product}/               Product: architecture, product ADRs, NFR baseline
+L2.5   services/{service-code}/          Service: external-spec, SLO, catalogs, billing, RSM
 L3     initiatives/{INIT-slug}/          Initiative: prd.md, requirements.yml, contracts/, ops/
 L4     .specify/specs/{NNN}-{slug}/      Feature: spec → plan → tasks → implement → trace
 L5     evidence/                         Evidence: CI-generated RTMs, reports (auto-populated)
@@ -42,8 +43,8 @@ L5     evidence/                         Evidence: CI-generated RTMs, reports (a
 Supporting tooling:
 
 ```text
-tools/schemas/          JSON Schema validators for requirements.yml
-tools/scripts/          check-trace.py — REQ-ID consistency checker
+tools/schemas/          JSON Schema validators (requirements, services, billing, etc.)
+tools/scripts/          CI scripts (check-trace, check-spec-quality, check-release-rollout, collect-evidence)
 tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
 .github/workflows/      CI: validate.yml + contracts.yml
 Makefile                Local task runner (make check-all)
@@ -67,12 +68,6 @@ For `oasdiff` (breaking change detection): see <https://github.com/oasdiff/oasdi
 ```bash
 ./tools/init.sh INIT-2026-042-my-feature 042-my-feature
 ```
-products/{product}/  →  services/{service-code}/  →  initiatives/{INIT}/
-     L2                        L2.5                         L3
-(what we build)         (what we offer clients)      (how we improve it)
-```
-
----
 
 This creates:
 
@@ -179,14 +174,21 @@ make check-all
 ## Local Commands
 
 ```bash
-make help            # List all commands
-make validate        # Validate all requirements.yml against JSON Schema
-make lint-docs       # Lint YAML and Markdown files (warning mode)
-make lint-contracts  # Validate OpenAPI and AsyncAPI contracts
-make check-trace     # Check REQ-ID consistency (L3 requirements.yml ↔ L4 trace.md)
-make check-release-rollout # Validate rollout/migration consistency vs ops/slo.yaml + ops/prr-checklist.md
-make check-all       # Run all validation checks
-make install-tools   # Install all required validation tools
+make help                  # List all commands
+make validate              # Validate all requirements.yml (initiatives)
+make validate-services     # Validate all service artifacts (L2.5)
+make lint-docs             # Lint YAML and Markdown files
+make lint-contracts        # Validate OpenAPI and AsyncAPI contracts
+make check-trace           # Check REQ-ID consistency (L3 ↔ L4)
+make check-spec-quality    # Check .specify specs quality gates
+make check-release-rollout # Validate rollout/migration vs SLO/PRR
+make collect-evidence      # Collect GSD execution evidence into RTM
+make check-all             # Run all validation checks
+make install-tools         # Install all required tools
+make test-unit             # Run unit tests (override TEST_UNIT_CMD)
+make test-contract         # Run contract tests
+make test-integration      # Run integration tests
+make test-perf             # Run performance tests
 ```
 
 ---
