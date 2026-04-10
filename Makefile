@@ -60,9 +60,9 @@ validate-services: ## Validate all machine-readable service artifacts against JS
 
 lint-docs: ## Lint YAML and Markdown files (warning mode)
 	@echo "==> Linting YAML..."
-	@yamllint -c .yamllint.yml . || true
+	@command -v yamllint >/dev/null 2>&1 && yamllint -c .yamllint.yml . || echo "  yamllint not found — run: make install-tools"
 	@echo "==> Linting Markdown..."
-	@markdownlint-cli2 "**/*.md" "#node_modules" || true
+	@markdownlint-cli2 "**/*.md" "#node_modules" "#.claude" "#.planning" || true
 
 lint-contracts: ## Validate OpenAPI and AsyncAPI contracts
 	@echo "==> Linting OpenAPI contracts..."

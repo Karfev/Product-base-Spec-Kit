@@ -7,7 +7,7 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
 
 ## Your job
 
-1. Read `initiatives/$ARGUMENTS/requirements.yml` (if exists) and `prd.md` (if exists).
+1. Check whether `initiatives/$ARGUMENTS/` exists. If it does not, skip to the questionnaire — profile will be written later by `/speckit-init`. If it exists, read `initiatives/$ARGUMENTS/requirements.yml` (if exists) and `prd.md` (if exists).
 2. Read `.specify/memory/constitution.md#профили` for profile definitions.
 
 3. Run a **risk-assessment questionnaire** — ask the user these 8 yes/no questions:
@@ -32,18 +32,15 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
    - [ ] Is this a large information system (IS-class) requiring ArchiMate / АИС 3-layer architecture documentation?
    - [ ] Does the system need machine-readable subsystem classification (system scale, type, owner)?
 
-4. **Score and recommend profile:**
+4. **Apply decision tree** (evaluate top-to-bottom, first match wins):
 
-   | Score (YES on questions 1–8) | Enterprise indicators (Q9–Q10) | Recommended Profile | Override allowed? |
-   |---|---|---|---|
-   | 0–1 | — | **Minimal** | No |
-   | 2–4 | — | **Standard** | Yes (up to Extended) |
-   | 5–8 | — | **Extended** | No (downgrade requires Tech Lead sign-off) |
-   | Any | ≥1 YES | **Enterprise** | Yes (requires explicit team decision) |
+   1. Enterprise indicator (Q9 or Q10) YES → **Enterprise** (confirm with architect)
+   2. Compliance question (Q2) YES → **Extended** (mandatory, not overrideable)
+   3. Score 5–8 YES answers → **Extended** (downgrade requires Tech Lead sign-off)
+   4. Score 2–4 YES answers → **Standard** (upgradeable to Extended)
+   5. Score 0–1 YES answers → **Minimal**
 
-   Security/compliance questions answered YES → MUST be at least **Standard**.
-   Any compliance YES → MUST be **Extended**.
-   Enterprise indicators YES → recommend **Enterprise** (confirm with architect).
+   **Guard:** Security question (Q1) YES → at minimum **Standard** (overrides Minimal).
 
 5. Show the user the **artifact checklist** for the recommended profile:
 

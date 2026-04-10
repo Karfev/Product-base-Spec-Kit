@@ -20,7 +20,7 @@ You are initializing the product-level specification for `$ARGUMENTS`.
 
 5. Create `products/$ARGUMENTS/` with:
 
-   **`architecture.md`** (arc42 skeleton):
+   **`architecture/overview.md`** (arc42 skeleton):
    ```markdown
    # Architecture: $ARGUMENTS
    Owner: @<handle> | Version: <version> | Updated: <date>
@@ -53,10 +53,10 @@ You are initializing the product-level specification for `$ARGUMENTS`.
    → See `decisions/` for ADRs (format: `$ARGUMENTS-NNNN-slug`)
 
    ## 10. Quality Requirements
-   → See `nfr-baseline.md` for measurable NFR targets
+   → See `nfr-baseline/baseline.md` for measurable NFR targets
    ```
 
-   **`nfr-baseline.md`** (stub):
+   **`nfr-baseline/baseline.md`** (stub):
    ```markdown
    # NFR Baseline: $ARGUMENTS
    Updated: <date>
@@ -89,8 +89,8 @@ You are initializing the product-level specification for `$ARGUMENTS`.
    <one-line purpose>
    Owner: @<handle> | Stack: <stack>
 
-   - Architecture: `architecture.md`
-   - NFR baseline: `nfr-baseline.md`
+   - Architecture: `architecture/overview.md`
+   - NFR baseline: `nfr-baseline/baseline.md`
    - Decisions: `decisions/` (ADR format: `$ARGUMENTS-NNNN-slug`)
    - Domains: `domains/<domain>/`
    ```

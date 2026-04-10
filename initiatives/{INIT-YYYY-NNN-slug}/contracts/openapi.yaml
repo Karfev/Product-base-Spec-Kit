@@ -1,10 +1,10 @@
 # FILE: contracts/openapi.yaml
-# OpenAPI 3.1.1 — минимальный шаблон
+# OpenAPI 3.1.0 — минимальный шаблон
 # Версия: major.minor.patch (SemVer). Breaking changes → increment MAJOR.
 # Линт: redocly lint contracts/openapi.yaml
 # Breaking diff: oasdiff breaking contracts/openapi.yaml <base>
 
-openapi: "3.1.1"
+openapi: "3.1.0"
 info:
   title: "{Product} API"
   version: "1.0.0"

@@ -85,6 +85,22 @@ def main():
         except Exception as e:
             errors.append(f"[ERROR] Cannot parse {req_file}: {e}")
 
+    # Check L3→L4 reverse: every REQ-ID from requirements.yml should appear in some L4 trace.md
+    l4_trace_files = [f for f in root.glob('.specify/specs/*/trace.md') if not is_template(f.parent)]
+    all_l4_req_ids = set()
+    for trace_file in l4_trace_files:
+        try:
+            all_l4_req_ids.update(parse_trace_md(trace_file))
+        except Exception:
+            pass
+
+    for req_id in all_req_ids:
+        if req_id not in all_l4_req_ids:
+            warnings.append(
+                f"[WARN] REQ-ID '{req_id}' from requirements.yml has no "
+                f"entry in any .specify/specs/*/trace.md"
+            )
+
     # Check L4 trace.md references exist in L3
     for trace_file in root.glob('.specify/specs/*/trace.md'):
         if is_template(trace_file.parent):

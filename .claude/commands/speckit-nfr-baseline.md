@@ -7,7 +7,7 @@ You are defining the Non-Functional Requirements baseline for product `$ARGUMENT
 
 ## Your job
 
-1. Read `products/$ARGUMENTS/nfr-baseline.md` (current state — may be stub).
+1. Read `products/$ARGUMENTS/nfr-baseline/baseline.md` (current state — may be stub).
 2. Scan all `initiatives/*/requirements.yml` for `type: nfr` requirements whose `trace.components`
    includes `$ARGUMENTS` — these must be satisfied by the baseline.
 3. Read `.specify/memory/constitution.md` for NFR principles.
@@ -43,7 +43,7 @@ You are defining the Non-Functional Requirements baseline for product `$ARGUMENT
       → Baseline must be tightened to ≤ 10ms for auth endpoints, or REQ-AUTH-004 must be revised
    ```
 
-6. Update `products/$ARGUMENTS/nfr-baseline.md` with confirmed targets and measurement sources:
+6. Update `products/$ARGUMENTS/nfr-baseline/baseline.md` with confirmed targets and measurement sources:
    ```markdown
    ## Latency
    - P95 API response: < 200ms (general), < 10ms (auth endpoints — REQ-AUTH-004)

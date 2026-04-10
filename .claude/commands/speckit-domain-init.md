@@ -35,7 +35,7 @@ You are initializing the domain-level specification for `$ARGUMENTS`.
    **Used in:** {placeholder: products, initiatives that use this term}
    ```
 
-   **`canonical-model.md`**:
+   **`canonical-model/model.md`**:
    ```markdown
    # Canonical Model: $ARGUMENTS domain
    Owner: @<handle> | Updated: <date>
@@ -75,7 +75,7 @@ You are initializing the domain-level specification for `$ARGUMENTS`.
    **Channel:** {placeholder: asyncapi channel name}
    ```
 
-   **`nfr.md`**:
+   **`nfr/domain-nfr.md`**:
    ```markdown
    # NFR: $ARGUMENTS domain
    Owner: @<handle> | Updated: <date>
@@ -99,9 +99,9 @@ You are initializing the domain-level specification for `$ARGUMENTS`.
    Owner: @<handle>
 
    - Glossary: `glossary.md`
-   - Canonical model: `canonical-model.md`
+   - Canonical model: `canonical-model/model.md`
    - Event catalog: `event-catalog.md`
-   - Domain NFR: `nfr.md`
+   - Domain NFR: `nfr/domain-nfr.md`
    - Products in this domain: {placeholder: `products/<name>/`}
    ```
 

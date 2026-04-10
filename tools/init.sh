@@ -84,11 +84,56 @@ find "$TARGET_INIT" -type f | while read -r f; do
   rm -f "${f}.bak"
 done
 
-# Patch profile in requirements.yml
+# Patch profile in requirements.yml (match any value in profile field)
 REQ_FILE="$TARGET_INIT/requirements.yml"
 if [[ -f "$REQ_FILE" ]]; then
-  sed -i.bak "s|profile: \"standard\"|profile: \"$PROFILE\"|g" "$REQ_FILE"
+  sed -i.bak 's|profile: ".*"|profile: "'"$PROFILE"'"|' "$REQ_FILE"
   rm -f "${REQ_FILE}.bak"
+fi
+
+# Remove placeholder-named files
+rm -f "$TARGET_INIT/contracts/schemas/{entity}.schema.json" 2>/dev/null || true
+
+# Replace placeholder requirements with empty array
+if [[ -f "$REQ_FILE" ]]; then
+  python3 -c "
+import sys, yaml
+path = sys.argv[1]
+with open(path) as f:
+    data = yaml.safe_load(f)
+# Clear placeholder requirements (those with {braces} in id)
+reqs = data.get('requirements', [])
+data['requirements'] = [r for r in reqs if '{' not in r.get('id', '')]
+with open(path, 'w') as f:
+    yaml.dump(data, f, default_flow_style=False, allow_unicode=True, sort_keys=False)
+" "$REQ_FILE"
+fi
+
+# Profile-based file filtering
+EXTENDED_ONLY=("brd.md" "hld.md" "compliance" "ops/threat-model.md"
+               "ops/nfr-validation.md" "delivery/migration.md")
+
+if [[ "$PROFILE" == "minimal" ]]; then
+  # Remove Standard + Extended files
+  rm -rf "$TARGET_INIT"/{design.md,trace.md,contracts,decisions}
+  rm -rf "$TARGET_INIT"/delivery/rollout.md
+  rm -rf "$TARGET_INIT"/ops/{slo.yaml,prr-checklist.md}
+  for f in "${EXTENDED_ONLY[@]}"; do rm -rf "$TARGET_INIT/$f"; done
+  find "$TARGET_INIT" -type d -empty -delete 2>/dev/null || true
+elif [[ "$PROFILE" == "standard" ]]; then
+  for f in "${EXTENDED_ONLY[@]}"; do rm -rf "$TARGET_INIT/$f"; done
+  find "$TARGET_INIT" -type d -empty -delete 2>/dev/null || true
+  # Remove Extended-only sections from PRR checklist
+  PRR="$TARGET_INIT/ops/prr-checklist.md"
+  if [[ -f "$PRR" ]]; then
+    python3 -c "
+import re, sys
+text = open(sys.argv[1]).read()
+# Remove Security & privacy section (Extended-only)
+text = re.sub(r'## Security & privacy.*?(?=\n## |\Z)', '', text, flags=re.DOTALL)
+open(sys.argv[1], 'w').write(text)
+" "$PRR"
+  fi
 fi
 
 # Enterprise-specific artifacts

@@ -83,5 +83,5 @@ You are generating machine-readable API contracts for initiative `$ARGUMENTS`.
 - Breaking changes to existing contracts require a note: "BREAKING — run `make lint-contracts` to check oasdiff"
 - Do NOT add endpoints without a corresponding REQ-ID — no spec = no code
 - `make lint-contracts` MUST pass with zero errors before reporting success
-- OpenAPI version MUST be `3.1.0`; AsyncAPI version MUST be `3.0.0`
+- OpenAPI version MUST be `3.1.0`; AsyncAPI version MUST be `3.0.0` (intentional — 3.0.0 has wider tooling support; AsyncAPI CLI info about 3.1.0 can be ignored)
 - `401` and `400` error responses are REQUIRED for all authenticated endpoints

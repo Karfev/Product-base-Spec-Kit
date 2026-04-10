@@ -36,7 +36,7 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 
 ## Rules
 - `prd.md` is a narrative document — it MUST NOT duplicate machine-readable data from `requirements.yml`
-- Every Scope item MUST reference at least one REQ-ID (existing or proposed)
+- Every Scope item MUST reference at least one REQ-ID from `requirements.yml` (existing) or propose new ones with `[PROPOSED]` marker — these will be formalized by `/speckit-requirements`
 - Mark unresolved questions as `[NEEDS CLARIFICATION: <question>]`
 - Do not invent success metrics — ask the user for baseline and source
 - Keep PRD focused: 1–2 pages maximum; link, don't embed

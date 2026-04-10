@@ -77,6 +77,8 @@ def extract_slo_ids(slo_file: Path) -> list[str]:
 
         name = metadata.get("name")
         if isinstance(name, str) and name.strip():
+            if '{' in name:
+                continue
             ids.append(name.strip())
 
     return ids
