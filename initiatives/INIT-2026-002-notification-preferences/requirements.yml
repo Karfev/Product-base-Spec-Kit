@@ -1,0 +1,126 @@
+# FILE: requirements.yml
+# Реестр требований инициативы. Валидируется JSON Schema:
+#   tools/schemas/requirements.schema.json
+# Команда: check-jsonschema --schemafile ../../tools/schemas/requirements.schema.json requirements.yml
+
+metadata:
+  initiative: "INIT-2026-002-notification-preferences"
+  product: "platform"
+  owner: "@platform-team"
+  profile: "standard"
+  version: "0.1.0"
+  last_updated: "2026-04-10"
+
+requirements:
+  - id: "REQ-NOTIF-001"
+    title: "Получение предпочтений уведомлений"
+    type: "functional"
+    priority: "P0"
+    status: "draft"
+    description: >
+      Пользователь MUST иметь возможность получить свои текущие предпочтения уведомлений
+      (каналы, частота, список категорий с opt-in/opt-out статусом) через API.
+    acceptance_criteria:
+      - "Given авторизованный пользователь When GET /notification-preferences Then 200 с полным набором предпочтений"
+      - "Given неавторизованный запрос When GET /notification-preferences Then 401"
+    trace:
+      prd: "prd.md#scope"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1notification-preferences/get"
+      tests: []
+      components: []
+
+  - id: "REQ-NOTIF-002"
+    title: "Обновление каналов доставки"
+    type: "functional"
+    priority: "P0"
+    status: "draft"
+    description: >
+      Пользователь MUST иметь возможность выбрать предпочтительные каналы доставки
+      уведомлений (email, push, SMS) через API.
+    acceptance_criteria:
+      - "Given авторизованный пользователь When PATCH /notification-preferences/channels с валидным payload Then 200 и каналы обновлены"
+      - "Given невалидный канал When PATCH /notification-preferences/channels Then 400"
+    trace:
+      prd: "prd.md#scope"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1notification-preferences~1channels/patch"
+      tests: []
+      components: []
+
+  - id: "REQ-NOTIF-003"
+    title: "Настройка частоты уведомлений"
+    type: "functional"
+    priority: "P1"
+    status: "draft"
+    description: >
+      Пользователь SHOULD иметь возможность выбрать частоту доставки уведомлений:
+      immediate (мгновенно), daily digest (ежедневно), weekly digest (еженедельно).
+    acceptance_criteria:
+      - "Given авторизованный пользователь When PATCH /notification-preferences/frequency с frequency=daily Then 200 и частота обновлена"
+      - "Given невалидное значение frequency When PATCH Then 400"
+    trace:
+      prd: "prd.md#scope"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1notification-preferences~1frequency/patch"
+      tests: []
+      components: []
+
+  - id: "REQ-NOTIF-004"
+    title: "Opt-out по категориям уведомлений"
+    type: "functional"
+    priority: "P0"
+    status: "draft"
+    description: >
+      Пользователь MUST иметь возможность отписаться от любой не-mandatory категории
+      уведомлений. Mandatory категории (e.g. security) MUST NOT быть отключаемыми.
+      GDPR compliance: opt-out MUST быть аудируемым.
+    acceptance_criteria:
+      - "Given авторизованный пользователь и немандаторная категория When DELETE /notification-preferences/categories/{categoryId} Then 200 и категория отключена"
+      - "Given mandatory категория (is_mandatory=true) When DELETE Then 403 с объяснением"
+      - "Given opt-out Then событие notifications.category.opted-out опубликовано"
+    trace:
+      prd: "prd.md#scope"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1notification-preferences~1categories~1{categoryId}/delete"
+      tests: []
+      components: []
+
+  - id: "REQ-NOTIF-005"
+    title: "SLO на латентность Preferences API"
+    type: "nfr"
+    priority: "P1"
+    status: "draft"
+    description: >
+      Preferences API SHOULD отвечать с латентностью P95 < 200ms и P99 < 500ms
+      при нормальной нагрузке (до 100 RPS).
+    metrics:
+      - name: "api_latency_p95_ms"
+        target: 200
+        measurement: "apm"
+      - name: "api_latency_p99_ms"
+        target: 500
+        measurement: "apm"
+    trace:
+      prd: "prd.md#scope"
+      slo: "ops/slo.yaml#notification-preferences-latency"
+      tests: []
+      components: []
+
+  - id: "REQ-NOTIF-006"
+    title: "Событие изменения предпочтений"
+    type: "functional"
+    priority: "P1"
+    status: "draft"
+    description: >
+      При любом изменении предпочтений уведомлений MUST публиковаться доменное
+      событие notifications.preference.updated через message bus для downstream consumers.
+    acceptance_criteria:
+      - "Given пользователь изменил preferences When изменение сохранено Then событие notifications.preference.updated опубликовано в RabbitMQ"
+      - "Given событие опубликовано Then payload содержит user_id, changed_fields, previous_values, new_values"
+    trace:
+      prd: "prd.md#scope"
+      contracts:
+        - "contracts/asyncapi.yaml#/channels/notifications.preferences.updated"
+      tests: []
+      components: []

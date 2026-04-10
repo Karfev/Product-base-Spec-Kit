@@ -1,0 +1,183 @@
+openapi: "3.1.0"
+info:
+  title: "Notification Preferences API"
+  version: "0.1.0"
+  description: "API для управления предпочтениями уведомлений пользователей"
+  contact:
+    name: "platform-team"
+
+servers:
+  - url: "https://api.example.com"
+    description: "Production"
+
+paths:
+  /notification-preferences:
+    get:
+      operationId: getNotificationPreferences
+      summary: "REQ-NOTIF-001 Получение предпочтений уведомлений"
+      tags: ["notification-preferences"]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+
+  /notification-preferences/channels:
+    patch:
+      operationId: updateChannelPreferences
+      summary: "REQ-NOTIF-002 Обновление каналов доставки"
+      tags: ["notification-preferences"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateChannelsRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+
+  /notification-preferences/frequency:
+    patch:
+      operationId: updateFrequencyPreference
+      summary: "REQ-NOTIF-003 Настройка частоты уведомлений"
+      tags: ["notification-preferences"]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateFrequencyRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPreferences"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+
+  "/notification-preferences/categories/{categoryId}":
+    delete:
+      operationId: optOutCategory
+      summary: "REQ-NOTIF-004 Opt-out по категориям"
+      tags: ["notification-preferences"]
+      parameters:
+        - name: categoryId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Unauthorized
+        "403":
+          description: "Forbidden — mandatory category cannot be opted out"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    NotificationPreferences:
+      type: object
+      required: [defaultChannel, digestFrequency, categories]
+      properties:
+        defaultChannel:
+          type: string
+          enum: ["email", "push", "sms"]
+        digestFrequency:
+          type: string
+          enum: ["immediate", "daily", "weekly"]
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/CategoryPreference"
+
+    CategoryPreference:
+      type: object
+      required: [categoryId, name, enabled, isMandatory]
+      properties:
+        categoryId:
+          type: string
+        name:
+          type: string
+        enabled:
+          type: boolean
+        isMandatory:
+          type: boolean
+        channelOverride:
+          type: string
+          enum: ["email", "push", "sms"]
+
+    UpdateChannelsRequest:
+      type: object
+      required: [defaultChannel]
+      properties:
+        defaultChannel:
+          type: string
+          enum: ["email", "push", "sms"]
+
+    UpdateFrequencyRequest:
+      type: object
+      required: [digestFrequency]
+      properties:
+        digestFrequency:
+          type: string
+          enum: ["immediate", "daily", "weekly"]
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+security:
+  - bearerAuth: []

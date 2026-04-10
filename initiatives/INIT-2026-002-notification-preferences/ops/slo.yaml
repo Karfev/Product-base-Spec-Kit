@@ -1,0 +1,56 @@
+# FILE: ops/slo.yaml
+# OpenSLO v1 multi-document (разделитель ---)
+# Валидация: check-jsonschema --schemafile <openslo-schema> ops/slo.yaml
+# Ссылка спецификации: https://github.com/OpenSLO/OpenSLO
+
+---
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: "prometheus-main"
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: "https://prometheus.internal"
+
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: "notification-preferences-latency"
+spec:
+  description: "SLI P95 latency for notification preferences API endpoints"
+  thresholdMetric:
+    metricSource:
+      metricSourceRef: "prometheus-main"
+      type: Prometheus
+      spec:
+        promql: |
+          histogram_quantile(0.95,
+            sum(rate(notification_preferences_api_latency_ms_bucket[5m]))
+            by (le))
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "notification-preferences-latency"
+spec:
+  service: "platform"
+  description: "P95 latency for notification preferences API < 200ms"
+  budgetingMethod: Occurrences
+  objectives:
+    - displayName: "P95 < 200ms"
+      target: 0.95
+      valueMetric:
+        metricSource:
+          metricSourceRef: "prometheus-main"
+          type: Prometheus
+          spec:
+            promql: |
+              histogram_quantile(0.95,
+                sum(rate(notification_preferences_api_latency_ms_bucket[5m]))
+                by (le))
+  timeWindow:
+    - duration: 30d
+      isRolling: true

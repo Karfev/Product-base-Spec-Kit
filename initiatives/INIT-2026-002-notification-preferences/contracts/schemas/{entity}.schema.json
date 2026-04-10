@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/{entity}.schema.json",
+  "title": "{Entity}",
+  "description": "{Описание сущности}",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "{field1}", "{field2}"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier"
+    },
+    "{field1}": {
+      "type": "string",
+      "minLength": 1,
+      "description": "{Описание поля}"
+    },
+    "{field2}": {
+      "type": "string",
+      "enum": ["{value1}", "{value2}"],
+      "description": "{Описание поля}"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

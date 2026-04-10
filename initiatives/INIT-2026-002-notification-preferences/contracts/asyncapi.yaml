@@ -1,0 +1,99 @@
+asyncapi: "3.0.0"
+info:
+  title: "Notification Preferences Events"
+  version: "0.1.0"
+  description: "Доменные события изменения предпочтений уведомлений"
+
+channels:
+  notifications.preferences.updated:
+    address: "notifications.preferences.updated"
+    description: "REQ-NOTIF-006 Публикуется при любом изменении предпочтений уведомлений"
+    messages:
+      PreferenceUpdatedEvent:
+        $ref: "#/components/messages/PreferenceUpdatedEvent"
+
+  notifications.preferences.category-opted-out:
+    address: "notifications.preferences.category-opted-out"
+    description: "REQ-NOTIF-004 Публикуется при opt-out из категории уведомлений"
+    messages:
+      CategoryOptedOutEvent:
+        $ref: "#/components/messages/CategoryOptedOutEvent"
+
+operations:
+  publishPreferenceUpdated:
+    action: send
+    channel:
+      $ref: "#/channels/notifications.preferences.updated"
+    summary: "Published when user updates notification preferences"
+
+  publishCategoryOptedOut:
+    action: send
+    channel:
+      $ref: "#/channels/notifications.preferences.category-opted-out"
+    summary: "Published when user opts out of a notification category"
+
+components:
+  messages:
+    PreferenceUpdatedEvent:
+      name: PreferenceUpdatedEvent
+      title: "Preference Updated"
+      summary: "Пользователь изменил предпочтения уведомлений"
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/PreferenceUpdatedPayload"
+
+    CategoryOptedOutEvent:
+      name: CategoryOptedOutEvent
+      title: "Category Opted Out"
+      summary: "Пользователь отписался от категории уведомлений"
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/CategoryOptedOutPayload"
+
+  schemas:
+    PreferenceUpdatedPayload:
+      type: object
+      required: [eventId, occurredAt, data]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required: [userId, changedFields]
+          properties:
+            userId:
+              type: string
+            changedFields:
+              type: array
+              items:
+                type: string
+            previousValues:
+              type: object
+            newValues:
+              type: object
+
+    CategoryOptedOutPayload:
+      type: object
+      required: [eventId, occurredAt, data]
+      properties:
+        eventId:
+          type: string
+          format: uuid
+        occurredAt:
+          type: string
+          format: date-time
+        data:
+          type: object
+          required: [userId, categoryId, optOutSource]
+          properties:
+            userId:
+              type: string
+            categoryId:
+              type: string
+            optOutSource:
+              type: string
+              enum: ["api", "email_link"]
