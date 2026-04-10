@@ -9,6 +9,7 @@ INITIATIVE_ID="${1:-}"
 FEATURE_SLUG=""
 PROFILE="standard"
 WITH_GSD=false
+PRESET=""
 
 # Parse remaining arguments
 shift || true
@@ -24,6 +25,14 @@ while [[ $# -gt 0 ]]; do
       ;;
     --with-gsd)
       WITH_GSD=true
+      shift
+      ;;
+    --preset)
+      PRESET="${2:-}"
+      shift 2
+      ;;
+    --preset=*)
+      PRESET="${1#--preset=}"
       shift
       ;;
     *)
@@ -159,6 +168,30 @@ if [[ -n "$FEATURE_SLUG" ]]; then
       echo "✅ Created L4 spec: .specify/specs/$FEATURE_SLUG"
     fi
   fi
+fi
+
+# Archkom preset (optional)
+if [[ "$PRESET" == "archkom" ]]; then
+  echo ""
+  echo "==> Applying archkom preset..."
+
+  TARGET_INIT="$REPO_ROOT/initiatives/$INITIATIVE_ID"
+  for f in "$TARGET_INIT/prd.md" "$TARGET_INIT/decisions/ADR-template.md"; do
+    if [[ -f "$f" ]]; then
+      sed -i.bak '/<!-- optional: archkom/d; /<!-- ## /{s/<!-- //;s/ -->//;}; /^-->$/d' "$f"
+      rm -f "${f}.bak"
+    fi
+  done
+
+  if [[ -f "$TARGET_INIT/hld.md" ]]; then
+    sed -i.bak '/<!-- archkom:/d; /<!-- ## /{s/<!-- //;s/ -->//;}; /<!-- |/d; /^-->$/d' "$TARGET_INIT/hld.md"
+    rm -f "${TARGET_INIT}/hld.md.bak"
+  fi
+
+  echo "  Archkom sections enabled in prd.md, hld.md, ADR-template.md"
+  echo ""
+  echo "Archkom artifact chain:"
+  echo "  brd.md → prd.md → hld.md → decisions/АТР → design.md"
 fi
 
 echo ""

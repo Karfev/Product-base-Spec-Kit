@@ -4,6 +4,7 @@
 **Owner (Tech Lead):** @{team-or-person}
 **Profile:** {Minimal|Standard|Extended}
 **Last updated:** {YYYY-MM-DD}
+**HLD:** `hld.md` (если есть — архитектура верхнего уровня)
 **Related:** `prd.md`, `requirements.yml`, `decisions/`, `contracts/`, `ops/`
 
 ---
@@ -17,7 +18,9 @@
 
 ## Контекст и границы (C4: Context)
 
-- **Системы и акторы:** {список внешних систем и пользователей}
+> Если `hld.md` существует, C4 Context и Container описаны там. Здесь — только implementation-level детали.
+
+- **Системы и акторы:** {список → или ссылка на hld.md §2}
 - **Trust boundaries** (Extended): {кратко}
 
 ```mermaid

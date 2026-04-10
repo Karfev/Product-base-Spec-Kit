@@ -240,6 +240,26 @@ Requirements run through standard CI gates at every step.
 
 ---
 
+## Archkom Preset (optional)
+
+For organizations with formal architecture governance, `--preset archkom` enables an extended artifact chain:
+
+```text
+brd.md → prd.md → hld.md → ADR/АТР → design.md
+```
+
+Each artifact is the single source of truth for its domain. No duplication down the chain.
+
+| Archkom Level | Trigger | Required Artifacts |
+|---|---|---|
+| У0 | Local change, no integration impact | Internal note (no Archkom) |
+| У1 | New API / contract change / integration | HLD + ADR + domain reviews |
+| У2 | Cross-cutting / high-risk / security | BRD + PRD + HLD + ADR + all domain reviews + TCO |
+
+Full policy: `.specify/memory/constitution.md` → section "Архитектурный комитет".
+
+---
+
 ## GSD Integration (optional)
 
 [GSD](https://github.com/gsd-build/get-shit-done) can replace the linear `/speckit-implement` with wave-based parallel execution and fresh context per agent.
