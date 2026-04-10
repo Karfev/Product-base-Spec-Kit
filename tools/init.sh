@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Bootstrap a new initiative + L4 spec from templates.
-# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug]
+# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--with-gsd]
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth
+# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-gsd
 set -euo pipefail
 
 # Separate flags from positional arguments

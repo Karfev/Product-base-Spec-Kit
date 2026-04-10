@@ -74,7 +74,7 @@ tasks.md → [/speckit-gsd-bridge] → .planning/PLAN.md
 | Complex feature, > 1 day | `/speckit-gsd-bridge` + `/gsd-execute-phase` |
 | Brownfield codebase | `/speckit-gsd-map` before spec cycle |
 
-Install GSD into an existing project: `make init` with `--with-gsd`, or `npx get-shit-done-cc@latest --claude --local`.
+Install GSD into an existing project: `./tools/init.sh INIT-... slug --with-gsd`, or `npx get-shit-done-cc@latest --claude --local`.
 
 Full policy: `.specify/memory/constitution.md` → section "GSD-интеграция".
 
