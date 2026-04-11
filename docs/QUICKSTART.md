@@ -9,13 +9,14 @@ pip install pyyaml check-jsonschema    # Python 3.10+
 npm install -g markdownlint-cli2       # Node 18+
 ```
 
-## Option A: Guided (Claude Code)
+## Option A: Guided (any AI coding agent)
 
 ```text
 /speckit-start
 ```
 
 Answer 5 questions. Done. Initiative created and validated.
+Works with Claude Code, OpenCode, or Kilo Code. See [AGENTS.md](../AGENTS.md) for setup.
 
 ## Option B: Manual
 

@@ -7,7 +7,7 @@
 ![Validate Contracts](https://github.com/Karfev/Product-base-Spec-Kit/actions/workflows/contracts.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-> **New here?** Start with [Quick Start](docs/QUICKSTART.md) — your first validated initiative in 30 minutes. Or run `/speckit-start` in Claude Code.
+> **New here?** Start with [Quick Start](docs/QUICKSTART.md) — your first validated initiative in 30 minutes. Or run `/speckit-start` in your AI coding agent.
 
 ---
 
@@ -22,7 +22,22 @@ Spec Kit gives a team:
 - **Traceability by construction** — REQ-IDs link L3 requirements to L4 specs to tests to SLOs
 - **Risk-calibrated depth** — four profiles (Minimal / Standard / Extended / Enterprise) so low-risk changes stay lightweight
 - **Bootstrap in one command** — `./tools/init.sh` scaffolds a full initiative in seconds
-- **24 Claude Code commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
+- **26 slash commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
+
+## Agent Compatibility
+
+SpecKit skills use the [SKILL.md](https://github.com/anthropics/skill-md) standard and work with multiple AI coding agents:
+
+| Agent | Custom Commands | AGENTS.md | Local LLM | Setup Guide |
+|-------|:--------------:|:---------:|:---------:|-------------|
+| Claude Code | ✅ Native | ✅ | ❌ Cloud only | Built-in |
+| OpenCode | ✅ via symlink | ✅ | ✅ Ollama | [Setup](docs/SETUP-OPENCODE.md) |
+| Kilo Code (VS Code / JetBrains) | ✅ Native | ✅ | ✅ Ollama/vLLM | [Setup](docs/SETUP-KILOCODE.md) |
+| Codex CLI | ❌ | ✅ | ❌ Cloud only | — |
+| Gemini CLI | ❌ | ⚠️ GEMINI.md | ❌ Cloud only | — |
+
+22 of 26 commands are fully portable (file I/O + bash). 4 GSD commands require optional GSD installation.
+See [AGENTS.md](AGENTS.md) for the complete skill catalog and [docs/COMPAT-MATRIX.md](docs/COMPAT-MATRIX.md) for detailed compatibility.
 
 ---
 
@@ -47,7 +62,7 @@ tools/schemas/          JSON Schema validators (requirements, services, billing,
 tools/scripts/          CI scripts (check-trace, check-spec-quality, check-release-rollout)
 tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
 .github/workflows/      CI: validate.yml + contracts.yml
-.claude/commands/       24 Claude Code slash commands for guided workflow
+.claude/commands/       26 slash commands (SKILL.md standard)
 Makefile                Local task runner (make check-all)
 ```
 
@@ -66,7 +81,7 @@ For `oasdiff` (breaking change detection): see <https://github.com/oasdiff/oasdi
 
 ### 2. Select a profile
 
-Decide on the conformity profile based on **risk**, not initiative size. In Claude Code:
+Decide on the conformity profile based on **risk**, not initiative size. Run:
 
 ```text
 /speckit-profile INIT-2026-042-my-feature
@@ -115,7 +130,6 @@ All placeholders (`{INIT-YYYY-NNN-slug}`, `{YYYY-MM-DD}`, `{product}`, `{team}`,
 ### 4. Fill requirements and validate
 
 ```bash
-# In Claude Code:
 /speckit-prd INIT-2026-042-my-feature           # fill PRD
 /speckit-requirements INIT-2026-042-my-feature   # fill requirements.yml
 
@@ -252,7 +266,7 @@ Full profile requirements and CI gates -> `.specify/memory/constitution.md`
 
 ---
 
-## Claude Code Commands — Full Reference
+## Slash Commands — Full Reference
 
 ### L3 Initiative Management
 
@@ -392,7 +406,7 @@ For large information systems following the AIS methodology (ArchiMate 3.2 / GOS
 ./tools/init.sh INIT-2026-NNN-my-system NNN-my-system --profile enterprise
 ```
 
-Then in Claude Code:
+Then run:
 ```text
 /speckit-architecture INIT-2026-NNN-my-system
 ```
@@ -478,7 +492,7 @@ Product-base-Spec-Kit/
     init.sh                             <- Bootstrap script
     schemas/                            <- JSON Schema validators
     scripts/                            <- Validation scripts
-  .claude/commands/                     <- 24 Claude Code skills
+  .claude/commands/                     <- 26 slash commands (SKILL.md)
   .github/workflows/                    <- CI pipelines
   Makefile                              <- Local task runner
 ```

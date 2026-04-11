@@ -324,10 +324,10 @@ if [[ "$PROFILE" = "enterprise" ]]; then
   echo "  3. Fill subsystem-classification.yaml (owner, activity_domain)"
   echo "  4. Run: /speckit-architecture $INITIATIVE_ID  (generates design.md layers + Mermaid stubs)"
   if [[ -n "$FEATURE_SLUG" ]]; then
-    echo "  5. Open Claude Code and run: /speckit-specify $FEATURE_SLUG"
+    echo "  5. Run: /speckit-specify $FEATURE_SLUG"
   fi
 elif [[ -n "$FEATURE_SLUG" ]]; then
-  echo "  3. Open Claude Code and run: /speckit-specify $FEATURE_SLUG"
+  echo "  3. Run: /speckit-specify $FEATURE_SLUG"
 fi
 
 # GSD integration (optional)
