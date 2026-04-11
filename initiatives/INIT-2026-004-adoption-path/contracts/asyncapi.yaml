@@ -1,0 +1,13 @@
+# AsyncAPI 3.0.0 — SpecKit Adoption Path
+# This initiative is tooling-focused (CLI scripts, Claude Code commands).
+# No async messaging contracts needed.
+
+asyncapi: "3.0.0"
+info:
+  title: "SpecKit Adoption Path"
+  version: "0.1.0"
+  description: >
+    This initiative adds CLI tooling (speckit-start, upgrade.sh, speckit-trace-viz).
+    No async messaging channels are introduced.
+channels: {}
+operations: {}

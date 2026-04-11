@@ -7,6 +7,8 @@
 ![Validate Contracts](https://github.com/Karfev/Product-base-Spec-Kit/actions/workflows/contracts.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
+> **New here?** Start with [Quick Start](docs/QUICKSTART.md) — your first validated initiative in 30 minutes. Or run `/speckit-start` in Claude Code.
+
 ---
 
 ## Why this kit?

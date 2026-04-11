@@ -68,6 +68,11 @@ if ! echo "$VALID_PROFILES" | grep -qw "$PROFILE"; then
   exit 1
 fi
 
+if [[ "$PRESET" == "archkom" && "$PROFILE" == "minimal" ]]; then
+  echo "Error: --preset archkom requires at least --profile standard (needs design.md and decisions/)"
+  exit 1
+fi
+
 if [[ -z "$INITIATIVE_ID" ]]; then
   echo "Usage: $0 INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise]"
   echo "Example: $0 INIT-2026-042-user-auth 042-user-auth --profile enterprise"
@@ -139,8 +144,9 @@ with open(path, 'w') as f:
 fi
 
 # Profile-based file filtering
-EXTENDED_ONLY=("brd.md" "hld.md" "compliance" "ops/threat-model.md"
+EXTENDED_ONLY=("compliance" "ops/threat-model.md"
                "ops/nfr-validation.md" "delivery/migration.md")
+ARCHKOM_ONLY=("brd.md" "hld.md")
 
 if [[ "$PROFILE" == "minimal" ]]; then
   # Remove Standard + Extended files
@@ -167,6 +173,11 @@ text = re.sub(r'\| Security \|[^\n]*\n', '', text)
 open(sys.argv[1], 'w').write(text)
 " "$PRR"
   fi
+fi
+
+# Remove archkom-only artifacts unless --preset archkom is used
+if [[ "$PRESET" != "archkom" ]]; then
+  for f in "${ARCHKOM_ONLY[@]}"; do rm -rf "$TARGET_INIT/$f"; done
 fi
 
 # Enterprise-specific artifacts
@@ -268,6 +279,25 @@ if [[ "$PRESET" == "archkom" ]]; then
   echo "==> Applying archkom preset..."
 
   TARGET_INIT="$REPO_ROOT/initiatives/$INITIATIVE_ID"
+
+  # Ensure archkom-only files exist (may have been removed by profile filtering)
+  for f in "${ARCHKOM_ONLY[@]}"; do
+    if [[ ! -f "$TARGET_INIT/$f" && -f "$TEMPLATE_INIT/$f" ]]; then
+      cp "$TEMPLATE_INIT/$f" "$TARGET_INIT/$f"
+      sed -i.bak "s|{INIT-YYYY-NNN-slug}|$INITIATIVE_ID|g" "$TARGET_INIT/$f"
+      sed -i.bak "s|{YYYY-MM-DD}|$(date +%Y-%m-%d)|g" "$TARGET_INIT/$f"
+      if [[ -n "$PRODUCT" ]]; then
+        sed -i.bak "s|{product}|$PRODUCT|g" "$TARGET_INIT/$f"
+      fi
+      if [[ -n "$OWNER" ]]; then
+        OWNER_BARE="${OWNER#@}"
+        sed -i.bak "s|{team}|$OWNER_BARE|g" "$TARGET_INIT/$f"
+        sed -i.bak "s|{team-or-person}|$OWNER|g" "$TARGET_INIT/$f"
+      fi
+      rm -f "${TARGET_INIT}/${f}.bak"
+    fi
+  done
+
   for f in "$TARGET_INIT/prd.md" "$TARGET_INIT/decisions/ADR-template.md"; do
     if [[ -f "$f" ]]; then
       sed -i.bak '/<!-- optional: archkom/d; /<!-- ## /{s/<!-- //;s/ -->//;}; /^-->$/d' "$f"

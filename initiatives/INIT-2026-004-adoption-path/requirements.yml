@@ -1,0 +1,163 @@
+# Реестр требований инициативы.
+# Команда валидации: make validate
+metadata:
+  initiative: "INIT-2026-004-adoption-path"
+  product: "speckit"
+  owner: "@karfev"
+  profile: "standard"
+  version: "0.1.0"
+  last_updated: "2026-04-11"
+
+requirements:
+  - id: "REQ-ADOPT-001"
+    title: "Unified entry command /speckit-start"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Пользователь MUST иметь возможность запустить одну команду `/speckit-start`,
+      которая последовательно проведёт его через: выбор профиля (по умолчанию Minimal),
+      scaffold инициативы, заполнение PRD (5 структурированных вопросов), генерацию
+      requirements.yml и валидацию через `make validate`. Результат — validated initiative
+      за одну сессию без переключения между командами.
+    acceptance_criteria:
+      - "Given a user runs /speckit-start with initiative slug, when they answer 5 questions, then initiatives/{INIT}/ is created with prd.md and requirements.yml"
+      - "Given the scaffold is complete, when make validate runs, then it passes with 0 errors"
+      - "Given a new user with no SpecKit experience, when they follow /speckit-start prompts, then time-to-first-validate < 30 minutes"
+    trace:
+      contracts: []
+      tests:
+        - "tests/commands/speckit-start.test.md"
+      components:
+        - ".claude/commands/speckit-start.md"
+
+  - id: "REQ-ADOPT-002"
+    title: "Clean Minimal scaffold"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Minimal-профиль MUST создавать только 4 файла: prd.md, requirements.yml,
+      README.md, changelog/CHANGELOG.md. Пустые директории contracts/, decisions/,
+      ops/, delivery/ НЕ ДОЛЖНЫ создаваться для Minimal-профиля. Это снижает
+      cognitive overload у новых пользователей — они видят только то, с чем работают.
+    acceptance_criteria:
+      - "Given init.sh --profile minimal, when scaffold is created, then only prd.md, requirements.yml, README.md, changelog/CHANGELOG.md exist"
+      - "Given init.sh --profile minimal, when user lists files, then no empty directories (contracts/, decisions/, ops/, delivery/) are present"
+      - "Given existing Minimal initiatives, when they upgrade to Standard, then missing directories are created by upgrade.sh"
+    trace:
+      contracts: []
+      tests:
+        - "tests/scripts/test-init-minimal.sh"
+      components:
+        - "tools/init.sh"
+
+  - id: "REQ-ADOPT-003"
+    title: "Profile upgrade path"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      Пользователь MUST иметь возможность мигрировать существующую инициативу
+      на более высокий профиль через команду `./tools/upgrade.sh INIT-... --profile standard`.
+      Скрипт MUST сохранить все существующие артефакты, создать недостающие stub-файлы
+      для нового профиля и обновить metadata.profile в requirements.yml.
+      Перед изменением создаётся backup в .backup/.
+    acceptance_criteria:
+      - "Given a Minimal initiative with filled prd.md, when upgrade.sh --profile standard runs, then contracts/, decisions/, ops/, delivery/ are created with stubs"
+      - "Given upgrade.sh runs, then existing prd.md and requirements.yml content is preserved byte-for-byte"
+      - "Given upgrade.sh runs, then metadata.profile in requirements.yml is updated to new profile"
+      - "Given upgrade.sh runs, then .backup/{INIT}-{timestamp}/ contains pre-upgrade snapshot"
+      - "Given upgrade.sh --profile minimal on a Standard initiative, then error: downgrade requires --force flag and Tech Lead sign-off"
+    trace:
+      contracts: []
+      tests:
+        - "tests/scripts/test-upgrade.sh"
+      components:
+        - "tools/upgrade.sh"
+
+  - id: "REQ-ADOPT-004"
+    title: "Gate 1 Quick Start document"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      README MUST содержать секцию «Quick Start (5 minutes)» объёмом ≤ 60 строк,
+      покрывающую полный Gate 1 путь: install → init minimal → prd → requirements → validate.
+      Дополнительно SHOULD быть standalone файл docs/QUICKSTART.md с тем же контентом
+      для прямой ссылки из GitHub / blog posts.
+    acceptance_criteria:
+      - "Given docs/QUICKSTART.md exists, when counted, then it contains <= 60 lines (excluding frontmatter)"
+      - "Given a new user follows QUICKSTART.md step by step, when they reach the end, then make validate passes"
+      - "Given QUICKSTART.md references file paths, when CI runs, then all referenced paths exist in the repo"
+    trace:
+      contracts: []
+      tests:
+        - "tests/docs/test-quickstart-links.sh"
+      components:
+        - "docs/QUICKSTART.md"
+        - "README.md"
+
+  - id: "REQ-ADOPT-005"
+    title: "Traceability visualization"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      Команда `/speckit-trace-viz` SHOULD генерировать Mermaid-диаграмму типа flowchart,
+      показывающую связи REQ-ID → ADR → Contract → Test → SLO для указанной инициативы.
+      Диаграмма записывается в trace-viz.md внутри инициативы. Это даёт визуальный
+      «aha-момент» для понимания value traceability.
+    acceptance_criteria:
+      - "Given an initiative with >=3 REQ-IDs with traces, when /speckit-trace-viz runs, then a Mermaid flowchart is generated in trace-viz.md"
+      - "Given trace-viz.md is generated, when rendered in GitHub, then REQ-IDs are clickable nodes linking to requirements.yml"
+      - "Given an initiative with empty traces, when /speckit-trace-viz runs, then orphan REQ-IDs are highlighted in red"
+    trace:
+      contracts: []
+      tests:
+        - "tests/commands/speckit-trace-viz.test.md"
+      components:
+        - ".claude/commands/speckit-trace-viz.md"
+
+  - id: "REQ-ADOPT-006"
+    title: "Archkom decoupling"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      Archkom governance chain (BRD → PRD → HLD → ADR → design.md) MUST быть
+      отдельным opt-in preset, не привязанным к Enterprise-профилю.
+      `init.sh --preset archkom` работает с любым профилем (Standard+).
+      Enterprise-профиль без --preset archkom НЕ ДОЛЖЕН создавать BRD/HLD stubs.
+      Это разделяет две ортогональные оси: глубину спецификации (профиль) и
+      формальную governance (Archkom).
+    acceptance_criteria:
+      - "Given init.sh --profile enterprise without --preset archkom, then brd.md and hld.md are NOT created"
+      - "Given init.sh --profile standard --preset archkom, then brd.md and hld.md ARE created"
+      - "Given existing Enterprise initiative without Archkom, when user adds --preset archkom via upgrade.sh, then BRD/HLD stubs are added"
+    trace:
+      contracts: []
+      tests:
+        - "tests/scripts/test-archkom-decoupling.sh"
+      components:
+        - "tools/init.sh"
+        - "tools/upgrade.sh"
+
+  - id: "REQ-ADOPT-007"
+    title: "Time-to-first-validate SLO"
+    type: "nfr"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Весь Gate 1 путь (от первой команды до `make validate` passing)
+      SHOULD занимать <= 30 минут для пользователя без предварительного
+      знакомства с SpecKit. Измеряется через user testing с 3+ участниками.
+    metrics:
+      - name: "time_to_first_validate_minutes"
+        target: 30
+        measurement: "user_testing"
+        iso_characteristic: "usability"
+        iso_sub_characteristic: "learnability"
+    trace:
+      tests:
+        - "tests/usability/gate1-time-test.md"
