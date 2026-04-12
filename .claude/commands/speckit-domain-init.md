@@ -114,3 +114,8 @@ You are initializing the domain-level specification for `$ARGUMENTS`.
 - Glossary terms MUST distinguish from similar terms in adjacent domains
 - Event names MUST follow pattern: `<domain>.<entity>.<past-tense-verb>` (e.g., `auth.api-key.created`)
 - Do NOT invent business rules — ask the user for each invariant
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

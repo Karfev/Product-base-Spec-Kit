@@ -64,6 +64,13 @@ spec → plan → tasks → implement
 
 **Правило:** init создаёт структуру, последующие навыки заполняют контент. Нет пересечения.
 
+### Управление состоянием сессии
+
+- **Session state (MUST):** Каждый `/speckit-*` command MUST выполнять Session Update protocol из `.specify/session/protocol.md` после успешного завершения.
+- **Ephemeral storage (MUST):** `.specify/session/` НЕ коммитится в git. Файлы — per-initiative, max 50 строк.
+- **Selective context loading (SHOULD):** При resume команда загружает session state + файлы из секции "Context Files" вместо полного re-read.
+- **Protocol location:** `.specify/session/protocol.md` — единый source of truth для 8-step middleware protocol.
+
 ---
 
 ## Уровни и профили обязательности

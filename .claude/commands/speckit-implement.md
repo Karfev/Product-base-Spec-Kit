@@ -59,3 +59,8 @@ This ensures graduation (`/speckit-graduate`) finds requirements with terminal s
 - Never mark a task complete if CI checks fail locally
 - Run `make check-all` before marking T5 complete
 - One task at a time — do not batch multiple tasks in one step
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-trace

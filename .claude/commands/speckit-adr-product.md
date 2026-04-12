@@ -84,3 +84,8 @@ You are recording an Architecture Decision Record for product `$ARGUMENTS`.
 - ADR filename MUST match scheme: `<product>-NNNN-<slug>.md` (zero-padded, lowercase slug)
 - Do NOT alter existing ADRs — create a new one that supersedes if a decision changes
 - Related REQ-IDs MUST be listed in the Links section
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

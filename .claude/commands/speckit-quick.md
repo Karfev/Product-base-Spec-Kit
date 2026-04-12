@@ -84,3 +84,8 @@ You are the SpecKit quick-start guide. Your goal: auto-detect the initiative pro
 - If user provides an INIT-ID as argument, inform: "Для существующей инициативы используйте `/speckit-start {INIT-ID}` или `/speckit-profile {INIT-ID}`"
 - risk-keywords.yml is the SINGLE source of truth for keyword patterns — do NOT hardcode patterns
 - Generate REQ-IDs that pass the schema pattern: `^REQ-[A-Z0-9]{2,16}-[0-9]{3}$`
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

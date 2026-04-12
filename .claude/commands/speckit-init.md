@@ -92,3 +92,8 @@ You are scaffolding a new initiative in this spec-driven repository.
 - All stub files MUST contain `{placeholder}` markers where real content is expected
 - Follow ID scheme: `INIT-YYYY-NNN-<slug>` — ASCII, lowercase slug, zero-padded NNN
 - For Enterprise profile: `subsystem-classification.yaml` must be valid against `tools/schemas/subsystem-classification.schema.json` before finishing
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

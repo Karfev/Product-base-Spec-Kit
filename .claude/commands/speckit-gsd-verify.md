@@ -116,3 +116,8 @@ If `initiatives/{INIT}/ops/prr-checklist.md` exists:
 - NEVER mark tasks.md items as complete — that's speckit-implement's job
 - If SUMMARY.md files are missing or incomplete, report gaps — do not fabricate evidence
 - Evidence report MUST use consistent column format for machine parsing by collect-evidence.py
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

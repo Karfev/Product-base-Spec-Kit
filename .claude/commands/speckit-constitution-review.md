@@ -86,3 +86,8 @@ You are auditing this repository for compliance with `.specify/memory/constituti
 - `make check-all` MUST be run and its output included verbatim
 - A passing audit requires zero ❌ failures — warnings do not block
 - Run this audit before any production release of a Standard/Extended initiative
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

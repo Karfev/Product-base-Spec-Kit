@@ -61,3 +61,8 @@ You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUM
 - `make check-trace` MUST pass with zero errors before reporting success
 - Do NOT fabricate test file paths — only link tests that actually exist
 - For Standard/Extended profile: every REQ-ID MUST have ≥1 trace link
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-rtm

@@ -103,3 +103,8 @@ You are initializing the product-level specification for `$ARGUMENTS`.
 - `architecture.md` MUST NOT duplicate content from domain glossaries — reference `domains/<domain>/`
 - All `{placeholder}` sections MUST remain until user fills them — do not invent content
 - `decisions/` naming: `$ARGUMENTS-NNNN-slug` (zero-padded, lowercase slug)
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

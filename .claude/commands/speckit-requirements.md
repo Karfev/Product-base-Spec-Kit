@@ -3,6 +3,8 @@ description: Fill or update requirements.yml for an initiative, then validate
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" instead of full context. If not found, proceed as below.
+
 You are managing the requirements registry for initiative `$ARGUMENTS`.
 
 ## Your job
@@ -71,3 +73,8 @@ You are managing the requirements registry for initiative `$ARGUMENTS`.
 - Every REQ-ID in `prd.md` MUST exist in `requirements.yml` — no dangling references
 - MUST run `make validate` and confirm zero errors before reporting success
 - Do NOT add trace links that don't yet exist — leave `trace: {}` or partial trace for now
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-contracts

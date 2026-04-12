@@ -4,3 +4,8 @@
 
 # Claude Code worktrees (local only)
 .claude/worktrees/
+
+# Session state (ephemeral, per-user)
+.specify/session/*
+!.specify/session/TEMPLATE.md
+!.specify/session/protocol.md

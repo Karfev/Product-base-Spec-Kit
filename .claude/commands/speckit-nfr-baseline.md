@@ -61,3 +61,8 @@ You are defining the Non-Functional Requirements baseline for product `$ARGUMENT
 - Every target MUST specify a measurement source (APM metric, uptime monitor, etc.)
 - Do NOT set targets without user confirmation — ask if unsure
 - Mark unresolved conflicts with `⚠️ CONFLICT:` prefix in the baseline file
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

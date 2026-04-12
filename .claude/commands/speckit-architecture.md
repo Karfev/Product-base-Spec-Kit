@@ -206,3 +206,8 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 - Не изобретай новые типы — если не подходит, уточни у архитектора
 - После заполнения: `make validate` должен пройти без ошибок
 - Не трогай другие разделы design.md (цели, контракты, качество)
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

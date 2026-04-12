@@ -3,6 +3,8 @@ description: Create or update a feature spec from a description
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists. Extract INIT-ID from the spec.md Initiative field. If session found, load only "Context Files". If not found, proceed as below.
+
 You are helping create a spec for feature `$ARGUMENTS` in this spec-driven repository.
 
 ## Your job
@@ -34,3 +36,8 @@ You are helping create a spec for feature `$ARGUMENTS` in this spec-driven repos
 - Mark every unresolved item with `[NEEDS CLARIFICATION]` in Open Questions
 - Do not propose technical solutions — that belongs in `plan.md`
 - Populate all mandatory sections in one pass; do not leave Scope/Non-goals/API/Contracts/Test strategy/Rollout empty.
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from spec.md Initiative field | **Type:** lifecycle | **Next:** /speckit-plan

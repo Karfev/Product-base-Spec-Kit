@@ -70,3 +70,8 @@ You are generating the evidence report for initiative `$ARGUMENTS` before releas
 - Do NOT fabricate coverage numbers — compute from actual file contents
 - For Minimal profile: skip SLO and PRR sections (not required)
 - Evidence report is append-only — create a new file with date stamp, never overwrite
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

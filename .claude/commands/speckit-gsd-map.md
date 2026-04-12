@@ -70,3 +70,8 @@ Print a summary of testing patterns found (frameworks, coverage, test structure)
 - NEVER auto-apply NFR suggestions — present and wait for approval
 - `[GSD-MAPPED]` markers MUST be present on all additions for audit trail
 - If `.planning/codebase/` already exists from a previous run, ask user whether to reuse or re-run
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_
