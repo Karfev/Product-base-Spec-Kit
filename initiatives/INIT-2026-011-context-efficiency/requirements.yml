@@ -3,7 +3,7 @@ metadata:
   product: "platform"
   owner: "@dmitriy"
   profile: "minimal"
-  version: "0.3.0"
+  version: "0.4.0"
   last_updated: "2026-04-12"
   initiative_status: "active"
 
@@ -103,7 +103,7 @@ requirements:
     title: "Phase-gated loading table"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       Таблица Phase → Load List в constitution или session middleware.
       Фазы: Discovery, Product, Architecture, L4-Spec, L4-Implement, Evidence.
