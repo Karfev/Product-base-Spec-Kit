@@ -1,0 +1,157 @@
+metadata:
+  initiative: "INIT-2026-007-quality-augmentation"
+  product: "platform"
+  owner: "@dmitriy"
+  profile: "minimal"
+  version: "0.2.0"
+  last_updated: "2026-04-12"
+  initiative_status: "active"
+
+requirements:
+  - id: "REQ-QUAL-001"
+    title: "Consilium multi-perspective review command"
+    type: functional
+    priority: P1
+    status: implemented
+    description: >
+      Новый command `/speckit-consilium <ADR-path>` запускает structured
+      multi-perspective review для указанного ADR. Агент последовательно
+      принимает 3-5 ролей, каждая анализирует ADR через свою линзу
+      и генерирует оценку: OK / Замечание / Блокер. Роли загружают
+      релевантный контекст (L1 domain NFR, L2 NFR baseline, threat-model,
+      SLO). Output — structured review в формате Архкомм доменных оценок.
+    acceptance_criteria:
+      - "Given ADR PLAT-0003-async-queue, When /speckit-consilium запущен, Then генерируется review от 3+ ролей с verdict per role"
+      - "Given ADR без security implications, When Security role анализирует, Then verdict = 'OK, не обнаружено security concerns' (не hallucinated issues)"
+      - "Given ADR с performance implications, When Ops role анализирует, Then verdict ссылается на L2 NFR baseline targets"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: /speckit-consilium on PLAT-0003 → 3 roles with verdicts"
+      components:
+        - ".claude/commands/speckit-consilium.md"
+
+  - id: "REQ-QUAL-002"
+    title: "Архкомм-aligned domain roles в consilium"
+    type: functional
+    priority: P1
+    status: implemented
+    description: >
+      Consilium использует роли, выровненные с доменными оценками
+      Архкомма (ADR-template-v2): ИБ (Information Security),
+      БД/нагрузки (Database/Load), Инфраструктура (Infrastructure),
+      Интеграции (Integrations), Прикладная архитектура (Application Architecture).
+      Каждая роль определена в конфигурации с: name, context_files
+      (какие артефакты загружать), checklist (что проверять),
+      verdict_format (OK / Замечание / Блокер + комментарий).
+    acceptance_criteria:
+      - "Given Standard profile ADR, When /speckit-consilium запущен, Then минимум 3 роли из списка Архкомм доменов"
+      - "Given Extended profile ADR, When /speckit-consilium запущен, Then все 5 базовых ролей + дополнительные если applicable"
+      - "Given роль ИБ, When анализирует ADR, Then загружает ops/threat-model.md и L1 domain nfr.md как контекст"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: /speckit-consilium --preset archkom-l1 → 5 roles"
+      components:
+        - ".specify/memory/consilium-roles.yml"
+
+  - id: "REQ-QUAL-003"
+    title: "Consilium output в ADR секцию Доменные оценки"
+    type: functional
+    priority: P1
+    status: implemented
+    description: >
+      Output consilium форматируется как секция "Доменные оценки" в ADR
+      (совместимо с ADR-template-v2 и ADR-template-L1-minimal). Формат:
+      таблица с колонками Домен | Оценщик | Статус | Комментарий.
+      Статусы: OK, Замечание (non-blocking), Блокер (requires resolution).
+      При наличии Блокеров — ADR получает статус "требует доработки"
+      с перечнем условий (аналог "Одобрено с условиями" в Архкомме).
+    acceptance_criteria:
+      - "Given consilium завершён, When output добавляется в ADR, Then секция 'Доменные оценки' заполнена в формате ADR-template-v2"
+      - "Given consilium выявил Блокер, When output записывается, Then ADR status = 'requires-rework' и условие с owner + deadline добавлено"
+      - "Given consilium без Блокеров, When output записывается, Then ADR status не меняется (остаётся proposed/accepted)"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: PoC on PLAT-0003 → Доменные оценки section injected"
+      components:
+        - ".claude/commands/speckit-consilium.md"
+
+  - id: "REQ-QUAL-004"
+    title: "AI quality gates document"
+    type: functional
+    priority: P1
+    status: implemented
+    description: >
+      Создать файл `tools/ai-quality-gates.md` с кодифицированными
+      constraints для AI-assisted implementation. Содержание:
+      (1) Decomposition: max 50 LOC per method, max 7-9 объектов в scope,
+      single responsibility per function.
+      (2) Architecture-first: создать skeleton stubs → approve → implement
+      method by method. Нет "write entire module at once".
+      (3) Test-first enforcement: T2a MUST precede T2b, tests define interface.
+      (4) Context management: narrow scope per task, explicit boundaries,
+      re-read spec before each T2b.
+      (5) Contract-aware constraints (SpecKit-specific): implementation
+      MUST match contract signatures (OpenAPI paths, AsyncAPI channels).
+    acceptance_criteria:
+      - "Given tools/ai-quality-gates.md exists, When /speckit-implement reads it, Then enforcement checklist loaded before T2b"
+      - "Given constraint 'max 50 LOC per method', When agent generates code, Then agent prompted to decompose methods > 50 LOC"
+      - "Given constraint 'architecture-first', When T2b starts, Then agent verifies stubs exist before writing implementation"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: /speckit-implement reads ai-quality-gates.md before T2b"
+      components:
+        - "tools/ai-quality-gates.md"
+
+  - id: "REQ-QUAL-005"
+    title: "Enforcement checklist в /speckit-implement"
+    type: functional
+    priority: P1
+    status: implemented
+    description: >
+      Модифицировать `/speckit-implement` для enforcement AI quality gates
+      перед каждым T2b шагом. Checklist: (1) T2a tests written and red?
+      (2) Architecture stubs created and approved? (3) Contract signatures
+      match? (4) Scope narrowed to single method/handler?
+      При невыполнении — warning с конкретным blocker.
+      Расширить `check-spec-quality.py` — lint-правило: tasks.md содержит
+      T2b без предшествующего T2a → CI warning (blocking after 2 weeks).
+    acceptance_criteria:
+      - "Given T2a not completed, When /speckit-implement moves to T2b, Then warning 'T2a tests not found, write tests first'"
+      - "Given tasks.md with T2b before T2a, When make check-spec-quality, Then warning 'T2b precedes T2a in {spec}'"
+      - "Given all pre-conditions met, When /speckit-implement starts T2b, Then checklist passes silently and implementation proceeds"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: T2b without T2a → pre-flight warning"
+        - "CI: check-spec-quality.py detects T2b[x] without T2a[x]"
+      components:
+        - ".claude/commands/speckit-implement.md"
+        - "tools/scripts/check-spec-quality.py"
+
+  - id: "REQ-QUAL-006"
+    title: "Custom panel composition"
+    type: functional
+    priority: P2
+    status: implemented
+    description: >
+      Пользователь может настраивать состав consilium panel через
+      флаг `/speckit-consilium --roles "ИБ,БД,Compliance"` или через
+      конфигурацию в `.specify/memory/consilium-roles.yml`.
+      Предустановленные presets: "standard" (3 роли: Architecture,
+      Security, Ops), "archkom-l1" (5 ролей по ADR-template-L1),
+      "archkom-l2" (все 10 доменов по ADR-template-v2).
+    acceptance_criteria:
+      - "Given --roles 'ИБ,Compliance', When /speckit-consilium запущен, Then только 2 указанные роли участвуют"
+      - "Given preset 'archkom-l2', When /speckit-consilium запущен, Then все 10 доменных ролей из ADR-template-v2"
+      - "Given consilium-roles.yml с custom role 'ML', When /speckit-consilium запущен, Then custom role загружается с указанными context_files"
+    trace:
+      prd: "prd.md#scope"
+      tests:
+        - "Manual: /speckit-consilium --roles 'security,integrations' → 2 roles only"
+      components:
+        - ".claude/commands/speckit-consilium.md"
+        - ".specify/memory/consilium-roles.yml"
