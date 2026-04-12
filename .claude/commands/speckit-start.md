@@ -148,3 +148,9 @@ You are the SpecKit onboarding guide. Your goal: take a new user from zero to a 
 - Generate REQ-IDs that pass the schema pattern: `^REQ-[A-Z0-9]{2,16}-[0-9]{3}$`
 - After validation passes, do NOT auto-proceed to /speckit-requirements — let the user decide.
 - Total interaction time target: < 15 minutes for the guided part.
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** generated from Q1 answer | **Type:** lifecycle | **Next:** /speckit-prd
+**Note:** This command CREATES the session file from TEMPLATE.md (step 1 of protocol). Initialize Progress checklist with all lifecycle commands, mark /speckit-start as `[x]`.

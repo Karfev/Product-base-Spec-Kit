@@ -3,6 +3,8 @@ description: Generate or update OpenAPI / AsyncAPI contract stubs from requireme
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" instead of full context. If not found, proceed as below.
+
 You are generating machine-readable API contracts for initiative `$ARGUMENTS`.
 
 ## Your job
@@ -85,3 +87,8 @@ You are generating machine-readable API contracts for initiative `$ARGUMENTS`.
 - `make lint-contracts` MUST pass with zero errors before reporting success
 - OpenAPI version MUST be `3.1.0`; AsyncAPI version MUST be `3.0.0` (intentional — 3.0.0 has wider tooling support; AsyncAPI CLI info about 3.1.0 can be ignored)
 - `401` and `400` error responses are REQUIRED for all authenticated endpoints
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-specify

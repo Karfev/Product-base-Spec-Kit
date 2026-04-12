@@ -3,6 +3,8 @@ description: Create or update the PRD for an initiative
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only files listed in its "Context Files" section instead of reading full constitution.md. If session not found or any Context File missing, proceed with full context load as below.
+
 You are helping write the Product Requirements Document for initiative `$ARGUMENTS`.
 
 ## Your job
@@ -136,3 +138,8 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 - Do not invent success metrics — ask the user for baseline and source
 - Keep PRD focused: 1–2 pages maximum; link, don't embed
 - Cross-initiative REQ-IDs SHOULD be mentioned in Motivation or Scope with initiative ID context (e.g., "REQ-NOTIF-004 from INIT-2026-002 requires auditable opt-out")
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-requirements
