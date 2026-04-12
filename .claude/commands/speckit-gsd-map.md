@@ -64,12 +64,16 @@ Print a summary of testing patterns found (frameworks, coverage, test structure)
 
 ## Rules
 
-- See `.specify/memory/constitution.md` section "Permission boundaries" for the full policy
+- See `.specify/memory/presets/gsd.md` section "Permission boundaries" for the full policy
 - NEVER modify L0, L1, or L3 artifacts
 - NEVER overwrite existing architecture docs — additive only
 - NEVER auto-apply NFR suggestions — present and wait for approval
 - `[GSD-MAPPED]` markers MUST be present on all additions for audit trail
 - If `.planning/codebase/` already exists from a previous run, ask user whether to reuse or re-run
+
+## Preset Loading
+
+Read `.specify/memory/presets/gsd.md` — required for GSD permission boundaries and mapping rules.
 
 ## Session Update
 

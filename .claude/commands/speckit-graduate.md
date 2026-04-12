@@ -306,6 +306,10 @@ Next steps:
 - **MUST run `make validate` and `make validate-registry`** before reporting success.
 - **Backward compatible**: `products/` without `requirements-registry.yml` continue to work. The registry is created on first graduation.
 
+## Preset Loading
+
+**Conditional:** If initiative profile is Standard or higher, Read `.specify/memory/presets/archkom.md` for Архкомм governance artifacts.
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.

@@ -207,6 +207,10 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 - После заполнения: `make validate` должен пройти без ошибок
 - Не трогай другие разделы design.md (цели, контракты, качество)
 
+## Preset Loading
+
+Read `.specify/memory/presets/archkom.md` — required for Архкомм artifact chain and domain evaluations.
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
