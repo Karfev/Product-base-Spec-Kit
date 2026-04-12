@@ -9,7 +9,7 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
+.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-index-stale check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -131,6 +131,10 @@ check-release-rollout: ## Validate rollout/migration consistency vs ops/slo.yaml
 	@echo "==> Checking release rollout consistency..."
 	@$(PYTHON) tools/scripts/check-release-rollout.py
 
+check-index-stale: ## Check if requirements-index.md / contracts-index.md are stale (warning only)
+	@echo "==> Checking index freshness..."
+	@$(PYTHON) tools/scripts/check-index-stale.py
+
 collect-evidence: ## Collect GSD execution evidence into RTM report
 	@echo "==> Collecting evidence from .planning/ SUMMARY files..."
 	@$(PYTHON) tools/scripts/collect-evidence.py
@@ -147,7 +151,7 @@ test-integration: ## Run integration tests (override TEST_INTEGRATION_CMD)
 test-perf: ## Run performance tests (override TEST_PERF_CMD)
 	@bash -lc '$(TEST_PERF_CMD)'
 
-check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality ## Run all validation checks
+check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-index-stale ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
 

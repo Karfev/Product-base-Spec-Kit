@@ -7,6 +7,8 @@ You are generating a concrete task list for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job
 
+**Index loading:** Read `initiatives/{INIT}/requirements-index.md` instead of full `requirements.yml` for context overview. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For specific REQ-IDs referenced in plan or spec, read targeted entries from `requirements.yml`.
+
 1. Read `.specify/specs/$ARGUMENTS/plan.md` (must be filled — no `{placeholders}`)
 2. Read `.specify/specs/$ARGUMENTS/spec.md` for requirements and acceptance criteria
 3. Read `docs/testing/test-strategy.md` and use its matrix when writing test tasks.

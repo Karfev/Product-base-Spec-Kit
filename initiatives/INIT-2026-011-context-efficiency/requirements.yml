@@ -3,7 +3,7 @@ metadata:
   product: "platform"
   owner: "@dmitriy"
   profile: "minimal"
-  version: "0.2.0"
+  version: "0.3.0"
   last_updated: "2026-04-12"
   initiative_status: "active"
 
@@ -48,7 +48,7 @@ requirements:
     title: "Auto-generated requirements-index.md"
     type: functional
     priority: P2
-    status: draft
+    status: implemented
     description: >
       После каждого вызова /speckit-requirements автоматически генерируется
       requirements-index.md рядом с requirements.yml. Формат: markdown
@@ -66,7 +66,7 @@ requirements:
     title: "Auto-generated contracts-index.md"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       После каждого вызова /speckit-contracts автоматически генерируется
       contracts/contracts-index.md. Формат: markdown таблица с колонками
@@ -83,7 +83,7 @@ requirements:
     title: "Command loading rules: index vs full"
     type: functional
     priority: P2
-    status: draft
+    status: implemented
     description: >
       Каждый command загружает requirements и contracts по правилам:
       L4 commands (implement, plan, tasks, specify) → requirements-index.md +
@@ -122,7 +122,7 @@ requirements:
     title: "Index stale detection CI gate"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       make validate проверяет, что requirements-index.md и contracts-index.md
       не stale. Stale = source file hash в index header не совпадает с текущим

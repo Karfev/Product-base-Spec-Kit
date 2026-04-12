@@ -74,6 +74,25 @@ You are managing the requirements registry for initiative `$ARGUMENTS`.
 - MUST run `make validate` and confirm zero errors before reporting success
 - Do NOT add trace links that don't yet exist — leave `trace: {}` or partial trace for now
 
+## Index Generation (post-write hook)
+
+After step 10 (validation passes), generate `initiatives/$ARGUMENTS/requirements-index.md`:
+
+1. Compute SHA-256 hash of `initiatives/$ARGUMENTS/requirements.yml`
+2. Write file in this format:
+   ```markdown
+   <!-- source-hash: <sha256-first-12-chars> | generated: YYYY-MM-DD -->
+   # Requirements Index — $ARGUMENTS
+
+   | ID | Title | P | Status |
+   |---|---|---|---|
+   | REQ-XXX-001 | Title here | P2 | draft |
+   ```
+3. One row per requirement, sorted by ID
+4. Commit this file alongside requirements.yml changes
+
+If `requirements-index.md` already exists, overwrite it with fresh data.
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
