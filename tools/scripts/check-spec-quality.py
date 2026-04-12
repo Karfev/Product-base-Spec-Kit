@@ -229,6 +229,17 @@ def main() -> int:
                 f"[ERROR] {tasks_md}: RED→GREEN sequence invalid (T2a must come before T2b)"
             )
 
+        # 5b) Task ordering enforcement (REQ-QUAL-005):
+        # Detect T2b checkbox marked done without T2a marked done.
+        if t2a_match and t2b_match:
+            t2a_done = re.search(r"-\s*\[x\]\s*\*\*T2a\b", tasks_text, re.IGNORECASE)
+            t2b_done = re.search(r"-\s*\[x\]\s*\*\*T2b\b", tasks_text, re.IGNORECASE)
+            if t2b_done and not t2a_done:
+                warnings.append(
+                    f"[WARN] {tasks_md}: T2b marked done but T2a not done "
+                    f"— tests should be written before implementation (AI Quality Gates Pillar 2)"
+                )
+
     for warning in warnings:
         print(warning)
     for error in errors:
