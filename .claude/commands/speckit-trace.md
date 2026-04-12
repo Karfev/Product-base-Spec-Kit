@@ -3,6 +3,8 @@ description: Generate or update trace.md (RTM) for a feature spec, then verify w
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+
 You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job

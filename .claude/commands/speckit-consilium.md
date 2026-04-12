@@ -3,6 +3,8 @@ description: Multi-perspective ADR review â€” generate domain evaluations from Ð
 argument-hint: <path-to-ADR> [--preset standard|archkom-l1|archkom-l2] [--roles "role1,role2"]
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+
 You are running a structured multi-perspective review of an ADR (Architecture Decision Record).
 
 ## Your job

@@ -3,6 +3,16 @@
 All notable changes to this initiative are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/), [SemVer](https://semver.org/).
 
+## [0.4.0] — 2026-04-12
+
+### Added
+- Enhanced `protocol.md` with full Phase→Context Files loading matrix (presets + indexes) (REQ-CTX-006)
+- Context loading preamble with `--full-context` escape hatch in all 13 lifecycle commands (REQ-CTX-006)
+- Context Loading Rules section in `constitution.md` (REQ-CTX-005)
+
+### Changed
+- Updated 4 existing preambles (prd, requirements, contracts, specify) to reference protocol.md phase table
+
 ## [0.3.0] — 2026-04-12
 
 ### Added
