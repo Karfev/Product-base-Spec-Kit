@@ -7,6 +7,12 @@ You are the SpecKit onboarding guide. Your goal: take a new user from zero to a 
 
 ## Your job
 
+0pre. **Session check.**
+  Glob `.specify/session/INIT-*.md`. If any session files found:
+  Say: "Найдены активные сессии ({count}). Продолжить с `/speckit-continue`? Или начать новую инициативу?"
+  - If user chooses continue → "Запустите `/speckit-continue`"
+  - If user chooses new → proceed to Step 0 below
+
 0. **Welcome & routing choice.**
    Say: "Welcome to SpecKit! I'll help you create a spec-validated initiative."
    Check if `initiatives/` has any existing initiatives. If yes, mention them for context.
