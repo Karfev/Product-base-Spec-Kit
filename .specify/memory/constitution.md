@@ -61,6 +61,7 @@ spec → plan → tasks → implement
 7. `/speckit-trace` + `/speckit-rtm` — traceability (Standard+: обязательно после implement)
 8. `/speckit-consilium` — мульти-перспективный ADR review (Standard+: перед graduation)
 9. `/speckit-graduate` → `make archive` (завершение)
+10. `/speckit-reflect` — structured reflection после graduation (SHOULD для Standard+)
 
 **Правило:** init создаёт структуру, последующие навыки заполняют контент. Нет пересечения.
 

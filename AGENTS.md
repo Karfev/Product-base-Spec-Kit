@@ -52,6 +52,7 @@ For first-time users: run `/speckit-start` to create your first validated initia
 | /speckit-prr-status | Review PRR checklist status — classify items as DONE / OPEN / BLOCKING |
 | /speckit-evidence | Generate an evidence report for an initiative (RTM coverage, PRR status, open gaps) |
 | /speckit-rtm | Build the Requirements Traceability Matrix for an initiative by scanning all artifacts |
+| /speckit-reflect | Generate structured reflection and evolution proposals for a graduated initiative |
 
 ### Domain & Product (L1/L2)
 

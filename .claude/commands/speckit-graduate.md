@@ -289,6 +289,7 @@ Graduation complete for {INIT-ID} → products/{product}/
 Next steps:
   1. Review products/{product}/knowledge-log.md — add key learnings
   2. Archive: tools/archive.sh {INIT-ID}  (or: make archive INIT={INIT-ID})
+  3. Reflect: /speckit-reflect {INIT-ID}  — generate lessons learned and evolution proposals
 ```
 
 ## Rules
