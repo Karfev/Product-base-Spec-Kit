@@ -3,7 +3,7 @@ metadata:
   product: "platform"
   owner: "@dmitriy"
   profile: "minimal"
-  version: "0.2.0"
+  version: "0.3.0"
   last_updated: "2026-04-12"
   initiative_status: "active"
 
@@ -49,7 +49,7 @@ requirements:
     title: "Evolution proposals в PR-ready формате"
     type: functional
     priority: P2
-    status: draft
+    status: implemented
     description: >
       Каждый proposal в reflection.md содержит: (1) target file
       (constitution.md / template / command), (2) тип изменения
@@ -67,7 +67,7 @@ requirements:
     title: "Evolution log"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       Файл `evolution-log.md` в корне репозитория. Append-only лог всех
       proposals: ID, дата, source INIT, target file, статус
@@ -84,7 +84,7 @@ requirements:
     title: "Human-in-the-loop approval"
     type: constraint
     priority: P1
-    status: draft
+    status: implemented
     description: >
       Никакие evolution proposals НЕ применяются автоматически.
       `/speckit-reflect` только генерирует proposals. Применение —
@@ -101,7 +101,7 @@ requirements:
     title: "Health metrics и audit triggers"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       Опциональные health metrics для framework: число активных commands
       (warn > 30), средний размер command file (warn > 500 строк),
