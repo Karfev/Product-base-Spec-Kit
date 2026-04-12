@@ -10,7 +10,7 @@ entries:
       - "POST /exports"
       - "GET /exports/{id}"
     graduated_at: "2026-04-12T00:00:00Z"
-    git_commit: "pending"
+    git_commit: "7cb9b96"
     forced: false
     breaking_changes_detected: false
 
@@ -22,6 +22,6 @@ entries:
     channels_added:
       - "export.report.completed"
     graduated_at: "2026-04-12T00:00:00Z"
-    git_commit: "pending"
+    git_commit: "7cb9b96"
     forced: false
     breaking_changes_detected: false

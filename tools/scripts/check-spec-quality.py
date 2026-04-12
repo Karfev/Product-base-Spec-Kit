@@ -161,7 +161,14 @@ def main() -> int:
             continue
 
         # 1) Unfilled placeholders in non-template specs.
+        in_code_block = False
         for line_no, line in enumerate(spec_text.splitlines(), start=1):
+            stripped = line.strip()
+            if stripped.startswith("```"):
+                in_code_block = not in_code_block
+                continue
+            if in_code_block:
+                continue
             if "<!--" in line and "-->" in line:
                 continue
             for match in PLACEHOLDER_PATTERN.finditer(line):

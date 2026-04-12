@@ -12,10 +12,10 @@ Graduation history — newest first. Auto-maintained by `/speckit-graduate`.
 
 | REQ-ID | Title | Final Status | Type |
 |---|---|---|---|
-| REQ-EXPORT-001 | Create export request via REST API | draft | functional |
-| REQ-EXPORT-002 | Support JSON and CSV export formats | draft | functional |
-| REQ-EXPORT-003 | Async export with completion notification | draft | functional |
-| REQ-EXPORT-004 | Export latency P95 under 30 seconds | draft | nfr |
+| REQ-EXPORT-001 | Create export request via REST API | implemented | functional |
+| REQ-EXPORT-002 | Support JSON and CSV export formats | implemented | functional |
+| REQ-EXPORT-003 | Async export with completion notification | implemented | functional |
+| REQ-EXPORT-004 | Export latency P95 under 30 seconds | implemented | nfr |
 
 ### ADRs graduated
 

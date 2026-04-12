@@ -58,7 +58,9 @@ spec → plan → tasks → implement
 4. `/speckit-requirements` — заполняет requirements.yml
 5. `/speckit-contracts` — генерирует OpenAPI / AsyncAPI stubs
 6. `/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement` (L4 контур)
-7. `/speckit-graduate` → `make archive` (завершение)
+7. `/speckit-trace` + `/speckit-rtm` — traceability (Standard+: обязательно после implement)
+8. `/speckit-consilium` — мульти-перспективный ADR review (Standard+: перед graduation)
+9. `/speckit-graduate` → `make archive` (завершение)
 
 **Правило:** init создаёт структуру, последующие навыки заполняют контент. Нет пересечения.
 

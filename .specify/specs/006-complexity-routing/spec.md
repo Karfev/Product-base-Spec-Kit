@@ -62,7 +62,7 @@ STEP 3: Output
     → Run scaffold immediately (init.sh --profile minimal)
     → Skip /speckit-profile
   else:
-    → Show: "Предложен профиль: {profile}. {risk_warning}. Подтвердить? [Да / Переопределить / Пройти /speckit-profile]"
+    → Show: "Предложен профиль: <profile>. <risk_warning>. Подтвердить? [Да / Переопределить / Пройти /speckit-profile]"
 ```
 
 ### Integration с `/speckit-start`
