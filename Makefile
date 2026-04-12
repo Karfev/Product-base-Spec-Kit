@@ -9,7 +9,7 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services validate-registry lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-all collect-evidence install-tools test-unit test-contract test-integration test-perf
+.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-all collect-evidence install-tools test-unit test-contract test-integration test-perf
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -70,6 +70,33 @@ validate-registry: ## Validate all products/*/requirements-registry.yml against 
 	if [ "$$found" -eq 0 ]; then echo "  No requirements-registry.yml files found — skipping"; fi; \
 	exit $$failed
 
+validate-contracts: ## Validate product contract-registry.yml + lint product baseline contracts
+	@echo "==> Validating contract-registry.yml files..."
+	@failed=0; \
+	found=0; \
+	for f in $$(find products -name contract-registry.yml | grep -v '{'); do \
+	  found=1; \
+	  echo "  Checking $$f"; \
+	  python3 -m check_jsonschema --schemafile tools/schemas/contract-registry.schema.json "$$f" || failed=1; \
+	done; \
+	if [ "$$found" -eq 0 ]; then echo "  No contract-registry.yml files found — skipping"; fi; \
+	echo "==> Linting product OpenAPI baselines..."; \
+	for f in $$(find products -name '*.openapi.yml' -o -name 'openapi.yaml' | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  redocly lint "$$f" 2>/dev/null || echo "    WARNING: redocly lint failed for $$f (install: npm i -g @redocly/cli)"; \
+	done; \
+	echo "==> Linting product AsyncAPI baselines..."; \
+	for f in $$(find products -name '*.asyncapi.yml' -o -name 'asyncapi.yaml' | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  asyncapi validate "$$f" 2>/dev/null || echo "    WARNING: asyncapi validate failed for $$f (install: npm i -g @asyncapi/cli)"; \
+	done; \
+	echo "==> Linting product Protobuf files..."; \
+	for f in $$(find products -name '*.proto' | grep -v '{'); do \
+	  echo "  Checking $$f"; \
+	  buf lint "$$(dirname $$f)" 2>/dev/null || echo "    WARNING: buf lint failed for $$f (install buf from https://buf.build)"; \
+	done; \
+	exit $$failed
+
 lint-docs: ## Lint YAML and Markdown files (warning mode)
 	@echo "==> Linting YAML..."
 	@command -v yamllint >/dev/null 2>&1 && yamllint -c .yamllint.yml . || echo "  yamllint not found — run: make install-tools"
@@ -118,7 +145,7 @@ test-integration: ## Run integration tests (override TEST_INTEGRATION_CMD)
 test-perf: ## Run performance tests (override TEST_PERF_CMD)
 	@bash -lc '$(TEST_PERF_CMD)'
 
-check-all: validate validate-services validate-registry lint-docs lint-contracts check-trace check-spec-quality ## Run all validation checks
+check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
 

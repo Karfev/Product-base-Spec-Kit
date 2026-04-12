@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/contract-registry.schema.json",
+  "title": "contract-registry.yml schema (L2 Product)",
+  "description": "Product-level registry of graduated API contracts. Auto-maintained by /speckit-graduate.",
+  "type": "object",
+  "required": ["version", "product", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "version": { "type": "string" },
+    "product": { "type": "string", "minLength": 1 },
+    "entries": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "required": ["id", "source_initiative", "format", "graduated_at", "git_commit", "forced"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^CONTR-[A-Z0-9]+-[0-9]+$"
+          },
+          "source_initiative": {
+            "type": "string",
+            "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["openapi", "proto", "asyncapi"]
+          },
+          "artifacts": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "paths_added": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "graduated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "git_commit": {
+            "type": "string",
+            "minLength": 7
+          },
+          "forced": {
+            "type": "boolean"
+          },
+          "breaking_changes_detected": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

@@ -108,6 +108,64 @@ jobs:
           fi
           exit $failed
 
+  validate-contracts:
+    name: Validate product contracts (L2) — smart-scope
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install check-jsonschema pyyaml
+
+      - name: Detect changed product contracts
+        id: scope
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD 2>/dev/null \
+            | grep '^products/.*/contracts/' || true)
+          if [ -n "$CHANGED" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate contract-registry.yml against JSON Schema
+        run: |
+          found=0
+          failed=0
+          for f in $(find products -name contract-registry.yml | grep -v '{'); do
+            found=1
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/contract-registry.schema.json "$f" || failed=1
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No contract-registry.yml files found — skipping"
+          fi
+          exit $failed
+
+      - name: Lint product OpenAPI baselines (redocly)
+        if: steps.scope.outputs.has_changes == 'true'
+        continue-on-error: true
+        run: |
+          for f in $(find products -name '*.openapi.yml' -o -name 'openapi.yaml' | grep -v '{'); do
+            echo "Linting $f..."
+            npx @redocly/cli lint "$f" || true
+          done
+
+      - name: Lint product AsyncAPI baselines
+        if: steps.scope.outputs.has_changes == 'true'
+        continue-on-error: true
+        run: |
+          for f in $(find products -name '*.asyncapi.yml' -o -name 'asyncapi.yaml' | grep -v '{'); do
+            echo "Validating $f..."
+            npx @asyncapi/cli validate "$f" || true
+          done
+
   validate-services:
     name: Validate service artifacts (L2.5) — warning mode
     runs-on: ubuntu-latest

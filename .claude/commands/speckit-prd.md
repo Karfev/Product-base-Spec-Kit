@@ -27,6 +27,14 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
    These are already implemented. Consider referencing or building upon them rather than re-specifying.
    ```
 
+4c. **Scan product contract registry**: If `products/{product}/contracts/contract-registry.yml` exists, scan it for graduated API endpoints. If found, present to the user:
+   ```
+   Found graduated contracts in the product baseline:
+   - CONTR-PLAT-001 (openapi): GET /api-keys, POST /api-keys, DELETE /api-keys/{id} — from INIT-2026-000
+   - CONTR-PLAT-002 (asyncapi): audit.event.recorded — from INIT-2026-003
+   These endpoints already exist in the product baseline. Avoid duplicating or conflicting with them.
+   ```
+
 5. Ask the user **5 structured questions** (skip if already answered in existing prd.md):
 
    - **Problem:** What specific problem does this solve? Who experiences it and what is the measurable impact?

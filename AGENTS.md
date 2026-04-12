@@ -61,7 +61,7 @@ For first-time users: run `/speckit-start` to create your first validated initia
 | /speckit-product-init | Scaffold a new product spec folder with architecture template, NFR baseline, and decisions/ |
 | /speckit-nfr-baseline | Define or update the NFR baseline for a product and surface conflicts with L3 requirements |
 | /speckit-adr-product | Create a Product ADR in MADR format via guided questions |
-| /speckit-graduate | Graduate knowledge (REQ-IDs, ADRs) from an initiative to the product layer before archiving |
+| /speckit-graduate | Graduate knowledge (REQ-IDs, ADRs, contracts) from an initiative to the product layer before archiving |
 
 ### Architecture & Audit
 

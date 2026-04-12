@@ -1,5 +1,5 @@
 ---
-description: Graduate knowledge (REQ-IDs, ADRs) from an initiative to the product layer before archiving
+description: Graduate knowledge (REQ-IDs, ADRs, contracts) from an initiative to the product layer before archiving
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 ---
 
@@ -90,6 +90,119 @@ Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 
      ```
    - Update the H1 heading from the initiative-scoped ID to the product-scoped ID
 
+### 3b. Contract graduation (REQ-CONTR-001–005)
+
+1. Scan `initiatives/$ARGUMENTS/contracts/` for contract files:
+   - OpenAPI: `*.openapi.yml`, `*.openapi.json`, `openapi.yaml`
+   - Protobuf: `*.proto`
+   - AsyncAPI: `*.asyncapi.yml`, `asyncapi.yaml`
+
+2. If no contracts directory or no contract files found — **silent skip**: log "No contracts found, skipping contract graduation" and proceed to Step 4.
+
+3. Present found contracts to user:
+
+   ```
+   Contracts found for graduation:
+   | # | Format   | File                    |
+   |---|----------|-------------------------|
+   | 1 | OpenAPI  | contracts/openapi.yaml  |
+   | 2 | AsyncAPI | contracts/asyncapi.yaml |
+   
+   Confirm graduation of all N contract files? (or specify numbers to skip)
+   ```
+
+4. After user confirms, process each format:
+
+   #### OpenAPI merge (upsert strategy)
+   
+   - Target: `products/{product}/contracts/openapi/baseline.openapi.yml`
+   - If baseline does not exist → copy source file as the baseline (create `contracts/openapi/` directory)
+   - If baseline exists → **upsert merge**:
+     - For each `path` in source `paths`:
+       - If path exists in baseline:
+         - For each `method` in that path:
+           - If method exists in baseline with **different** schema/operationId → **CONFLICT**
+           - If method does not exist → add (new method for existing path)
+       - If path does not exist → add (new path)
+     - Merge `components.schemas` → baseline (upsert by schema name; conflict if same name, different definition)
+     - Merge `components.securitySchemes` → baseline (upsert by name)
+     - Merge `components.responses` → baseline (upsert by name)
+   - Preserve baseline's `info.title`, `info.version`, `info.description` — do not overwrite with initiative values
+   - Add initiative-specific paths/schemas to the baseline file
+   
+   #### Protobuf merge (copy with namespace isolation)
+   
+   - Target: `products/{product}/contracts/proto/`
+   - For each `.proto` file:
+     - Extract `package` declaration from the file
+     - Target directory: `products/{product}/contracts/proto/{package}/`
+     - If a file with the same name exists in target:
+       - Compare content (hash) — if different → **CONFLICT**
+       - If identical → skip (already graduated)
+     - If no conflict → copy file to target directory
+   
+   #### AsyncAPI merge (upsert strategy)
+   
+   - Target: `products/{product}/contracts/asyncapi/baseline.asyncapi.yml`
+   - If baseline does not exist → copy source as baseline (create `contracts/asyncapi/` directory)
+   - If baseline exists → **upsert merge**:
+     - For each `channel` in source `channels`:
+       - If channel exists in baseline with **different** message schema → **CONFLICT**
+       - If channel does not exist → add
+     - Merge `operations` → baseline (upsert by operationId)
+     - Merge `components.schemas` and `components.messages` → baseline (upsert by name)
+   - Preserve baseline's `info.title`, `info.version`, `info.description`
+
+5. **Conflict handling** (REQ-CONTR-003):
+   - If any conflicts detected → STOP and display conflict report:
+     ```
+     CONFLICT: Cannot merge contracts automatically.
+     | # | Format  | Conflict Type      | Detail                                      |
+     |---|---------|--------------------|--------------------------------------------- |
+     | 1 | OpenAPI | path+method exists | POST /api-keys — different request schema    |
+     | 2 | Proto   | file hash mismatch | user.proto — different content in baseline   |
+     
+     Options:
+       a) Resolve conflicts manually, then re-run /speckit-graduate
+       b) Use --force to override baseline with initiative version
+     ```
+   - If `--force` is present in arguments → proceed with override, mark `forced: true` in registry
+
+6. **Breaking change detection** (REQ-CONTR-004):
+   - After successful merge, inform user about available breaking change tools:
+     ```
+     Breaking change detection (run manually if needed):
+       OpenAPI: oasdiff breaking <old-baseline> <new-baseline> --format text
+       Protobuf: buf breaking --against <old-proto-dir> <new-proto-dir>
+     ```
+   - If oasdiff is available, offer to run it. Report findings as WARNING.
+   - If constitution contains `contracts.breaking_changes_block: true` and breaking changes detected → STOP
+
+7. **Update contract-registry.yml** (REQ-CONTR-005):
+   - Read or create `products/{product}/contracts/contract-registry.yml`:
+     ```yaml
+     version: "1.0"
+     product: "{product}"
+     entries: []
+     ```
+   - Determine next CONTR-ID: scan existing entries, find max number → increment. Format: `CONTR-{PRODUCT}-NNN` where `{PRODUCT}` is uppercase product prefix.
+   - Append entry for each graduated format:
+     ```yaml
+     - id: "CONTR-PLAT-001"
+       source_initiative: "{INIT-ID}"
+       format: "openapi"
+       artifacts:
+         - "contracts/openapi/baseline.openapi.yml"
+       paths_added:
+         - "GET /api-keys"
+         - "POST /api-keys"
+         - "DELETE /api-keys/{id}"
+       graduated_at: "{ISO 8601 timestamp}"
+       git_commit: "{current commit hash — fill after commit}"
+       forced: false
+       breaking_changes_detected: false
+     ```
+
 ### 4. Knowledge log (REQ-GRAD-005)
 
 1. Read or create `products/{product}/knowledge-log.md`. If creating, add header:
@@ -127,6 +240,17 @@ Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 
    ```
 
    If no ADRs were graduated, omit the "ADRs graduated" sub-section.
+   
+   If contracts were graduated, add a "Contracts graduated" sub-section:
+
+   ```markdown
+   ### Contracts graduated
+   
+   | Format | Artifacts | Paths/Channels Added |
+   |--------|-----------|---------------------|
+   | OpenAPI | baseline.openapi.yml | GET /api-keys, POST /api-keys, DELETE /api-keys/{id} |
+   | AsyncAPI | baseline.asyncapi.yml | audit.event.recorded |
+   ```
 
 ### 5. Mark initiative as graduated
 
@@ -139,9 +263,10 @@ Run:
 ```
 make validate
 make validate-registry
+make validate-contracts
 ```
 
-Fix ALL errors before proceeding. Both commands MUST pass.
+Fix ALL errors before proceeding. All commands MUST pass.
 
 ### 7. Report
 
@@ -149,9 +274,10 @@ Summarize:
 ```
 Graduation complete for {INIT-ID} → products/{product}/
 
-  REQ-IDs graduated: N
-  ADRs graduated:    M
-  Knowledge log:     updated
+  REQ-IDs graduated:  N
+  ADRs graduated:     M
+  Contracts graduated: K (OpenAPI: X paths, AsyncAPI: Y channels, Protobuf: Z files)
+  Knowledge log:      updated
 
 Next steps:
   1. Review products/{product}/knowledge-log.md — add key learnings
@@ -166,6 +292,8 @@ Next steps:
 - **ADR numbering** in product scope is independent of initiative ADR numbering. Always scan `products/{product}/decisions/` to find the next sequential number.
 - **If `products/{product}/` does not exist**, do NOT create it — direct user to `/speckit-product-init`.
 - **Do NOT touch L1 (domains/) artifacts.** Domain knowledge graduation is a manual process.
-- **Do NOT graduate contracts** (OpenAPI/AsyncAPI). This is deferred to a future initiative.
+- **Contract graduation = COPY + MERGE.** Source contracts remain in initiative. Baseline in `products/{product}/contracts/` is the merged result.
+- **Contract conflicts block by default.** Use `--force` to override. Forced overrides are logged in contract-registry.yml.
+- **Protobuf uses strict namespace isolation.** Each `.proto` file MUST have a unique package within the product scope.
 - **MUST run `make validate` and `make validate-registry`** before reporting success.
 - **Backward compatible**: `products/` without `requirements-registry.yml` continue to work. The registry is created on first graduation.
