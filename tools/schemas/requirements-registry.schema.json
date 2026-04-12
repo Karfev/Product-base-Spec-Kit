@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/requirements-registry.schema.json",
+  "title": "requirements-registry.yml schema (L2 Product)",
+  "description": "Product-level registry of graduated requirements from L3 initiatives. Auto-maintained by /speckit-graduate.",
+  "type": "object",
+  "required": ["metadata", "entries"],
+  "additionalProperties": false,
+  "properties": {
+    "metadata": {
+      "type": "object",
+      "required": ["product", "last_updated"],
+      "additionalProperties": true,
+      "properties": {
+        "product":      { "type": "string", "minLength": 1 },
+        "owner":        { "type": "string" },
+        "last_updated": { "type": "string", "format": "date" }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "type", "final_status", "source_initiative", "graduated_date"],
+        "additionalProperties": true,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^REQ-[A-Z0-9]{2,16}-[0-9]{3}$"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 3
+          },
+          "type": {
+            "type": "string",
+            "enum": ["functional", "nfr", "quality", "constraint", "compliance"]
+          },
+          "final_status": {
+            "type": "string",
+            "enum": ["implemented", "verified", "deprecated"],
+            "description": "Only terminal statuses qualify for graduation"
+          },
+          "source_initiative": {
+            "type": "string",
+            "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$"
+          },
+          "graduated_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
+    }
+  }
+}

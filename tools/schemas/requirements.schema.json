@@ -20,7 +20,8 @@
         "last_updated": { "type": "string", "format": "date" },
         "archkom_level": { "type": "string", "enum": ["У0", "У1", "У2"], "description": "Archkom classification level (optional)" },
         "archkom_status": { "type": "string", "enum": ["pending", "approved", "approved-with-conditions", "rejected", "waiver"], "description": "Archkom decision status (optional)" },
-        "brd_ref": { "type": "string", "description": "Reference to BRD document (optional)" }
+        "brd_ref": { "type": "string", "description": "Reference to BRD document (optional)" },
+        "graduated": { "type": "boolean", "description": "Set to true after knowledge graduation to products/ layer (INIT-2026-007)" }
       }
     },
     "requirements": {

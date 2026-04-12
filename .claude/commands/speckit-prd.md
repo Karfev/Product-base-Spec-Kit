@@ -19,6 +19,14 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
    Consider referencing these in the Motivation or Scope sections.
    ```
 
+4b. **Scan product requirements registry**: If `products/{product}/requirements-registry.yml` exists (where `{product}` comes from `initiatives/$ARGUMENTS/requirements.yml` metadata), scan it for graduated REQ-IDs that may overlap with the scope of this PRD. If found, present to the user:
+   ```
+   Found graduated requirements in the product registry:
+   - REQ-AUTH-001 (Create API key) — graduated from INIT-2026-000 on 2026-06-15
+   - REQ-AUTH-003 (Rate limiting) — graduated from INIT-2026-000 on 2026-06-15
+   These are already implemented. Consider referencing or building upon them rather than re-specifying.
+   ```
+
 5. Ask the user **5 structured questions** (skip if already answered in existing prd.md):
 
    - **Problem:** What specific problem does this solve? Who experiences it and what is the measurable impact?

@@ -81,6 +81,33 @@ jobs:
           done
           exit $failed
 
+  validate-registry:
+    name: Validate requirements-registry.yml (L2 Products)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install check-jsonschema pyyaml
+
+      - name: Validate requirements-registry.yml against JSON Schema
+        run: |
+          found=0
+          failed=0
+          for f in $(find products -name requirements-registry.yml | grep -v '{'); do
+            found=1
+            echo "Validating $f..."
+            python3 -m check_jsonschema --schemafile tools/schemas/requirements-registry.schema.json "$f" || failed=1
+          done
+          if [ "$found" -eq 0 ]; then
+            echo "No requirements-registry.yml files found — skipping"
+          fi
+          exit $failed
+
   validate-services:
     name: Validate service artifacts (L2.5) — warning mode
     runs-on: ubuntu-latest
