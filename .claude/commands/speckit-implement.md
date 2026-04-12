@@ -7,6 +7,8 @@ You are guiding implementation for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job
 
+**Index loading:** Read `initiatives/{INIT}/requirements-index.md` instead of full `requirements.yml` for context and status checks. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For specific REQ-IDs referenced in tasks or specs, read targeted entries from `requirements.yml`.
+
 1. Read `.specify/specs/$ARGUMENTS/tasks.md`
 2. Find the first unchecked task `[ ]`
 3. Implement ONLY that one task:

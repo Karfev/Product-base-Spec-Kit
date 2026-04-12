@@ -9,8 +9,10 @@ You are helping create a spec for feature `$ARGUMENTS` in this spec-driven repos
 
 ## Your job
 
+**Index loading:** Read `initiatives/{INIT}/requirements-index.md` instead of full `requirements.yml` for context overview. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For specific REQ-IDs referenced in the spec, read targeted entries from `requirements.yml`.
+
 1. Read `.specify/specs/$ARGUMENTS/spec.md` (current template state)
-2. Read the parent initiative's `requirements.yml` — the initiative ID is in the spec's **Initiative:** field
+2. Read the parent initiative's `requirements-index.md` (or full `requirements.yml` per index loading rule above) — the initiative ID is in the spec's **Initiative:** field
 3. Ask the user 3–5 clarifying questions about the feature (scope, users, constraints)
 4. Fill `spec.md` with real content in canonical format:
    - **Summary**: 1–3 sentences — what changes and why

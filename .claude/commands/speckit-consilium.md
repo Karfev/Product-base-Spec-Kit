@@ -22,7 +22,7 @@ You are running a structured multi-perspective review of an ADR (Architecture De
    a. If `--roles` flag provided → parse comma-separated role IDs, match against `roles[].id` in consilium-roles.yml. Error if any ID not found.
    b. If `--preset` flag provided → load preset from `presets` section. Error if preset not found.
    c. If neither flag → auto-detect from initiative profile:
-      - Read the initiative's `requirements.yml` metadata to get `profile`
+      - Read the initiative's `requirements-index.md` to get `profile` (fallback: full `requirements.yml` if index missing — warn: "Run /speckit-requirements to generate index.")
       - Map profile to preset using `profile_defaults` in consilium-roles.yml
       - If profile = `minimal` or mapping is `null` → inform user: "Consilium не применяется к Minimal профилю. Используйте `--preset standard` для принудительного запуска." Stop.
 

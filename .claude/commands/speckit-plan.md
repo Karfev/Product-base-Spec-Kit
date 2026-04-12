@@ -7,6 +7,8 @@ You are helping create an architecture plan for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job
 
+**Index loading:** Read `initiatives/{INIT}/requirements-index.md` instead of full `requirements.yml` for context overview. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For specific REQ-IDs referenced in the spec, read targeted entries from `requirements.yml`.
+
 1. Read `.specify/specs/$ARGUMENTS/spec.md`
    - If it contains unfilled `{placeholders}`, stop and ask the user to run `/speckit-specify $ARGUMENTS` first
 2. Read `.specify/memory/constitution.md` for architectural principles

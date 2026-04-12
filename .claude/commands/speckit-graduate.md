@@ -20,7 +20,9 @@ Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 
 
 ### 2. REQ-ID graduation (REQ-GRAD-001, REQ-GRAD-002)
 
-1. Scan all requirements in `initiatives/$ARGUMENTS/requirements.yml` where `status` is `implemented` or `verified`.
+**Index loading:** Read `initiatives/$ARGUMENTS/requirements-index.md` for initial scan of eligible requirements. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For the actual graduation data (full fields), read targeted entries from `requirements.yml`.
+
+1. Scan all requirements in `initiatives/$ARGUMENTS/requirements-index.md` (or full `requirements.yml` per above) where `status` is `implemented` or `verified`.
 2. Present candidate list to user:
 
    ```

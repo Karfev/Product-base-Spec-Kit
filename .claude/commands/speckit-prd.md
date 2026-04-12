@@ -24,7 +24,7 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 
    Announce the mode: "Discovery mode: {Quick|Standard|Deep} ({N} вопросов по профилю {profile})"
 
-4. **Scan for cross-initiative dependencies**: Read `initiatives/*/requirements.yml` (skip template dirs with `{`). Look for REQ-IDs that reference similar domains, resources, or capabilities. If found, present to the user:
+4. **Scan for cross-initiative dependencies**: Read `initiatives/*/requirements-index.md` for cross-scan (skip template dirs with `{`). If an index is missing for any initiative, fall back to its full `requirements.yml` and warn: "Run /speckit-requirements for that initiative to generate index." Look for REQ-IDs that reference similar domains, resources, or capabilities. If found, present to the user:
    ```
    Found potentially related requirements in other initiatives:
    - REQ-NOTIF-004 (auditable opt-out) in INIT-2026-002
