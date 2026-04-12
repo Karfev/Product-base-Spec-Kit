@@ -1,0 +1,88 @@
+# Consilium role definitions for multi-perspective ADR review.
+# Used by /speckit-consilium to compose review panels.
+# Canonical source of truth for domain review roles (REQ-QUAL-002).
+
+roles:
+  - name: "Прикладная архитектура"
+    id: "arch"
+    description: "Оценка архитектурных решений, соответствие C4/arc42, backward compatibility"
+    context_files:
+      - "products/{product}/architecture/overview.md"
+      - "domains/{domain}/canonical-model.md"
+    checklist:
+      - "Решение соответствует C4 context/containers?"
+      - "Нет архитектурных anti-patterns (God service, distributed monolith)?"
+      - "Backward compatibility сохранена?"
+      - "Альтернативы рассмотрены с trade-offs?"
+
+  - name: "ИБ (Information Security)"
+    id: "security"
+    description: "Анализ безопасности: auth model, PII, input validation, secrets management"
+    context_files:
+      - "ops/threat-model.md"
+      - "domains/{domain}/nfr.md"
+    checklist:
+      - "Auth model определён и адекватен?"
+      - "PII/ПДн обработка соответствует 152-ФЗ?"
+      - "Input validation на всех boundaries?"
+      - "Secrets management определён?"
+
+  - name: "БД/нагрузки"
+    id: "db-load"
+    description: "Оценка схемы данных, миграций, индексов, нагрузочного профиля"
+    context_files:
+      - "products/{product}/nfr-baseline/baseline.md"
+      - "ops/slo.yaml"
+    checklist:
+      - "Схема данных нормализована / обоснована денормализация?"
+      - "Миграция backward-compatible?"
+      - "Индексы для hot paths определены?"
+      - "Нагрузочный профиль оценён (RPS, P95 latency)?"
+
+  - name: "Инфраструктура"
+    id: "infra"
+    description: "Deployment topology, rollback, scaling, мониторинг"
+    context_files:
+      - "delivery/rollout.md"
+      - "ops/prr-checklist.md"
+    checklist:
+      - "Deployment topology определена?"
+      - "Rollback strategy описана?"
+      - "Горизонтальное масштабирование возможно?"
+      - "Мониторинг и alerting настроены?"
+
+  - name: "Интеграции"
+    id: "integrations"
+    description: "Contract compatibility, breaking changes, event schema versioning, retry/DLQ"
+    context_files:
+      - "contracts/openapi.yaml"
+      - "contracts/asyncapi.yaml"
+      - "domains/{domain}/event-catalog.md"
+    checklist:
+      - "Contract changes backward-compatible?"
+      - "Breaking changes задокументированы с deprecation plan?"
+      - "Event schema versioning определён?"
+      - "Retry/DLQ strategy для async определена?"
+
+# Presets map to Архкомм governance levels.
+presets:
+  standard:
+    description: "Default for Standard profile (У0→У1 light)"
+    roles: ["arch", "security", "infra"]
+
+  archkom-l1:
+    description: "Default for Extended profile (У1 full Архкомм)"
+    roles: ["arch", "security", "db-load", "infra", "integrations"]
+
+  archkom-l2:
+    description: "Default for Enterprise profile (У2 full Архкомм + extended domains)"
+    roles: ["arch", "security", "db-load", "infra", "integrations"]
+    # Note: archkom-l2 can be extended with additional roles (TCO, QA, CI/CD)
+    # via --roles flag. Base set is same as archkom-l1 in v1.
+
+# Profile-to-preset mapping (used when no --preset or --roles specified).
+profile_defaults:
+  minimal: null  # Consilium not applicable to Minimal profile
+  standard: "standard"
+  extended: "archkom-l1"
+  enterprise: "archkom-l2"
