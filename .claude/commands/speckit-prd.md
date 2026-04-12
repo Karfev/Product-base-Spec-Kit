@@ -11,6 +11,17 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
 2. Read `initiatives/$ARGUMENTS/requirements.yml` to understand existing REQ-IDs.
 3. Read `.specify/memory/constitution.md` for principles and profile definitions.
 
+3b. **Determine discovery depth mode (REQ-DISC-005):**
+   Read the `profile` field from `initiatives/$ARGUMENTS/requirements.yml` metadata.
+   Map profile to depth:
+   - `minimal` → **Quick mode** (3-5 questions): Problem+Outcome, Scope, Risks (optional), Metrics (optional)
+   - `standard` → **Standard mode** (5-10 questions): Quick + Why now, Users/Scenarios, Architecture constraints, Contract changes, NFR targets, Dependencies
+   - `extended` or `enterprise` → **Deep mode** (10-15 questions): Standard + Security/threat model, Compliance, Migration strategy, Rollout constraints, Cross-initiative impact
+
+   If `$ARGUMENTS` contains `--depth quick|standard|deep`, use that override regardless of profile.
+
+   Announce the mode: "Discovery mode: {Quick|Standard|Deep} ({N} вопросов по профилю {profile})"
+
 4. **Scan for cross-initiative dependencies**: Read `initiatives/*/requirements.yml` (skip template dirs with `{`). Look for REQ-IDs that reference similar domains, resources, or capabilities. If found, present to the user:
    ```
    Found potentially related requirements in other initiatives:
@@ -35,15 +46,75 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
    These endpoints already exist in the product baseline. Avoid duplicating or conflicting with them.
    ```
 
-5. Ask the user **5 structured questions** (skip if already answered in existing prd.md):
+4d. **Codebase-first context loading (REQ-DISC-003, REQ-DISC-004):**
 
-   - **Problem:** What specific problem does this solve? Who experiences it and what is the measurable impact?
-   - **Why now:** What is the urgency driver — deadline, revenue risk, regulatory, competitive?
-   - **Primary personas:** Who are the users? (role + JTBD format)
-   - **Scope:** What is explicitly IN-scope and OUT-of-scope for this initiative?
-   - **Success metrics:** What measurable outcomes define success? (metric name, baseline, target, timeframe, source)
+   Before each PRD question, scan existing L1/L2/L3 artifacts for relevant context.
+   Use this mapping to determine which files to check:
 
-5. Fill `initiatives/$ARGUMENTS/prd.md` with:
+   | Question topic | Files to check | Section to extract |
+   |---|---|---|
+   | Problem / Outcome | Last 3 active L3 `initiatives/*/prd.md` (by last_updated) | "Цель и ожидаемый эффект" |
+   | Architecture / Tech stack | `products/{product}/architecture/overview.md` | Technology, Stack, Components |
+   | NFR targets | `products/{product}/nfr-baseline/baseline.md` | All measurable targets |
+   | Terminology | `domains/*/glossary.md` (all domains) | All terms |
+   | API patterns | Last 3 active L3 `initiatives/*/contracts/openapi.yaml` | paths section |
+   | Users / Scenarios | Last 3 active L3 `initiatives/*/prd.md` | "Пользователи и сценарии" |
+   | Security | Active L3 `initiatives/*/ops/threat-model.md` | Threats, Mitigations |
+   | Compliance | `domains/*/regulatory/` (if exists) | All |
+
+   **Loading rules:**
+   - Max 3 files per question (sorted by `last_updated` desc if metadata available, else by filename desc)
+   - Skip archived initiatives (`initiative_status == "archived"` in requirements.yml)
+   - Skip template directories (containing `{` in path)
+   - If a file doesn't exist at the expected path → silently skip
+
+   **Proposed answer format:**
+   If relevant context is found, present it BEFORE asking the question:
+   ```
+   📋 Контекст из репозитория:
+   Предположительно: {extracted_content}
+   (источник: {relative_path})
+   Верно? [Да / Нет / Уточнить]
+   ```
+
+   If the source file's `last_updated` or git modification date is > 90 days old:
+   ```
+   ⚠️ Источник обновлён > 90 дней назад — проверьте актуальность
+   ```
+
+   **User responses:**
+   - **Да** → use the proposed answer as-is, write it into prd.md, move to next question
+   - **Нет** → discard the proposed answer, ask the question as open-ended
+   - **Уточнить** → use the proposed answer as a starting point, ask user to modify
+
+   **If no relevant context found** → ask the question as open-ended (current behavior, no change).
+
+5. **Ask questions based on depth mode** (skip if already answered in existing prd.md):
+
+   **Quick mode (3-5 questions) — Minimal profile:**
+   - Q1 **Problem + Outcome:** What problem does this solve and what does success look like?
+   - Q2 **Scope:** What is IN-scope? (2-4 items → maps to REQ-IDs)
+   - Q3 **Risks:** Top risk? (optional — skip if user says "none")
+   - Q4 **Metrics:** One key success metric? (optional — skip if user says "later")
+
+   **Standard mode (5-10 questions) — Standard profile:**
+   All Quick questions, plus:
+   - Q5 **Why now:** Urgency driver — deadline, revenue risk, regulatory, competitive?
+   - Q6 **Primary personas:** Who are the users? (role + JTBD format)
+   - Q7 **Architecture constraints:** Any technology/stack constraints? (check L2 architecture first)
+   - Q8 **Contract changes:** Does this add or change API endpoints or events?
+   - Q9 **NFR targets:** Any latency, throughput, or availability requirements? (check L2 NFR baseline first)
+   - Q10 **Dependencies:** Any upstream/downstream service dependencies?
+
+   **Deep mode (10-15 questions) — Extended/Enterprise profile:**
+   All Standard questions, plus:
+   - Q11 **Security scope:** Authentication/authorization changes? Data classification?
+   - Q12 **Compliance:** Regulatory requirements (GDPR, SOC2, PCI-DSS)?
+   - Q13 **Migration:** Data migration or schema changes needed?
+   - Q14 **Rollout constraints:** Feature flags? Canary? Regional rollout?
+   - Q15 **Cross-initiative impact:** Does this affect other active initiatives?
+
+6. Fill `initiatives/$ARGUMENTS/prd.md` with:
    - **Цель и ожидаемый эффект**: Problem statement, urgency, Outcome (user-facing goal)
    - **Пользователи и сценарии**: Primary personas, top 2–3 JTBD scenarios
    - **Метрики успеха**: Table — Метрика | Baseline | Target | Период | Источник
@@ -52,9 +123,9 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
    - **Требования (ссылки на REQ)**: Only REQ-ID references — full detail lives in `requirements.yml`
    - **Приёмка**: Links to test files and Definition of Done reference
 
-6. Narrative text in `prd.md` MUST reference REQ-IDs from `requirements.yml` — do NOT duplicate requirement detail.
+7. Narrative text in `prd.md` MUST reference REQ-IDs from `requirements.yml` — do NOT duplicate requirement detail.
 
-7. After writing, remind the user:
+8. After writing, remind the user:
    - `Run /speckit-requirements $ARGUMENTS to add or update requirements`
    - `Run make validate to check requirements.yml schema`
 

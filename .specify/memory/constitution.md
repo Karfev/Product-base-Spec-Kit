@@ -47,7 +47,9 @@ spec → plan → tasks → implement
 
 ### Порядок навыков (Skill ordering)
 
-**Быстрый старт:** `/speckit-start` — guided onboarding, объединяет init + prd + requirements в одну сессию. Рекомендуется для новых пользователей.
+**Быстрый старт:**
+- `/speckit-quick` — экспресс-режим: auto-routing по описанию задачи → scaffold → PRD с codebase-first контекстом. Для опытных пользователей.
+- `/speckit-start` — guided onboarding с выбором режима (quick / profile / explicit). Рекомендуется для новых пользователей.
 
 **Поэтапный workflow:**
 1. `/speckit-profile` — выбор профиля (Minimal / Standard / Extended / Enterprise)

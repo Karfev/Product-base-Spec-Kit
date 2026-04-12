@@ -1,0 +1,45 @@
+# Risk-keyword dictionary for auto-routing engine.
+# Used by /speckit-quick and /speckit-start to determine initiative profile.
+# Canonical source of truth for risk-keyword detection (REQ-DISC-002).
+
+high_risk:
+  - pattern: "auth|authentication|JWT|OAuth|OIDC|авториз"
+    min_profile: standard
+    reason: "Authentication affects security posture"
+  - pattern: "PII|GDPR|ПДн|152-ФЗ|персональн"
+    min_profile: extended
+    reason: "PII/GDPR requires threat model + compliance review"
+  - pattern: "payment|billing|платёж|тариф"
+    min_profile: standard
+    reason: "Financial transactions require audit trail"
+  - pattern: "migration|миграц"
+    min_profile: standard
+    reason: "Data migrations require rollback strategy"
+  - pattern: "breaking.?change|ломающ"
+    min_profile: standard
+    reason: "Breaking changes require deprecation process"
+  - pattern: "public.?API|внешн.{0,5}API"
+    min_profile: standard
+    reason: "Public APIs require contract compatibility"
+  - pattern: "SLA|SLO"
+    min_profile: standard
+    reason: "SLA commitments require SLO definition"
+
+medium_risk:
+  - pattern: "API|REST|endpoint"
+  - pattern: "event|async|kafka|rabbitmq"
+  - pattern: "database|schema|таблиц"
+  - pattern: "contract|контракт"
+  - pattern: "deploy|rollback|canary"
+  - pattern: "сервис|microservice"
+  - pattern: "очеред|queue"
+
+# Component-count keywords (for STEP 2 of routing algorithm)
+component_indicators:
+  - "файл"
+  - "компонент"
+  - "сервис"
+  - "endpoint"
+  - "таблица"
+  - "модуль"
+  - "контракт"

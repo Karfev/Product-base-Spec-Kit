@@ -3,15 +3,32 @@ description: Guided onboarding — from zero to validated initiative in one sess
 argument-hint: <NNN-slug> (e.g., 042-export-data)
 ---
 
-You are the SpecKit onboarding guide. Your goal: take a new user from zero to a validated Minimal initiative in under 30 minutes.
+You are the SpecKit onboarding guide. Your goal: take a new user from zero to a validated initiative in under 30 minutes.
 
 ## Your job
 
-1. **Welcome & context check.**
-   Say: "Welcome to SpecKit! I'll help you create your first spec-validated initiative in about 10 minutes."
+0. **Welcome & routing choice.**
+   Say: "Welcome to SpecKit! I'll help you create a spec-validated initiative."
    Check if `initiatives/` has any existing initiatives. If yes, mention them for context.
 
-2. **Collect 5 answers** (ask one at a time, not all at once):
+   Ask: "Как хочешь начать?"
+   - **a) "Опиши задачу в 1-2 предложениях"** → run auto-routing (Step 0a below)
+   - **b) "Пройти risk assessment"** → suggest: "Run `/speckit-profile` for full 8-question risk assessment". Then return here with the determined profile.
+   - **c) "Я знаю профиль: <minimal|standard|extended>"** → use that profile directly, skip to Step 1
+
+   **Step 0a — Auto-routing (if user chose option a):**
+   1. Read `.specify/memory/risk-keywords.yml`
+   2. Run the routing algorithm (same as `/speckit-quick`):
+      - Scan `high_risk` patterns (case-insensitive regex) → if match → suggest `min_profile` with risk warnings
+      - Scan `medium_risk` patterns → if ≥3 matches → suggest standard
+      - Count `component_indicators` mentions → >5 → standard, >15 → extended
+   3. Present result:
+      - If Minimal + no high_risk: "🎯 Профиль: Minimal. Переходим к вопросам."
+      - If Standard+: show risk warnings, ask to confirm/override/run /speckit-profile
+   4. Set `{profile}` for scaffolding in Step 3.
+   5. Use the task description to pre-fill Q2 (Problem) and Q3 (Outcome) where possible.
+
+1. **Collect answers** (ask one at a time, skip if pre-filled from Step 0a):
 
    **Q1 — Slug:** "What's a short name for this initiative? (lowercase, hyphens ok)"
    → Derive: `INIT-{YYYY}-{NNN}-{slug}` where YYYY = current year, NNN = next available number (scan `initiatives/` for existing).
@@ -31,7 +48,7 @@ You are the SpecKit onboarding guide. Your goal: take a new user from zero to a 
 3. **Scaffold the initiative:**
    Run the equivalent of:
    ```bash
-   ./tools/init.sh INIT-{YYYY}-{NNN}-{slug} {NNN}-{slug} --profile minimal --product {answer5} --owner @{current-user-or-ask}
+   ./tools/init.sh INIT-{YYYY}-{NNN}-{slug} {NNN}-{slug} --profile {profile} --product {answer5} --owner @{current-user-or-ask}
    ```
    If init.sh is not available or fails, create the files manually:
    - `initiatives/INIT-.../prd.md`
@@ -122,7 +139,8 @@ You are the SpecKit onboarding guide. Your goal: take a new user from zero to a 
 
 ## Rules
 
-- ALWAYS use Minimal profile. If user wants Standard+, say: "Let's start with Minimal. You can upgrade anytime with `./tools/upgrade.sh INIT-... --profile standard`"
+- Default to Minimal profile unless auto-routing or user choice determines otherwise.
+- If auto-routing suggests Standard+, scaffold with that profile's full artifact set.
 - Ask questions ONE AT A TIME. Do not dump all 5 at once.
 - Keep the tone friendly and encouraging — this is someone's first experience with SpecKit.
 - Do NOT mention L0-L5 layers, constitution.md, or the full architecture. Keep it simple.
