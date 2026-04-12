@@ -101,6 +101,43 @@ Reflection complete for {INIT-ID}
 - At least 1 evolution proposal per reflection (if any findings exist)
 - Do NOT count TEMPLATE.md, protocol.md, or .gitignore as artifacts
 
+## Health Metrics (--health flag)
+
+If `--health` flag is present in $ARGUMENTS, OR this is the 5th+ reflection being generated (count `reflection.md` files across `initiatives/*/`):
+
+### Compute metrics
+
+1. **Active commands:** `ls .claude/commands/speckit-*.md | wc -l` — threshold: warn > 30
+2. **Avg command size:** average `wc -l` across all speckit commands — threshold: warn > 500
+3. **Templates unused:** cross-reference `templates/` files against last 5 `initiatives/*/reflection.md` Usage Analysis tables — threshold: warn if any template has verdict=unused across all 5
+4. **Compliance rate:** percentage of Standard+ initiatives with all required artifacts (design.md, contracts/, ops/slo.yaml, trace.md) — threshold: warn < 80%
+5. **Pending proposals:** count rows with Status=proposed in `evolution-log.md` — threshold: warn > 15
+
+### Render dashboard
+
+Add section to reflection.md:
+
+```
+## Framework Health
+
+| Metric | Current | Threshold | Status |
+|---|---|---|---|
+| Active commands | {count} | warn > 30 | {OK/WARN} |
+| Avg command size | {avg} lines | warn > 500 | {OK/WARN} |
+| Templates unused (5 INITs) | {count} | warn > 0 | {OK/WARN} |
+| Compliance rate (Standard+) | {pct}% | warn < 80% | {OK/WARN} |
+| Pending proposals | {count} | warn > 15 | {OK/WARN} |
+```
+
+### Auto-audit trigger
+
+If ≥ 2 metrics are in WARN state, generate an audit proposal in evolution-log.md:
+- `id`: next EVOL-ID
+- `source_init`: "health-check"
+- `change_type`: "modify"
+- `summary`: "Framework audit triggered: {count} health metrics in WARN state ({list})"
+- `status`: "proposed"
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
