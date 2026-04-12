@@ -19,7 +19,7 @@ Versioning: [SemVer](https://semver.org/spec/v2.0.0.html).
 - `.specify/session/TEMPLATE.md` — session state template (REQ-SESS-001)
 - `.specify/session/protocol.md` — shared middleware reference (REQ-SESS-002)
 - Session Update refs in all 29 `/speckit-*` commands (REQ-SESS-002)
-- Selective context loading preamble in 5 core commands (REQ-SESS-004)
+- Selective context loading preamble in 4 core commands (REQ-SESS-004)
 - Constitution section: Управление состоянием сессии (REQ-SESS-002)
 
 ## [0.1.0] - 2026-04-12
