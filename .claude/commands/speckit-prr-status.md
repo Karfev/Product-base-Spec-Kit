@@ -72,3 +72,8 @@ You are reviewing the Production Readiness Review for initiative `$ARGUMENTS`.
 - For Minimal profile: skip SLO, Security, Capacity, Incidents categories
 - Items the user asks to skip MUST be documented with explicit justification in `prr-checklist.md`
 - Do not edit `prr-checklist.md` — only report status; user must check items manually
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

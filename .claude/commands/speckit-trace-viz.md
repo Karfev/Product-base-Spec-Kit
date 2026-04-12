@@ -91,3 +91,8 @@ You are generating a traceability visualization for initiative `$ARGUMENTS`.
 - Node IDs in Mermaid must be sanitized (replace `-` with `_` in IDs to avoid Mermaid parse errors)
 - Keep the Mermaid diagram under 50 nodes total — if more, group by REQ prefix (subgraph per scope)
 - If a trace link points to a file that doesn't exist on disk, mark the edge with `:::dashed` style
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

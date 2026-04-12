@@ -94,3 +94,8 @@ You are helping select the correct conformity profile for initiative `$ARGUMENTS
 - If the user is unsure about any question, default to YES (conservative)
 - Document the profile rationale as a comment in `requirements.yml` metadata
 - Enterprise profile requires explicit team/architect confirmation — it adds significant documentation overhead
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

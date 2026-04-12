@@ -50,3 +50,8 @@ You are building the Requirements Traceability Matrix (RTM) for initiative `$ARG
 - If a REQ-ID is in `requirements.yml` but absent from all contracts and tests, it MUST be listed as GAP
 - Do NOT add trace links by inference — only link explicitly referenced IDs
 - `make check-trace` MUST be run and results shown verbatim
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-consilium (Standard+) or /speckit-graduate (Minimal)

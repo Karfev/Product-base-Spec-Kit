@@ -54,3 +54,8 @@ python3 tools/scripts/check-release-rollout.py --initiative $ARGUMENTS
   - результат `check-release-rollout.py`.
 - Не оставляй незаполненные плейсхолдеры в `delivery/*.md`.
 - Не придумывай несуществующие метрики/дашборды: используй только артефакты инициативы.
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** contextual (depends on profile)

@@ -118,3 +118,8 @@ You are running a structured multi-perspective review of an ADR (Architecture De
 - For Standard+ profile only — Minimal initiatives skip consilium
 - Maximum context per role: 500 tokens per file, 3 files max (prevent context overflow)
 - Output format MUST be compatible with ADR-template-v2 "Доменные оценки" section
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-graduate

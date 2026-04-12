@@ -37,3 +37,8 @@ If `requirements.yml` has `profile: enterprise`:
 - Breaking API changes require a note: "run `make lint-contracts` to check oasdiff"
 - Do not write implementation code — that belongs in T2b of `tasks.md`
 - Check traceability after: `make check-trace`
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS (spec slug) | **Type:** lifecycle | **Next:** /speckit-tasks

@@ -32,3 +32,8 @@ For each task, add specific file paths, test names, metric names, and exact comm
 - T5 must include explicit command `make check-trace`
 - After filling tasks.md, run: `make check-trace` to verify REQ-ID consistency
 - Check the DoD table at the bottom — fill the profile column for this feature
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-implement

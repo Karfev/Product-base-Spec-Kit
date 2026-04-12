@@ -62,3 +62,8 @@ You are updating the domain specification for `$ARGUMENTS`.
 - Event names MUST be unique across ALL domains — scan all `event-catalog.md` files before adding
 - Updating an existing entity MUST NOT remove existing invariants without user confirmation
 - Mark deprecated terms with `**Deprecated:** <date> — use <NewTerm> instead` rather than deleting
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_

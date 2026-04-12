@@ -120,3 +120,8 @@ After generating all files, print:
 - NEVER modify requirements.yml, spec.md, plan.md, or tasks.md
 - If tasks.md has custom tasks beyond T1-T6, map them to the appropriate wave based on their dependencies described in tasks.md
 - If a task references files that don't exist yet (greenfield), note this in `read_first` as "to be created"
+
+## Session Update
+
+Execute session middleware per `.specify/session/protocol.md`.
+**INIT-ID:** from $ARGUMENTS or context | **Type:** utility | **Next:** _(preserve current)_
