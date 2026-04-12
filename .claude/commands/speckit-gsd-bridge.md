@@ -115,11 +115,15 @@ After generating all files, print:
 
 ## Rules
 
-- See `.specify/memory/constitution.md` section "Permission boundaries" for the full policy
+- See `.specify/memory/presets/gsd.md` section "Permission boundaries" for the full policy
 - NEVER modify any file outside `.planning/` — this command only generates GSD artifacts
 - NEVER modify requirements.yml, spec.md, plan.md, or tasks.md
 - If tasks.md has custom tasks beyond T1-T6, map them to the appropriate wave based on their dependencies described in tasks.md
 - If a task references files that don't exist yet (greenfield), note this in `read_first` as "to be created"
+
+## Preset Loading
+
+Read `.specify/memory/presets/gsd.md` — required for GSD permission boundaries and artifact flow.
 
 ## Session Update
 

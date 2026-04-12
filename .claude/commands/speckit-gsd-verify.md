@@ -111,11 +111,15 @@ If `initiatives/{INIT}/ops/prr-checklist.md` exists:
 
 ## Rules
 
-- See `.specify/memory/constitution.md` section "Permission boundaries" for the full policy
+- See `.specify/memory/presets/gsd.md` section "Permission boundaries" for the full policy
 - NEVER modify requirements.yml, spec.md, or tasks.md — this is read-only verification
 - NEVER mark tasks.md items as complete — that's speckit-implement's job
 - If SUMMARY.md files are missing or incomplete, report gaps — do not fabricate evidence
 - Evidence report MUST use consistent column format for machine parsing by collect-evidence.py
+
+## Preset Loading
+
+Read `.specify/memory/presets/gsd.md` — required for GSD permission boundaries and verification rules.
 
 ## Session Update
 

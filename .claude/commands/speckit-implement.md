@@ -60,6 +60,10 @@ This ensures graduation (`/speckit-graduate`) finds requirements with terminal s
 - Run `make check-all` before marking T5 complete
 - One task at a time — do not batch multiple tasks in one step
 
+## Preset Loading
+
+**Conditional:** If GSD mode is detected (`.planning/` exists or user requests GSD), Read `.specify/memory/presets/gsd.md` for GSD permission boundaries.
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
