@@ -3,6 +3,8 @@ description: Generate tasks.md from a filled plan.md
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+
 You are generating a concrete task list for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job

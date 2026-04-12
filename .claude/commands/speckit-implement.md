@@ -3,6 +3,8 @@ description: Guide task-by-task implementation from tasks.md
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+
 You are guiding implementation for `.specify/specs/$ARGUMENTS/`.
 
 ## Your job

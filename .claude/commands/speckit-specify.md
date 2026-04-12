@@ -3,7 +3,7 @@ description: Create or update a feature spec from a description
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists. Extract INIT-ID from the spec.md Initiative field. If session found, load only "Context Files". If not found, proceed as below.
+**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are helping create a spec for feature `$ARGUMENTS` in this spec-driven repository.
 
