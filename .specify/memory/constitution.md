@@ -27,6 +27,7 @@
 | Каталог инцидентов (L2.5) | `services/<code>/ops/incident-catalog.yml` |
 | Каталог запросов (L2.5) | `services/<code>/ops/request-catalog.yml` |
 | Параметры изменений (L2.5) | `services/<code>/ops/change-catalog.yml` |
+| Evolution proposals | `evolution-log.md` |
 
 Narrative-документы (`prd.md`, `design.md`, `runbooks`) MUST ссылаться на anchors выше и НЕ дублировать их.
 
@@ -105,6 +106,7 @@ spec → plan → tasks → implement
 4. **ADR-as-PR (SHOULD):** решения оформляются ADR и ревьюятся в PR.
 5. **Контракты обратимо-совместимы по умолчанию (MUST):** breaking changes требуют отдельного deprecation-процесса и major-сдвига.
 6. **Сервисы порождаются продуктами (MUST):** каждый `services/<code>/` MUST иметь ссылку на родительский `products/<product>/`; каждая `initiatives/{INIT}/` SHOULD ссылаться на `services/<code>/`, если реализует изменение сервиса.
+7. **Human-in-the-loop evolution (MUST):** proposals в `evolution-log.md`, генерируемые `/speckit-reflect`, требуют ручного PR для применения. Автоматическое применение proposals запрещено.
 
 ---
 
