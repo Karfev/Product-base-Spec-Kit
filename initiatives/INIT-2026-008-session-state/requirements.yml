@@ -1,0 +1,92 @@
+metadata:
+  initiative: "INIT-2026-008-session-state"
+  product: "platform"
+  owner: "@dmitriy"
+  profile: "minimal"
+  version: "0.2.0"
+  last_updated: "2026-04-12"
+  initiative_status: "active"
+
+requirements:
+  - id: "REQ-SESS-001"
+    title: "Session state structure и storage"
+    type: functional
+    priority: P2
+    status: implemented
+    description: >
+      Создать директорию `.specify/session/` с per-initiative session files.
+      Формат: header (initiative, profile, phase, last command, timestamp),
+      progress checklist, decisions (max 10, FIFO), next recommended command,
+      open questions, context files list. Max 50 строк per file. Ephemeral —
+      `.specify/session/` в `.gitignore`.
+    acceptance_criteria:
+      - "Given /speckit-prd завершён, When session state обновлён, Then .specify/session/INIT-2026-006.md содержит last_command=speckit-prd, next=speckit-requirements"
+      - "Given session file exists, When read, Then формат < 50 строк"
+      - "Given .gitignore updated, When git status, Then .specify/session/ не отслеживается"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-SESS-002"
+    title: "Middleware pattern для автоматического обновления"
+    type: functional
+    priority: P2
+    status: implemented
+    description: >
+      Каждый `/speckit-*` command обновляет session state после успешного
+      выполнения. Middleware: update last_command + timestamp, append decisions,
+      compute next command по lifecycle sequence, sync open questions.
+      Реализуется как секция "Session Update" в каждом command file.
+    acceptance_criteria:
+      - "Given /speckit-contracts выполнен, When session checked, Then last_command=speckit-contracts, next=speckit-specify"
+      - "Given decision принято в /speckit-prd, When session checked, Then decisions содержит decision"
+      - "Given /speckit-implement T2b, When session checked, Then progress показывает T2b done"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-SESS-003"
+    title: "/speckit-continue command"
+    type: functional
+    priority: P2
+    status: draft
+    description: >
+      Новый command `/speckit-continue [INIT-ID]`. Без аргумента — dashboard
+      всех сессий. С INIT-ID — summary + stale check + предложение next command.
+      При отсутствии sessions — предложить /speckit-start. При stale artifacts —
+      warning с предложением resync.
+    acceptance_criteria:
+      - "Given session state, When /speckit-continue INIT-ID, Then summary: last, next, decisions, open questions"
+      - "Given нет sessions, When /speckit-continue, Then предложен /speckit-start"
+      - "Given artifact modified after session, When /speckit-continue, Then stale warning"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-SESS-004"
+    title: "Selective context loading из session state"
+    type: functional
+    priority: P2
+    status: implemented
+    description: >
+      При resume агент загружает selective context вместо полного re-read:
+      session state (~50 строк) всегда, current spec если L4 phase,
+      requirements.yml только если command работает с requirements,
+      constitution summary только. Сокращение initial context с ~2-5K до ~500-800 tokens.
+    acceptance_criteria:
+      - "Given resume в L4 implement, When context loaded, Then: session + tasks.md + quality-gates.md (не PRD, не contracts)"
+      - "Given resume в L3 contracts, When context loaded, Then: session + requirements.yml + contract templates"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-SESS-005"
+    title: "Multi-initiative session switching"
+    type: functional
+    priority: P3
+    status: draft
+    description: >
+      `/speckit-continue` без аргумента показывает dashboard: список инициатив
+      с session state (sorted by last_updated desc), для каждой: INIT-ID,
+      profile, phase, next command. Пользователь выбирает → resume.
+    acceptance_criteria:
+      - "Given 3 session files, When /speckit-continue, Then dashboard с 3 инициативами sorted by date"
+      - "Given выбрана INIT-007, When resume, Then session INIT-007 загружена, INIT-006 сохранена"
+    trace:
+      prd: "prd.md#scope"
