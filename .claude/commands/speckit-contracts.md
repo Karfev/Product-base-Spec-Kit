@@ -88,6 +88,30 @@ You are generating machine-readable API contracts for initiative `$ARGUMENTS`.
 - OpenAPI version MUST be `3.1.0`; AsyncAPI version MUST be `3.0.0` (intentional — 3.0.0 has wider tooling support; AsyncAPI CLI info about 3.1.0 can be ignored)
 - `401` and `400` error responses are REQUIRED for all authenticated endpoints
 
+## Index Generation (post-write hook)
+
+After step 10 (validation passes), generate `initiatives/$ARGUMENTS/contracts/contracts-index.md`:
+
+1. Compute SHA-256 hash of `initiatives/$ARGUMENTS/contracts/openapi.yaml` (and `asyncapi.yaml` if exists)
+2. Write file in this format:
+   ```markdown
+   <!-- source-hash: <sha256-first-12-chars> | generated: YYYY-MM-DD -->
+   # Contracts Index — $ARGUMENTS
+
+   ## REST Endpoints
+   | Method | Path | Summary | REQ-ID |
+   |---|---|---|---|
+   | POST | /resource | Create resource | REQ-XXX-001 |
+
+   ## Events (if asyncapi.yaml exists)
+   | Channel | Message | REQ-ID |
+   |---|---|---|
+   | resource.created | ResourceCreated | REQ-XXX-002 |
+   ```
+3. Commit this file alongside contract changes
+
+If `contracts-index.md` already exists, overwrite it with fresh data.
+
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
