@@ -41,24 +41,47 @@ start → prd → requirements → contracts → specify → plan → tasks → 
 | speckit-release-rollout | lifecycle | contextual | $ARGUMENTS |
 | _all other commands_ | utility | _(preserve current next)_ | $ARGUMENTS or context |
 
-## Phase → Context Files Table (for selective loading)
+## Phase → Context Files Table (enhanced with presets + indexes)
 
-| Phase | Always Load | Load Additionally | Skip |
-|---|---|---|---|
-| Any resume | `.specify/session/{INIT-ID}.md` | — | Full constitution |
-| L3: PRD | — | `requirements.yml`, `domains/*/glossary.md` | Contracts, specs |
-| L3: Requirements | — | `prd.md`, `requirements.yml` | Contracts, specs |
-| L3: Contracts | — | `requirements.yml`, existing contracts | PRD, specs |
-| L4: specify/plan | — | `spec.md`, `requirements.yml` | PRD, contracts |
-| L4: tasks | — | `plan.md`, `spec.md` | PRD, contracts |
-| L4: implement | — | `tasks.md`, `tools/ai-quality-gates.md` | PRD, other specs |
-| L4: trace | — | `requirements.yml`, `contracts/*`, test files | PRD, specs |
-| L5: evidence | — | `requirements.yml`, `trace.md` | PRD, specs |
+| Phase | Constitution | Presets | Requirements | Contracts | Other |
+|---|---|---|---|---|---|
+| L3: PRD | lean | — | index (cross-scan) | — | `domains/*/glossary.md` |
+| L3: Requirements | lean | — | **full** (write) | — | `prd.md` |
+| L3: Contracts | lean | — | full | **full** (write) | — |
+| L4: specify | lean | — | index + targeted REQs | — | `spec.md` |
+| L4: plan | lean | — | index + targeted REQs | — | `spec.md` |
+| L4: tasks | lean | — | index | — | `plan.md`, `spec.md` |
+| L4: implement | lean | gsd (if GSD mode) | index | — | `tasks.md` |
+| L5: trace/rtm | lean | — | **full** (needs traces) | full | test files |
+| L5: evidence | lean | — | **full** | `trace.md` | — |
+| Governance: consilium | lean | archkom | index | — | ADR files |
+| Governance: graduate | lean | archkom (Standard+) | index | — | product registry |
+| Architecture | lean | archkom | — | — | IS ontology |
+| GSD: bridge/verify/map | lean | gsd | index | — | `.planning/*` |
+| Any resume | session file | per phase | per phase | per phase | — |
+
+**Legend:** lean = `.specify/memory/constitution.md`; index = `requirements-index.md`; full = `requirements.yml`
+
+### Loading Rules
+
+- **L3 write commands** (requirements, contracts): read full source files — they generate indexes
+- **L4 commands** (specify, plan, tasks, implement): read index + targeted REQs from spec
+- **Evidence commands** (trace, rtm, evidence): read full files — need trace fields
+- **Governance** (consilium, graduate): read index for overview
+- **Presets**: loaded only by commands that need them (see `.specify/memory/presets/README.md`)
+
+### Escape Hatch
+
+If `--full-context` is passed to any command, skip selective loading and read all files. Use when:
+- Debugging unexpected behavior
+- Cross-referencing across phases
+- First run after major refactoring
 
 ## Selective Context Loading (command preamble)
 
 When a command starts, BEFORE reading full context:
 1. Check if `.specify/session/{INIT-ID}.md` exists
-2. **If YES (resume):** read session file (~50 lines) + load only files from "Context Files" section
+2. **If YES (resume):** read session file (~50 lines) + load only files from "Context Files" section per phase table above
    - If any Context File is missing → fall back to full context load
+   - If `--full-context` flag → load all files (override)
 3. **If NO (fresh start):** read full context as currently designed (no change)
