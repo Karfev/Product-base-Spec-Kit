@@ -8,10 +8,12 @@ on:
 
 jobs:
   validate-requirements:
-    name: Validate requirements.yml (blocking)
+    name: Validate requirements.yml (blocking, smart-scope)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
@@ -20,11 +22,53 @@ jobs:
       - name: Install tools
         run: pip install check-jsonschema pyyaml
 
+      - name: Determine validation scope
+        id: scope
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/main...HEAD)
+            OVERRIDE=$(echo "$CHANGED" | grep -cE '^(\.github/|tools/schemas/|tools/scripts/)' || true)
+            if [ "$OVERRIDE" -gt "0" ]; then
+              echo "mode=full" >> $GITHUB_OUTPUT
+              echo "Scope: FULL (override paths changed)"
+            else
+              INITS=$(echo "$CHANGED" | grep '^initiatives/' | \
+                      sed 's|initiatives/\([^/]*\)/.*|\1|' | sort -u | \
+                      grep -v '{' || true)
+              echo "mode=smart" >> $GITHUB_OUTPUT
+              echo "initiatives<<EOF" >> $GITHUB_OUTPUT
+              echo "$INITS" >> $GITHUB_OUTPUT
+              echo "EOF" >> $GITHUB_OUTPUT
+              echo "Scope: SMART — $(echo "$INITS" | wc -w | tr -d ' ') initiative(s)"
+            fi
+          else
+            echo "mode=full" >> $GITHUB_OUTPUT
+            echo "Scope: FULL (push to main)"
+          fi
+
       - name: Validate requirements.yml against JSON Schema
         run: |
           failed=0
-          for f in $(find initiatives -name requirements.yml | grep -v '{'); do
-            echo "Validating $f..."
+          if [ "${{ steps.scope.outputs.mode }}" = "smart" ]; then
+            TARGETS="${{ steps.scope.outputs.initiatives }}"
+            if [ -z "$TARGETS" ]; then
+              echo "No initiative changes detected — skipping"
+              exit 0
+            fi
+          else
+            TARGETS=$(find initiatives -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -v '{' | xargs -I{} basename {} || true)
+          fi
+          for init in $TARGETS; do
+            f="initiatives/$init/requirements.yml"
+            [ ! -f "$f" ] && continue
+            STATUS=$(python3 -c "
+          import yaml
+          with open('$f') as fh:
+              d = yaml.safe_load(fh)
+          print(d.get('metadata', {}).get('initiative_status', 'active'))
+          " 2>/dev/null || echo "active")
+            [ "$STATUS" = "archived" ] && echo "  Skipping $f (archived)" && continue
+            echo "  Validating $f (status=$STATUS)..."
             python3 -m check_jsonschema --schemafile tools/schemas/requirements.schema.json "$f" || failed=1
           done
           exit $failed

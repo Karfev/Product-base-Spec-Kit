@@ -281,7 +281,7 @@ Graduation complete for {INIT-ID} → products/{product}/
 
 Next steps:
   1. Review products/{product}/knowledge-log.md — add key learnings
-  2. When ready to archive, run the archive workflow
+  2. Archive: tools/archive.sh {INIT-ID}  (or: make archive INIT={INIT-ID})
 ```
 
 ## Rules

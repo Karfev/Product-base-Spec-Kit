@@ -9,16 +9,18 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-all collect-evidence install-tools test-unit test-contract test-integration test-perf
+.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-release-rollout check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 	  awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
-validate: ## Validate all requirements.yml against JSON Schema
+validate: ## Validate all active requirements.yml against JSON Schema (skips archived)
 	@echo "==> Validating requirements.yml files..."
 	@failed=0; \
 	for f in $$(find initiatives -name requirements.yml | grep -v '{'); do \
+	  status=$$(python3 -c "import yaml; d=yaml.safe_load(open('$$f')); print(d.get('metadata',{}).get('initiative_status','active'))" 2>/dev/null || echo active); \
+	  if [ "$$status" = "archived" ]; then echo "  Skipping $$f (archived)"; continue; fi; \
 	  echo "  Checking $$f"; \
 	  python3 -m check_jsonschema --schemafile tools/schemas/requirements.schema.json "$$f" || failed=1; \
 	done; \
@@ -148,6 +150,14 @@ test-perf: ## Run performance tests (override TEST_PERF_CMD)
 check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
+
+archive: ## Archive a completed initiative (usage: make archive INIT=INIT-2026-xxx)
+	@[ -z "$(INIT)" ] && echo "Usage: make archive INIT=INIT-2026-xxx [ARGS='--force']" && exit 1 || true
+	@bash tools/archive.sh $(INIT) $(ARGS)
+
+restore: ## Restore an archived initiative (usage: make restore INIT=INIT-2026-xxx)
+	@[ -z "$(INIT)" ] && echo "Usage: make restore INIT=INIT-2026-xxx" && exit 1 || true
+	@bash tools/restore.sh $(INIT)
 
 install-tools: ## Install all required validation tools
 	@echo "==> Installing Python tools..."

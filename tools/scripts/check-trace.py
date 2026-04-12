@@ -73,6 +73,14 @@ def main():
     for req_file in root.glob('initiatives/*/requirements.yml'):
         if is_template(req_file.parent):
             continue
+        # Skip archived initiatives (INIT-2026-006)
+        try:
+            with open(req_file) as _f:
+                _meta = yaml.safe_load(_f)
+            if _meta.get('metadata', {}).get('initiative_status') == 'archived':
+                continue
+        except Exception:
+            pass
         try:
             reqs = parse_requirements_yml(req_file)
             for req_id, has_evidence in reqs.items():
