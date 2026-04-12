@@ -3,7 +3,7 @@ metadata:
   product: "platform"
   owner: "@dmitriy"
   profile: "minimal"
-  version: "0.2.0"
+  version: "0.3.0"
   last_updated: "2026-04-12"
   initiative_status: "active"
 
@@ -47,7 +47,7 @@ requirements:
     title: "/speckit-continue command"
     type: functional
     priority: P2
-    status: draft
+    status: implemented
     description: >
       Новый command `/speckit-continue [INIT-ID]`. Без аргумента — dashboard
       всех сессий. С INIT-ID — summary + stale check + предложение next command.
@@ -80,7 +80,7 @@ requirements:
     title: "Multi-initiative session switching"
     type: functional
     priority: P3
-    status: draft
+    status: implemented
     description: >
       `/speckit-continue` без аргумента показывает dashboard: список инициатив
       с session state (sorted by last_updated desc), для каждой: INIT-ID,

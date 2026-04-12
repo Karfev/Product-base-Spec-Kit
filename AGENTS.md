@@ -24,6 +24,7 @@ For first-time users: run `/speckit-start` to create your first validated initia
 | /speckit-start | Guided onboarding — from zero to validated initiative in one session |
 | /speckit-profile | Select initiative profile (Minimal / Standard / Extended / Enterprise) via risk assessment |
 | /speckit-init | Scaffold a new initiative folder with all required artifacts for the chosen profile |
+| /speckit-continue | Resume from last checkpoint or show multi-initiative dashboard |
 
 ### Requirements & Contracts
 
