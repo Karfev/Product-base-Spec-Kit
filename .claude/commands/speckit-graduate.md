@@ -197,8 +197,8 @@ Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 
          - "GET /api-keys"
          - "POST /api-keys"
          - "DELETE /api-keys/{id}"
-       graduated_at: "{ISO 8601 timestamp}"
-       git_commit: "{current commit hash — fill after commit}"
+       graduated_at: "{ISO 8601 date-time, e.g. 2026-04-12T00:00:00Z}"
+       git_commit: "pending"
        forced: false
        breaking_changes_detected: false
      ```
@@ -268,7 +268,14 @@ make validate-contracts
 
 Fix ALL errors before proceeding. All commands MUST pass.
 
-### 7. Report
+### 7. Update git_commit in contract-registry
+
+After the graduation commit succeeds:
+1. Get commit hash: `HASH=$(git rev-parse --short HEAD)`
+2. Replace `git_commit: "pending"` with the actual hash in `products/{product}/contracts/contract-registry.yml`
+3. Amend the commit: `git add products/{product}/contracts/contract-registry.yml && git commit --amend --no-edit`
+
+### 8. Report
 
 Summarize:
 ```

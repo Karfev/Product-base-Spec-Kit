@@ -106,6 +106,22 @@ def parse_initiative_id(spec_text: str) -> str | None:
     return None
 
 
+def is_archived_initiative(init_id: str | None, root: Path) -> bool:
+    """Check if the initiative is archived."""
+    if not init_id:
+        return False
+    try:
+        import yaml
+        req_yml = root / "initiatives" / init_id / "requirements.yml"
+        if req_yml.exists():
+            with open(req_yml) as f:
+                data = yaml.safe_load(f)
+            return data.get("metadata", {}).get("initiative_status") == "archived"
+    except Exception:
+        pass
+    return False
+
+
 def main() -> int:
     args = parse_args()
     root = Path(args.root)
@@ -124,10 +140,25 @@ def main() -> int:
             errors.append(f"[ERROR] {spec_md}: missing file")
             continue
         if not tasks_md.exists():
-            errors.append(f"[ERROR] {tasks_md}: missing file")
+            plan_md = spec_dir / "plan.md"
+            if plan_md.exists():
+                errors.append(
+                    f"[ERROR] {tasks_md}: missing file "
+                    f"(plan.md exists — run /speckit-tasks)"
+                )
+            else:
+                warnings.append(
+                    f"[WARN] {tasks_md}: not yet created "
+                    f"(run /speckit-plan then /speckit-tasks)"
+                )
             continue
 
         spec_text = spec_md.read_text(encoding="utf-8")
+
+        # Skip specs whose parent initiative is archived.
+        init_id_early = parse_initiative_id(spec_text)
+        if is_archived_initiative(init_id_early, root):
+            continue
 
         # 1) Unfilled placeholders in non-template specs.
         for line_no, line in enumerate(spec_text.splitlines(), start=1):

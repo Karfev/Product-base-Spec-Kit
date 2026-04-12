@@ -45,6 +45,21 @@ spec → plan → tasks → implement
 ```
 Формат L4-файлов MUST быть совместим с `.specify/specs/` и шаблонами из этого репозитория (см. `.specify/specs/{NNN}-{slug}/`).
 
+### Порядок навыков (Skill ordering)
+
+**Быстрый старт:** `/speckit-start` — guided onboarding, объединяет init + prd + requirements в одну сессию. Рекомендуется для новых пользователей.
+
+**Поэтапный workflow:**
+1. `/speckit-profile` — выбор профиля (Minimal / Standard / Extended / Enterprise)
+2. `/speckit-init` — создаёт scaffold с `{placeholder}` маркерами. НЕ заполняет контент.
+3. `/speckit-prd` — заполняет prd.md (первый контентный шаг)
+4. `/speckit-requirements` — заполняет requirements.yml
+5. `/speckit-contracts` — генерирует OpenAPI / AsyncAPI stubs
+6. `/speckit-specify` → `/speckit-plan` → `/speckit-tasks` → `/speckit-implement` (L4 контур)
+7. `/speckit-graduate` → `make archive` (завершение)
+
+**Правило:** init создаёт структуру, последующие навыки заполняют контент. Нет пересечения.
+
 ---
 
 ## Уровни и профили обязательности

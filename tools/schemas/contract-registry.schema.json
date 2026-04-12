@@ -43,7 +43,8 @@
           },
           "git_commit": {
             "type": "string",
-            "minLength": 7
+            "minLength": 1,
+            "description": "Git commit hash after graduation commit, or 'pending' if not yet committed"
           },
           "forced": {
             "type": "boolean"

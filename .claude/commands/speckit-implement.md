@@ -29,6 +29,19 @@ If `.claude/commands/gsd/` exists (GSD is installed):
 
 If GSD is NOT installed — proceed with the linear task-by-task flow below.
 
+## REQ status lifecycle
+
+After completing **T2b (GREEN)** — all tests pass:
+1. Read `initiatives/{INIT}/requirements.yml`
+2. For each REQ-ID covered by passing tests:
+   - Change `status: draft` → `status: implemented`
+3. Run `make validate` to confirm
+
+After completing **T5 (trace update)** — if all REQ-IDs have `status: implemented` and full trace links:
+- Optionally set `status: verified` for fully traced REQ-IDs
+
+This ensures graduation (`/speckit-graduate`) finds requirements with terminal status (`implemented` or `verified`), which is required by the requirements-registry schema.
+
 ## Rules
 - Never skip T2a — write failing tests BEFORE implementing
 - Never mark a task complete if CI checks fail locally

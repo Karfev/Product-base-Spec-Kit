@@ -1,0 +1,27 @@
+version: "1.0"
+product: "platform"
+entries:
+  - id: "CONTR-PLAT-001"
+    source_initiative: "INIT-2026-009-smoke-test"
+    format: "openapi"
+    artifacts:
+      - "contracts/openapi/baseline.openapi.yml"
+    paths_added:
+      - "POST /exports"
+      - "GET /exports/{id}"
+    graduated_at: "2026-04-12T00:00:00Z"
+    git_commit: "pending"
+    forced: false
+    breaking_changes_detected: false
+
+  - id: "CONTR-PLAT-002"
+    source_initiative: "INIT-2026-009-smoke-test"
+    format: "asyncapi"
+    artifacts:
+      - "contracts/asyncapi/baseline.asyncapi.yml"
+    channels_added:
+      - "export.report.completed"
+    graduated_at: "2026-04-12T00:00:00Z"
+    git_commit: "pending"
+    forced: false
+    breaking_changes_detected: false

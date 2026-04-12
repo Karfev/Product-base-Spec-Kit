@@ -1,0 +1,41 @@
+---
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: platform-prometheus
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: http://prometheus.platform.internal
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: export-latency-sli
+spec:
+  thresholdMetric:
+    source: platform-prometheus
+    queryType: promql
+    query: >
+      histogram_quantile(0.95,
+        sum(rate(export_duration_seconds_bucket{service="export-service"}[5m]))
+        by (le)
+      )
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: export-latency
+  labels:
+    req: REQ-EXPORT-004
+spec:
+  sli:
+    metadata:
+      name: export-latency-sli
+  objectives:
+    - target: 0.95
+      value: 30
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences

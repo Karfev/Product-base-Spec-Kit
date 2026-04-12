@@ -22,6 +22,22 @@ DST="archive/$INIT"
 [ ! -d "$SRC" ] && echo "ERROR: $SRC not found" && exit 1
 [ -d "$DST" ] && echo "ERROR: $DST already exists in archive" && exit 1
 
+# --- Pre-flight: check for uncommitted changes ---
+if git diff --quiet HEAD -- "$SRC" 2>/dev/null; then
+  : # Clean — all changes committed
+else
+  echo "ERROR: Uncommitted changes in $SRC. Commit first, then archive."
+  echo "  git add $SRC && git commit -m 'chore: prepare $INIT for archive'"
+  exit 1
+fi
+# Also check for untracked files
+UNTRACKED=$(git ls-files --others --exclude-standard "$SRC" 2>/dev/null)
+if [ -n "$UNTRACKED" ]; then
+  echo "ERROR: Untracked files in $SRC. Commit or remove them first:"
+  echo "$UNTRACKED"
+  exit 1
+fi
+
 # --- Check lifecycle status ---
 STATUS=$(python3 -c "
 import yaml
@@ -63,23 +79,24 @@ if [ "$GRADUATED" != "True" ]; then
   fi
 fi
 
-# --- Set status to archived ---
-python3 - <<PYEOF
-import yaml
-with open('$SRC/requirements.yml') as f:
-    d = yaml.safe_load(f)
-d['metadata']['initiative_status'] = 'archived'
-with open('$SRC/requirements.yml', 'w') as f:
-    yaml.dump(d, f, allow_unicode=True, sort_keys=False)
-PYEOF
-
 # --- Git tag for easy rollback ---
 TAG="archive/$INIT/$(date +%Y-%m-%d)"
 git tag "$TAG" 2>/dev/null || echo "WARNING: tag $TAG already exists, skipping"
 
-# --- Move to archive ---
+# --- Move to archive first (before modifying files) ---
 mkdir -p archive
 git mv "$SRC" "$DST"
+
+# --- Set status to archived (in the moved location) ---
+python3 - <<PYEOF
+import yaml
+with open('$DST/requirements.yml') as f:
+    d = yaml.safe_load(f)
+d['metadata']['initiative_status'] = 'archived'
+with open('$DST/requirements.yml', 'w') as f:
+    yaml.dump(d, f, allow_unicode=True, sort_keys=False)
+PYEOF
+git add "$DST/requirements.yml"
 
 # --- Move linked L4 specs ---
 NNN=$(echo "$INIT" | sed 's/INIT-[0-9]*-\([0-9]*\)-.*/\1/')

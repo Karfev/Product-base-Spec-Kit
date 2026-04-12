@@ -1,0 +1,118 @@
+metadata:
+  initiative: "INIT-2026-006-smart-discovery"
+  product: "platform"
+  owner: "@dmitriy"
+  profile: "minimal"
+  version: "0.1.0"
+  last_updated: "2026-04-12"
+  initiative_status: "active"
+
+requirements:
+  - id: "REQ-DISC-001"
+    title: "Auto-routing по scope description"
+    type: functional
+    priority: P0
+    status: draft
+    description: >
+      Command `/speckit-quick <description>` анализирует текстовое описание задачи
+      и автоматически определяет профиль (Minimal/Standard/Extended) на основе
+      эвристик: количество упомянутых компонентов, наличие risk-keywords,
+      упоминание contracts/API/events. Для Minimal — запускает scaffold без
+      интервью. Для Standard+ — предлагает профиль и переключает на `/speckit-profile`
+      для подтверждения.
+    acceptance_criteria:
+      - "Given описание '<50 LOC, 1 файл, bug fix', When /speckit-quick запущен, Then профиль = Minimal и scaffold создан без вопросов"
+      - "Given описание 'новый REST API с auth', When /speckit-quick запущен, Then предложен Standard и пользователю предложено подтвердить или запустить /speckit-profile"
+      - "Given описание без risk-keywords, When scope < 3 компонентов, Then профиль = Minimal"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-DISC-002"
+    title: "Risk-keyword detection для override suggestion"
+    type: functional
+    priority: P0
+    status: draft
+    description: >
+      При auto-routing система сканирует описание на risk-keywords:
+      auth, authentication, JWT, OAuth, PII, GDPR, ПДн, migration, payment,
+      billing, SLA, public API, breaking change. При обнаружении — повышает
+      предложенный профиль минимум до Standard и выводит предупреждение
+      с указанием обнаруженных keywords.
+    acceptance_criteria:
+      - "Given описание содержит 'JWT auth', When auto-routing, Then предложен Standard+ с пояснением 'обнаружен risk-keyword: auth'"
+      - "Given описание содержит 'GDPR' или 'ПДн', When auto-routing, Then предложен Extended с пояснением"
+      - "Given описание не содержит risk-keywords, When auto-routing, Then профиль определяется только по scope metrics"
+    trace:
+      prd: "prd.md#риски-и-ограничения"
+
+  - id: "REQ-DISC-003"
+    title: "Codebase-first context loading в PRD"
+    type: functional
+    priority: P0
+    status: draft
+    description: >
+      При запуске `/speckit-prd` система перед каждым вопросом проверяет
+      существующие артефакты: L1 domain glossary (domains/{domain}/glossary.md),
+      L2 architecture (products/{product}/architecture/overview.md),
+      L2 NFR baseline (products/{product}/nfr-baseline/baseline.md),
+      предыдущие L3 инициативы (initiatives/INIT-*/requirements.yml).
+      Найденный контекст используется для генерации proposed answers.
+    acceptance_criteria:
+      - "Given существует domains/notifications/glossary.md, When PRD для notification feature, Then термины из glossary предложены в контексте"
+      - "Given существует products/platform/architecture/overview.md, When PRD задаёт вопрос об архитектуре, Then предложен ответ на основе overview.md"
+      - "Given L2 NFR baseline определяет P95 < 200ms, When PRD для нового API, Then latency target предложен как '≤ 200ms (baseline L2)'"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-DISC-004"
+    title: "Proposed answers generation"
+    type: functional
+    priority: P0
+    status: draft
+    description: >
+      Для каждого вопроса PRD система генерирует proposed answer на основе
+      codebase-first контекста (REQ-DISC-003). Формат: "Предположительно: {answer}
+      (источник: {file}:{section}). Верно? [Да / Нет / Уточнить]".
+      Пользователь подтверждает, корректирует или отклоняет. При подтверждении —
+      ответ записывается в PRD без дополнительного ввода.
+    acceptance_criteria:
+      - "Given контекст из L2 architecture содержит 'PostgreSQL', When PRD спрашивает о storage, Then предложен 'PostgreSQL (источник: products/platform/architecture/overview.md)'"
+      - "Given контекст из предыдущей INIT содержит 'OpenAPI 3.1', When PRD спрашивает о contract format, Then предложен 'OpenAPI 3.1 (источник: INIT-2026-002)'"
+      - "Given контекст не содержит релевантной информации, When PRD задаёт вопрос, Then proposed answer не генерируется и вопрос задаётся как open-ended"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-DISC-005"
+    title: "Discovery depth modes"
+    type: functional
+    priority: P1
+    status: draft
+    description: >
+      `/speckit-prd` поддерживает три режима глубины discovery:
+      Quick (3-5 вопросов, для Minimal), Standard (5-10 вопросов, для Standard),
+      Deep (10-15 вопросов, для Extended+). Режим определяется автоматически
+      по профилю инициативы, но может быть переопределён пользователем
+      через флаг `--depth quick|standard|deep`.
+    acceptance_criteria:
+      - "Given профиль = Minimal, When /speckit-prd запущен, Then задано 3-5 вопросов (Quick mode)"
+      - "Given профиль = Standard, When /speckit-prd запущен, Then задано 5-10 вопросов (Standard mode)"
+      - "Given профиль = Minimal и флаг --depth deep, When /speckit-prd запущен, Then задано 10-15 вопросов"
+    trace:
+      prd: "prd.md#scope"
+
+  - id: "REQ-DISC-006"
+    title: "Profile override из quick mode"
+    type: functional
+    priority: P1
+    status: draft
+    description: >
+      Пользователь может переопределить автоматически предложенный профиль
+      командой `/speckit-profile --override <profile>` или ответом на prompt
+      в `/speckit-quick`. При override вверх (Minimal → Standard) —
+      система дозапрашивает недостающие артефакты. При override вниз
+      (Standard → Minimal) — система предупреждает о потере coverage.
+    acceptance_criteria:
+      - "Given auto-routing предложил Minimal, When пользователь выбирает Standard, Then scaffold дополняется артефактами Standard (design.md, contracts/, ops/)"
+      - "Given auto-routing предложил Standard, When пользователь выбирает Minimal, Then выводится предупреждение о risk-keywords и пользователь подтверждает"
+    trace:
+      prd: "prd.md#scope"
