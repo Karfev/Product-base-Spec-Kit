@@ -5,6 +5,13 @@ All notable changes to INIT-2026-008-session-state.
 Format: [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 Versioning: [SemVer](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] - 2026-04-12
+
+### Added
+
+- `/speckit-continue` command — resume with dashboard + stale check (REQ-SESS-003, REQ-SESS-005)
+- Session existence check in `/speckit-start` (REQ-SESS-003)
+
 ## [0.2.0] - 2026-04-12
 
 ### Added
