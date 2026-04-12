@@ -3,6 +3,20 @@
 All notable changes to this initiative are documented here.
 Format: [Keep a Changelog](https://keepachangelog.com/), [SemVer](https://semver.org/).
 
+## [0.3.0] — 2026-04-12
+
+### Added
+- Index generation hook in `/speckit-requirements` — auto-generates `requirements-index.md` (REQ-CTX-003)
+- Index generation hook in `/speckit-contracts` — auto-generates `contracts-index.md` (REQ-CTX-004)
+- `tools/scripts/check-index-stale.py` — SHA-256 stale detection for indexes (REQ-CTX-007)
+- `check-index-stale` Makefile target, added to `check-all` chain
+
+### Changed
+- 7 commands updated to read `requirements-index.md` instead of full `requirements.yml` (REQ-CTX-005)
+  - L4: implement, plan, tasks, specify
+  - L3 read: prd (cross-scan)
+  - Governance: graduate, consilium
+
 ## [0.2.0] — 2026-04-12
 
 ### Added
