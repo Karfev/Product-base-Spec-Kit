@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 # Bootstrap a new initiative + L4 spec from canonical templates.
-# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise] [--product name] [--owner @team] [--with-gsd] [--preset archkom]
+# Usage: ./tools/init.sh INIT-YYYY-NNN-slug [NNN-feature-slug] [--profile minimal|standard|extended|enterprise] [--product name] [--owner @team] [--with-gsd] [--preset archkom] [--with-example]
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --profile enterprise --product platform --owner @platform-team
 # Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-gsd
+# Example: ./tools/init.sh INIT-2026-042-user-auth 042-user-auth --with-example
 set -euo pipefail
 
 INITIATIVE_ID="${1:-}"
@@ -11,6 +12,7 @@ PROFILE="standard"
 PRODUCT=""
 OWNER=""
 WITH_GSD=false
+WITH_EXAMPLE=false
 PRESET=""
 
 # Parse remaining arguments
@@ -43,6 +45,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --with-gsd)
       WITH_GSD=true
+      shift
+      ;;
+    --with-example)
+      WITH_EXAMPLE=true
       shift
       ;;
     --preset)
@@ -328,6 +334,31 @@ if [[ "$PROFILE" = "enterprise" ]]; then
   fi
 elif [[ -n "$FEATURE_SLUG" ]]; then
   echo "  3. Run: /speckit-specify $FEATURE_SLUG"
+fi
+
+# Copy golden reference example (optional)
+if [[ "$WITH_EXAMPLE" == true ]]; then
+  EXAMPLE_SRC="$REPO_ROOT/initiatives/INIT-2026-000-api-key-management"
+  EXAMPLE_SPEC_SRC="$REPO_ROOT/.specify/specs/000-api-key-management"
+  EXAMPLE_TESTS_SRC="$REPO_ROOT/tests"
+  EXAMPLE_DST="$REPO_ROOT/examples"
+
+  if [[ -d "$EXAMPLE_SRC" ]]; then
+    mkdir -p "$EXAMPLE_DST/initiatives" "$EXAMPLE_DST/.specify/specs"
+    cp -r "$EXAMPLE_SRC" "$EXAMPLE_DST/initiatives/"
+    if [[ -d "$EXAMPLE_SPEC_SRC" ]]; then
+      cp -r "$EXAMPLE_SPEC_SRC" "$EXAMPLE_DST/.specify/specs/"
+    fi
+    if [[ -d "$EXAMPLE_TESTS_SRC" ]]; then
+      cp -r "$EXAMPLE_TESTS_SRC" "$EXAMPLE_DST/"
+    fi
+    echo ""
+    echo "==> Golden reference example copied to examples/"
+    echo "  See examples/initiatives/INIT-2026-000-api-key-management/ for a fully filled initiative."
+    echo "  See examples/.specify/specs/000-api-key-management/ for the matching L4 spec."
+  else
+    echo "Warning: Golden reference not found at $EXAMPLE_SRC. Skipping --with-example."
+  fi
 fi
 
 # GSD integration (optional)

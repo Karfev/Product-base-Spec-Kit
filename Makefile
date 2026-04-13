@@ -127,6 +127,10 @@ check-spec-quality: ## Check .specify specs quality gates
 	@echo "==> Checking .specify specs quality..."
 	@$(PYTHON) tools/scripts/check-spec-quality.py
 
+check-spec-structure: ## Check spec.md/plan.md/tasks.md canonical sections
+	@echo "==> Checking spec structure..."
+	@$(PYTHON) tools/scripts/check-spec-structure.py
+
 check-release-rollout: ## Validate rollout/migration consistency vs ops/slo.yaml + ops/prr-checklist.md
 	@echo "==> Checking release rollout consistency..."
 	@$(PYTHON) tools/scripts/check-release-rollout.py
@@ -151,7 +155,7 @@ test-integration: ## Run integration tests (override TEST_INTEGRATION_CMD)
 test-perf: ## Run performance tests (override TEST_PERF_CMD)
 	@bash -lc '$(TEST_PERF_CMD)'
 
-check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-index-stale ## Run all validation checks
+check-all: validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-spec-quality check-spec-structure check-index-stale check-release-rollout ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
 
@@ -165,7 +169,7 @@ restore: ## Restore an archived initiative (usage: make restore INIT=INIT-2026-x
 
 install-tools: ## Install all required validation tools
 	@echo "==> Installing Python tools..."
-	pip install yamllint check-jsonschema pyyaml
+	pip install -r tools/requirements.txt
 	@echo "==> Installing Node.js tools..."
-	npm install -g markdownlint-cli2 @redocly/cli @asyncapi/cli
+	cd tools && npm install
 	@echo "==> Note: install oasdiff from https://github.com/oasdiff/oasdiff"

@@ -22,7 +22,7 @@ Spec Kit gives a team:
 - **Traceability by construction** — REQ-IDs link L3 requirements to L4 specs to tests to SLOs
 - **Risk-calibrated depth** — four profiles (Minimal / Standard / Extended / Enterprise) so low-risk changes stay lightweight
 - **Bootstrap in one command** — `./tools/init.sh` scaffolds a full initiative in seconds
-- **26 slash commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
+- **31 slash commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
 
 ## Agent Compatibility
 
@@ -34,9 +34,8 @@ SpecKit skills use the [SKILL.md](https://github.com/anthropics/skill-md) standa
 | OpenCode | ✅ via symlink | ✅ | ✅ Ollama | [Setup](docs/SETUP-OPENCODE.md) |
 | Kilo Code (VS Code / JetBrains) | ✅ Native | ✅ | ✅ Ollama/vLLM | [Setup](docs/SETUP-KILOCODE.md) |
 | Codex CLI | ❌ | ✅ | ❌ Cloud only | — |
-| Gemini CLI | ❌ | ⚠️ GEMINI.md | ❌ Cloud only | — |
 
-22 of 26 commands are fully portable (file I/O + bash). 4 GSD commands require optional GSD installation.
+27 of 31 commands are fully portable (file I/O + bash). 4 GSD commands require optional GSD installation.
 See [AGENTS.md](AGENTS.md) for the complete skill catalog and [docs/COMPAT-MATRIX.md](docs/COMPAT-MATRIX.md) for detailed compatibility.
 
 ---
@@ -62,7 +61,7 @@ tools/schemas/          JSON Schema validators (requirements, services, billing,
 tools/scripts/          CI scripts (check-trace, check-spec-quality, check-release-rollout)
 tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
 .github/workflows/      CI: validate.yml + contracts.yml
-.claude/commands/       26 slash commands (SKILL.md standard)
+.claude/commands/       31 slash commands (SKILL.md standard)
 Makefile                Local task runner (make check-all)
 ```
 
@@ -126,6 +125,7 @@ All placeholders (`{INIT-YYYY-NNN-slug}`, `{YYYY-MM-DD}`, `{product}`, `{team}`,
 | `--owner` | Team/person (replaces `@{team}`) | `--owner @platform-team` |
 | `--with-gsd` | Install GSD parallel execution engine | |
 | `--preset archkom` | Enable Archkom governance chain | |
+| `--with-example` | Copy golden reference initiative to `examples/` | |
 
 ### 4. Fill requirements and validate
 
@@ -211,6 +211,15 @@ make lint-contracts  # OpenAPI + AsyncAPI
 6. **T5:** Update `trace.md` + `CHANGELOG.md` -> `make check-trace`
 7. **T6:** Complete PRR checklist items
 
+**Test type selection (which tests are mandatory):**
+
+| Requirement type | Test type | When mandatory | Command |
+|---|---|---|---|
+| functional | unit | Always for business logic | `make test-unit` |
+| functional | contract | Standard+ with API changes | `make test-contract` |
+| functional | integration | DB/external service/queue | `make test-integration` |
+| nfr | perf | NFR by latency/throughput | `make test-perf` |
+
 ### Phase 4: Implementation
 
 | Step | Command | What happens |
@@ -266,51 +275,19 @@ Full profile requirements and CI gates -> `.specify/memory/constitution.md`
 
 ---
 
-## Slash Commands — Full Reference
+## Slash Commands
 
-### L3 Initiative Management
+See [AGENTS.md](AGENTS.md) for the complete catalog of 31 slash commands with descriptions.
 
-| Command | Description |
-|---|---|
-| `/speckit-profile <INIT>` | Select profile via risk assessment (10 yes/no questions) |
-| `/speckit-init <INIT>` | Scaffold initiative folder with all artifacts for chosen profile |
-| `/speckit-prd <INIT>` | Create/update PRD with 5 structured questions |
-| `/speckit-requirements <INIT>` | Fill requirements.yml with REQ-IDs, validate schema |
-| `/speckit-contracts <INIT>` | Generate OpenAPI/AsyncAPI stubs from requirements |
-| `/speckit-release-rollout <INIT>` | Build release package, validate SLO/PRR consistency |
-| `/speckit-prr-status <INIT>` | Review PRR checklist: DONE / OPEN / BLOCKING |
-| `/speckit-evidence <INIT>` | Generate evidence report (RTM coverage, gaps, recommendation) |
-| `/speckit-constitution-review` | Audit all L1-L5 artifacts for compliance |
-
-### L4 Spec-Driven Workflow
-
-| Command | Description |
-|---|---|
-| `/speckit-specify <slug>` | Create/update spec.md (canonical sections: Scope, Non-goals, API, Tests, Rollout) |
-| `/speckit-plan <slug>` | Generate plan.md from spec (architecture, contracts impact, risks) |
-| `/speckit-tasks <slug>` | Generate tasks.md from plan (T1-T6, test-first order) |
-| `/speckit-implement <slug>` | Guide task-by-task implementation (one task at a time) |
-| `/speckit-trace <slug>` | Build L4 trace.md (REQ-ID traceability matrix) |
-| `/speckit-rtm <INIT>` | Build L3 initiative-level RTM |
-
-### L1 Domain & L2 Product
-
-| Command | Description |
-|---|---|
-| `/speckit-domain-init <domain>` | Scaffold domain: glossary, canonical model, event catalog, NFR |
-| `/speckit-domain-update <domain>` | Add terms, entities, or events to existing domain |
-| `/speckit-product-init <product>` | Scaffold product: architecture, NFR baseline, decisions/ |
-| `/speckit-nfr-baseline <product>` | Define/update NFR baseline, surface conflicts with L3 |
-| `/speckit-adr-product <product>` | Create product ADR in MADR format |
-| `/speckit-architecture <INIT>` | Guide IS ontology layers (Enterprise profile only) |
-
-### GSD Integration (optional)
-
-| Command | Description |
-|---|---|
-| `/speckit-gsd-bridge <slug>` | Convert tasks.md to GSD phase plans for parallel execution |
-| `/speckit-gsd-map <product>` | Map existing codebase (brownfield), route to L2 architecture |
-| `/speckit-gsd-verify <slug>` | Verify GSD execution against spec, generate evidence |
+**By workflow phase:**
+- **Discovery:** `/speckit-start`, `/speckit-quick`, `/speckit-profile`, `/speckit-continue`
+- **L3 Initiative:** `/speckit-init`, `/speckit-prd`, `/speckit-requirements`, `/speckit-contracts`
+- **L4 Spec-Driven:** `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-implement`
+- **Release & Evidence:** `/speckit-trace`, `/speckit-rtm`, `/speckit-evidence`, `/speckit-prr-status`, `/speckit-release-rollout`, `/speckit-graduate`, `/speckit-reflect`
+- **Domain & Product:** `/speckit-domain-init`, `/speckit-domain-update`, `/speckit-product-init`, `/speckit-nfr-baseline`, `/speckit-adr-product`
+- **Architecture & Audit:** `/speckit-architecture`, `/speckit-constitution-review`, `/speckit-consilium`
+- **Visualization:** `/speckit-trace-viz`
+- **GSD (optional):** `/speckit-gsd-bridge`, `/speckit-gsd-map`, `/speckit-gsd-verify`
 
 ---
 
@@ -343,7 +320,7 @@ Full profile requirements and CI gates -> `.specify/memory/constitution.md`
 | Requirement | `REQ-<SCOPE>-NNN` | `REQ-AUTH-001`, `REQ-AUDIT-003` |
 | Platform ADR | `PLAT-NNNN-<slug>` | `PLAT-0001-event-bus` |
 | Product ADR | `<PROD>-NNNN-<slug>` | `ANALYTICS-0003-cache-strategy` |
-| Initiative ADR | `<INIT>-ADR-NNNN-<slug>` | `INIT-2026-003-ADR-0001-storage-strategy` |
+| Initiative ADR | `<INIT>-ADR-NNNN-<slug>` | `INIT-2026-000-ADR-0001-storage` |
 
 REQ-ID rules:
 - `<SCOPE>` = 2-16 uppercase alphanumeric chars (domain area)
@@ -467,46 +444,58 @@ tasks.md -> /speckit-gsd-bridge -> .planning/PLAN.md
 Product-base-Spec-Kit/
   .specify/
     memory/constitution.md              <- L0 governance
-    specs/{NNN}-{slug}/                 <- L4 feature specs
-      spec.md, plan.md, tasks.md, trace.md
+    specs/000-api-key-management/       <- L4 golden reference
+    specs/{NNN}-{slug}/                 <- L4 template
   domains/
-    {domain}/                           <- L1 domain layer
-      glossary.md, canonical-model/, event-catalog/, nfr/
-    is-ontology/                        <- IS architecture reference
+    is-ontology/                        <- L1 reference (Enterprise IS)
+    {domain}/                           <- L1 template
   products/
-    {product}/                          <- L2 product layer
-      architecture/, nfr-baseline/, decisions/
+    platform/                           <- L2 reference (graduated knowledge)
+    {product}/                          <- L2 template
   services/
-    {service-code}/                     <- L2.5 service layer
-      ops/, billing/, responsibilities.yml
+    example-vm-hosting/                 <- L2.5 reference (anonymized)
+    {service-code}/                     <- L2.5 template
   initiatives/
-    {INIT-YYYY-NNN-slug}/              <- L3 initiative layer
+    INIT-2026-000-api-key-management/   <- L3 golden reference (Standard)
+    INIT-2026-001-ontology-demo/        <- L3 reference (Enterprise)
+    {INIT-YYYY-NNN-slug}/              <- L3 template
       prd.md, requirements.yml, design.md
       contracts/ (openapi.yaml, asyncapi.yaml, schemas/)
       decisions/ (ADRs in MADR format)
       ops/ (slo.yaml, prr-checklist.md)
       delivery/ (rollout.md, migration.md)
       changelog/CHANGELOG.md
+  tests/                                <- Test stubs (traceability demo)
   evidence/                             <- L5 evidence reports
   tools/
     init.sh                             <- Bootstrap script
     schemas/                            <- JSON Schema validators
     scripts/                            <- Validation scripts
-  .claude/commands/                     <- 26 slash commands (SKILL.md)
+    requirements.txt                    <- Pinned Python dependencies
+    package.json                        <- Pinned Node dependencies
+  .claude/commands/                     <- 31 slash commands (SKILL.md)
   .github/workflows/                    <- CI pipelines
   Makefile                              <- Local task runner
 ```
 
 ---
 
-## Demo Initiatives
+## Golden Reference
 
-| Initiative | Profile | Description |
+The repository includes two fully worked reference initiatives that demonstrate the framework in action.
+
+To copy the golden reference into your project for side-by-side comparison:
+
+```bash
+./tools/init.sh INIT-2026-042-my-feature 042-my-feature --profile standard --with-example
+```
+
+| Initiative | Profile | Purpose |
 |---|---|---|
-| `INIT-2026-000-api-key-management` | Extended | API key CRUD, bcrypt hashing, rate limiting. Fully worked reference. |
-| `INIT-2026-001-ontology-demo` | Enterprise | IS architecture ontology demo |
-| `INIT-2026-002-notification-preferences` | Standard | User notification preferences (channels, frequency, opt-out) |
-| `INIT-2026-003-audit-log` | Standard | Audit log infrastructure (E2E dogfooding test initiative) |
+| `INIT-2026-000-api-key-management` | Standard | **Golden reference.** Complete L3 initiative + L4 spec + test stubs + evidence report. Start here. |
+| `INIT-2026-001-ontology-demo` | Enterprise | Enterprise IS profile reference: 3-layer architecture, subsystem classification, architecture views. |
+
+**INIT-2026-000** demonstrates the full traceability chain: `requirements.yml` → `contracts/openapi.yaml` → `decisions/ADR-0001` → `tests/api/api-keys.spec.ts` → `ops/slo.yaml` → `evidence/`.
 
 ---
 

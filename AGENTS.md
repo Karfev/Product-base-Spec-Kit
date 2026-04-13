@@ -15,7 +15,7 @@ For first-time users: run `/speckit-start` to create your first validated initia
 - **Governance rules:** [.specify/memory/constitution.md](.specify/memory/constitution.md)
 - **Full workflow:** [README.md](README.md#full-workflow--14-steps)
 
-## All skills (27)
+## All skills (31)
 
 ### Discovery & Onboarding
 

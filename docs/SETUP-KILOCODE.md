@@ -35,7 +35,7 @@ Open the repository in VS Code.
 
 ### 4. Run Commands
 
-Kilo Code natively reads `.claude/commands/` — all 26 SpecKit skills are available.
+Kilo Code natively reads `.claude/commands/` — all 31 SpecKit skills are available.
 
 Open Command Palette (Cmd/Ctrl+Shift+P) → type the skill name → run.
 
@@ -63,11 +63,9 @@ Access SpecKit skills from the AI Assistant panel. Kilo Code discovers skills in
 
 ## Model Recommendations
 
-See [ADR: Model Selection](../initiatives/INIT-2026-005-multi-agent-portability/decisions/INIT-2026-005-ADR-0001-model-selection.md).
-
 | Use Case | Recommended Model |
 |----------|------------------|
-| Full workflow (all 26 commands) | Qwen2.5-Coder-32B fp16 |
+| Full workflow (all 31 commands) | Qwen2.5-Coder-32B fp16 |
 | Budget / limited VRAM | Qwen2.5-Coder-14B fp16 |
 | Cloud API (best quality) | Claude Opus 4 via Anthropic |
 

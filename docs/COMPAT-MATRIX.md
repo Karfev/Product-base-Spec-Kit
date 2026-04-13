@@ -34,6 +34,11 @@ Status of SpecKit skills across AI coding agents.
 | /speckit-gsd-bridge | ✅ | ⏳ | ⏳ | HIGH |
 | /speckit-gsd-map | ✅ | ⏳ | ⏳ | HIGH |
 | /speckit-gsd-verify | ✅ | ⏳ | ⏳ | HIGH |
+| /speckit-consilium | ✅ | ⏳ | ⏳ | HIGH |
+| /speckit-continue | ✅ | ⏳ | ⏳ | MEDIUM |
+| /speckit-graduate | ✅ | ⏳ | ⏳ | MEDIUM |
+| /speckit-quick | ✅ | ⏳ | ⏳ | MEDIUM |
+| /speckit-reflect | ✅ | ⏳ | ⏳ | LOW |
 
 ## Capability Matrix
 
@@ -48,15 +53,15 @@ Status of SpecKit skills across AI coding agents.
 
 ## Portability Risk Levels
 
-- **LOW** (3 commands): Read-only reporting, no dialogue, simple file I/O
-- **MEDIUM** (13 commands): Multi-turn dialogue, YAML generation, make validate calls
-- **HIGH** (10 commands): Complex reasoning, decision trees, GSD integration, 16-question flows
+- **LOW** (4 commands): Read-only reporting, no dialogue, simple file I/O
+- **MEDIUM** (16 commands): Multi-turn dialogue, YAML generation, make validate calls
+- **HIGH** (11 commands): Complex reasoning, decision trees, GSD integration, 16-question flows
 
 ## How to Run a Smoke Test
 
 Test these 5 representative commands to verify agent compatibility:
-1. `/speckit-profile INIT-2026-003-audit-log` (multi-turn Q&A, decision tree)
-2. `/speckit-prd INIT-2026-003-audit-log` (5 questions, YAML refs, file write)
-3. `/speckit-requirements INIT-2026-003-audit-log` (REQ-ID generation, make validate)
-4. `/speckit-specify 003-audit-log` (multi-turn spec filling)
-5. `/speckit-trace 003-audit-log` (trace matrix generation)
+1. `/speckit-profile INIT-2026-000-api-key-management` (multi-turn Q&A, decision tree)
+2. `/speckit-prd INIT-2026-000-api-key-management` (5 questions, YAML refs, file write)
+3. `/speckit-requirements INIT-2026-000-api-key-management` (REQ-ID generation, make validate)
+4. `/speckit-specify 000-api-key-management` (multi-turn spec filling)
+5. `/speckit-trace 000-api-key-management` (trace matrix generation)

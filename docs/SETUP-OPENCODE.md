@@ -34,7 +34,7 @@ ollama pull qwen2.5-coder:32b          # fp16, ~64 GB VRAM (fits with 32 GB head
 ollama pull qwen2.5-coder:32b-instruct-q4_K_M   # Q4, ~22 GB VRAM
 ```
 
-See [ADR: Model Selection](../initiatives/INIT-2026-005-multi-agent-portability/decisions/INIT-2026-005-ADR-0001-model-selection.md) for detailed comparison.
+See the Hardware Recommendations table below for detailed comparison.
 
 ## 3. Install OpenCode
 

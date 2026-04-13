@@ -4,7 +4,7 @@ metadata:
   initiative: "INIT-2026-000-api-key-management"
   product: "platform"
   owner: "@platform-team"
-  profile: "extended"
+  profile: "standard"
   version: "0.1.0"
   last_updated: "2026-03-01"
 
