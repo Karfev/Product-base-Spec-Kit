@@ -3,7 +3,7 @@ description: Graduate knowledge (REQ-IDs, ADRs, contracts) from an initiative to
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: Governance graduate):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **Governance: graduate** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are graduating knowledge from initiative `$ARGUMENTS` to the product layer (L2).
 

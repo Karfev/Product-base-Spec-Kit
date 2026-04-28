@@ -3,7 +3,7 @@ description: Generate plan.md from a filled spec.md
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: L4 plan):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **L4: plan** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are helping create an architecture plan for `.specify/specs/$ARGUMENTS/`.
 

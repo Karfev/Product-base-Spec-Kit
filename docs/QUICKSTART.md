@@ -40,7 +40,7 @@ make install-tools
 Open `initiatives/INIT-2026-042-my-feature/prd.md` — fill problem, outcome, scope.
 Open `requirements.yml` — add one requirement per scope item (id, title, type, priority, status, description, acceptance_criteria, trace).
 
-### 5. Validate
+### 4. Validate
 
 ```bash
 make validate

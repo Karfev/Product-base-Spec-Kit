@@ -3,7 +3,7 @@ description: Generate a sводный evidence report for an initiative (RTM cov
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: L5 evidence):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **L5: evidence** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are generating the evidence report for initiative `$ARGUMENTS` before release.
 

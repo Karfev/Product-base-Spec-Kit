@@ -3,7 +3,9 @@ description: Сформировать release rollout-пакет (rollout/migrat
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: Release rollout):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per the **L5: evidence** row of the phase table in `.specify/session/protocol.md` (release-rollout draws from the same artefacts as evidence). If `--full-context` passed, load all files. If no session found, proceed as below.
+
+**Profile gate:** read `profile` from `initiatives/$ARGUMENTS/requirements.yml`. If `profile == "minimal"`, fail fast with: "Release rollout is not applicable for Minimal profile (no SLO/PRR artifacts). For Minimal initiatives, ship via direct merge after `/speckit-implement`." Stop without writing any files.
 
 Ты готовишь release-пакет для инициативы `$ARGUMENTS` перед выпуском.
 

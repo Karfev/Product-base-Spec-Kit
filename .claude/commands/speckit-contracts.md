@@ -3,7 +3,7 @@ description: Generate or update OpenAPI / AsyncAPI contract stubs from requireme
 argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-042-export-data)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: L3 Contracts):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **L3: Contracts** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are generating machine-readable API contracts for initiative `$ARGUMENTS`.
 

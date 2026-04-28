@@ -38,7 +38,8 @@ def parse_requirements_yml(path: Path) -> dict:
         has_evidence = bool(
             trace.get('tests') or
             trace.get('contracts') or
-            trace.get('slo')
+            trace.get('slo') or
+            trace.get('architecture_views')
         )
         result[req_id] = has_evidence
     return result

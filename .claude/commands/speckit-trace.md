@@ -3,7 +3,7 @@ description: Generate or update trace.md (RTM) for a feature spec, then verify w
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: L5 trace — L4 spec scope):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **L5: trace/rtm** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
 
 You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUMENTS/`.
 
@@ -67,4 +67,4 @@ You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUM
 ## Session Update
 
 Execute session middleware per `.specify/session/protocol.md`.
-**INIT-ID:** from $ARGUMENTS | **Type:** lifecycle | **Next:** /speckit-rtm
+**INIT-ID:** read from `.specify/specs/$ARGUMENTS/spec.md` `**Initiative:**` field (NOT $ARGUMENTS — `$ARGUMENTS` is the L4 spec slug, not the L3 INIT-ID). | **Type:** lifecycle | **Next:** `/speckit-rtm <INIT-ID>` (use the resolved INIT-ID from spec.md, e.g., `INIT-2026-042-export-data`).

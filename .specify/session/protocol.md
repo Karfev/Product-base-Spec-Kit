@@ -19,8 +19,13 @@ After successful command completion:
 ## Lifecycle Sequence (for next-command computation)
 
 ```text
-start → prd → requirements → contracts → specify → plan → tasks → implement → trace → rtm → consilium → graduate
+start → prd → requirements → contracts → specify → plan → tasks → implement → trace ╬═> rtm → consilium → graduate ──[optional]──> release-rollout
+                                         └────────── L4 spec slug (NNN-slug) ─────────┘   └─────────────── L3 INIT-ID ───────────────────────────┘
 ```
+
+> `╬═>` marks a **scope shift**: `trace` operates on an L4 spec (`<NNN>-<slug>`); `rtm` operates on an L3 initiative (`INIT-YYYY-NNN-slug`). The handoff requires reading `Initiative:` from `.specify/specs/<NNN>-<slug>/spec.md` and passing the resolved INIT-ID to `/speckit-rtm`.
+
+> **release-rollout positioning:** runs after `graduate` for Standard+ profiles that ship to production. For Minimal profile it does not apply (see profile gate in the command). After release-rollout, the session ends; no automatic Next.
 
 ## Command Adaptation Table
 
@@ -34,11 +39,11 @@ start → prd → requirements → contracts → specify → plan → tasks → 
 | speckit-plan | lifecycle | speckit-tasks | $ARGUMENTS (spec slug) |
 | speckit-tasks | lifecycle | speckit-implement | $ARGUMENTS |
 | speckit-implement | lifecycle | speckit-trace | $ARGUMENTS |
-| speckit-trace | lifecycle | speckit-rtm | $ARGUMENTS |
-| speckit-rtm | lifecycle | speckit-consilium | $ARGUMENTS |
+| speckit-trace | lifecycle | speckit-rtm | **From spec.md `Initiative:` field** — `$ARGUMENTS` is L4 spec slug (e.g. `001-user-auth`); rtm needs L3 INIT-ID. Resolve before handoff. |
+| speckit-rtm | lifecycle | speckit-consilium | $ARGUMENTS (INIT-ID) |
 | speckit-consilium | lifecycle | speckit-graduate | $ARGUMENTS |
 | speckit-graduate | terminal | _(mark session complete)_ | $ARGUMENTS |
-| speckit-release-rollout | lifecycle | contextual | $ARGUMENTS |
+| speckit-release-rollout | lifecycle (Standard+ only; Minimal fails fast in profile gate) | _(terminal — session ends; no automatic Next)_ | $ARGUMENTS (INIT-ID) |
 | _all other commands_ | utility | _(preserve current next)_ | $ARGUMENTS or context |
 
 ## Phase → Context Files Table (enhanced with presets + indexes)

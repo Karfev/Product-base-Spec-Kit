@@ -3,7 +3,9 @@ description: Generate tasks.md from a filled plan.md
 argument-hint: <NNN>-<slug> (e.g., 001-user-auth)
 ---
 
-**Context loading:** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" per phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+**Context loading (phase: L4 tasks):** Before step 1, check if `.specify/session/{INIT-ID}.md` exists (where INIT-ID = $ARGUMENTS). If found, read session file and load only "Context Files" for the **L4: tasks** row of the phase table in `.specify/session/protocol.md`. If `--full-context` passed, load all files. If no session found, proceed as below.
+
+**Profile gate:** read `Initiative:` field from `.specify/specs/$ARGUMENTS/spec.md`, then read `profile` from `initiatives/<INIT-ID>/requirements.yml`. If `profile == "minimal"`, fail fast with: "L4 task generation is not applicable for Minimal profile (Minimal initiatives skip plan/tasks and go directly to `/speckit-implement` from requirements.yml)." Stop without writing tasks.md.
 
 You are generating a concrete task list for `.specify/specs/$ARGUMENTS/`.
 

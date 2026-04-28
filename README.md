@@ -7,7 +7,11 @@
 ![Validate Contracts](https://github.com/Karfev/Product-base-Spec-Kit/actions/workflows/contracts.yml/badge.svg)
 ![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)
 
-> **New here?** Start with [Quick Start](docs/QUICKSTART.md) — your first validated initiative in 30 minutes. Or run `/speckit-start` in your AI coding agent.
+> **New here?**
+>
+> - 📘 **Hands-on tutorial (RU, ~2 hours):** [`docs/tutorial/INDEX.md`](docs/tutorial/INDEX.md) — пошаговый курс для Dev / Tech Lead с worked example и разбором всех артефактов.
+> - ⚡ **Quick Start (5 min):** [`docs/QUICKSTART.md`](docs/QUICKSTART.md) — first validated initiative in 30 minutes.
+> - 🤖 **With AI agent:** run `/speckit-tutorial` (interactive 20-min tour) or `/speckit-start` (create new initiative).
 
 ---
 
@@ -22,7 +26,7 @@ Spec Kit gives a team:
 - **Traceability by construction** — REQ-IDs link L3 requirements to L4 specs to tests to SLOs
 - **Risk-calibrated depth** — four profiles (Minimal / Standard / Extended / Enterprise) so low-risk changes stay lightweight
 - **Bootstrap in one command** — `./tools/init.sh` scaffolds a full initiative in seconds
-- **31 slash commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
+- **32 slash commands** (`/speckit-*`) guide the full lifecycle: profile -> init -> prd -> requirements -> contracts -> spec -> plan -> tasks -> implement -> trace -> rollout -> evidence
 
 ## Agent Compatibility
 
@@ -61,7 +65,7 @@ tools/schemas/          JSON Schema validators (requirements, services, billing,
 tools/scripts/          CI scripts (check-trace, check-spec-quality, check-release-rollout)
 tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
 .github/workflows/      CI: validate.yml + contracts.yml
-.claude/commands/       31 slash commands (SKILL.md standard)
+.claude/commands/       32 slash commands (SKILL.md standard)
 Makefile                Local task runner (make check-all)
 ```
 
@@ -277,7 +281,7 @@ Full profile requirements and CI gates -> `.specify/memory/constitution.md`
 
 ## Slash Commands
 
-See [AGENTS.md](AGENTS.md) for the complete catalog of 31 slash commands with descriptions.
+See [AGENTS.md](AGENTS.md) for the complete catalog of 32 slash commands with descriptions.
 
 **By workflow phase:**
 - **Discovery:** `/speckit-start`, `/speckit-quick`, `/speckit-profile`, `/speckit-continue`
@@ -473,7 +477,7 @@ Product-base-Spec-Kit/
     scripts/                            <- Validation scripts
     requirements.txt                    <- Pinned Python dependencies
     package.json                        <- Pinned Node dependencies
-  .claude/commands/                     <- 31 slash commands (SKILL.md)
+  .claude/commands/                     <- 32 slash commands (SKILL.md)
   .github/workflows/                    <- CI pipelines
   Makefile                              <- Local task runner
 ```
