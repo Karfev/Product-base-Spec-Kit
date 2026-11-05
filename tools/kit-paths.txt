@@ -1,6 +1,7 @@
 # Framework paths that tools/kit-update.sh takes from a tagged kit version.
 # One path per line, a directory covers everything inside it.
 # Everything else (initiatives, products, services, domains, decisions) is project content.
+# A repository skips paths from this list with its own .kit-exclude, which must not be listed here.
 VERSION
 CHANGELOG.md
 AGENTS.md

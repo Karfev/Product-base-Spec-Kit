@@ -522,6 +522,22 @@ git fetch --no-tags <remote-or-path> refs/tags/kit-vX.Y.Z
 git show FETCH_HEAD:tools/kit-update.sh | bash -s -- <remote-or-path> kit-vX.Y.Z
 ```
 
+To keep a path out of every update, for example a template directory the fork removed on purpose, list it in `.kit-exclude` in the repository root and commit the file:
+
+```text
+# Removed on purpose
+domains/{domain}
+products/{product}
+services/{service-code}
+```
+
+The format is the same as in `tools/kit-paths.txt`: one path per line, `#` starts a comment, and entries are paths, not patterns.
+An entry covers everything inside it, and it can be wider or narrower than a listed path: `domains` skips `domains/{domain}`, and `tools/check.py` skips one file of `tools`.
+The script reports what it skipped and warns about an entry that matches nothing.
+The file belongs to the repository, and the update never replaces it. An excluded path no longer receives fixes from the kit.
+
+Support for `.kit-exclude` arrives with the script itself, so the script already in a fork ignores the file. For the first update to a version that has it, use the two commands above.
+
 See [PLAT-0006](decisions/PLAT-0006-kit-versioning-and-updates.md).
 
 ## Governance
