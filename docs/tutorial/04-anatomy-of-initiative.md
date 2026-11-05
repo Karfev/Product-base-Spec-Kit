@@ -87,7 +87,7 @@ initiatives/INIT-2026-099-csv-export/
 
 **Валидация:**
 - `make validate` — JSON Schema (`tools/schemas/requirements.schema.json`)
-- `make check-trace` — каждый REQ-ID должен иметь хотя бы одну запись в `trace`
+- `make check-trace` — ссылки в `trace` разрешаются, а у реализованных требований есть хотя бы одно подтверждение
 
 > **💡 Immutable IDs.** После `status: approved` REQ-ID НЕЛЬЗЯ переименовывать — это сломает все
 > ссылки в контрактах, тестах, ADR. Если требование изменилось радикально —

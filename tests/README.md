@@ -12,8 +12,14 @@ tests/api/api-keys.spec.ts::REQ-AUTH-001   ← links test to requirement
 tests/perf/auth-latency.jmx::REQ-AUTH-004  ← links perf test to NFR
 ```
 
-This convention enables `check-trace.py` to verify that every requirement
-has at least one test reference, and every test reference points to a valid REQ-ID.
+`check-trace.py` verifies that the file exists, the `REQ-ID` matches the requirement
+and appears in the file. Broken links are errors once a requirement is `implemented`
+or `verified`, and warnings before that.
+
+A test that lives in another repository is written as
+`ext:<repo>/<path>::REQ-AUTH-001`. Only its format and `REQ-ID` are checked.
+
+`check-trace.py` checks links only: it does not prove that a test passes.
 
 ## In Your Project
 

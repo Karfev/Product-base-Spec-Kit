@@ -73,8 +73,16 @@ jobs:
           done
           exit $failed
 
+      - name: Run tool tests
+        run: python -m unittest discover -s tools/scripts/tests -p 'test_*.py'
+
       - name: Check REQ-ID traceability (L3 ↔ L4)
         run: python tools/scripts/check-trace.py
+
+      # Эталонные инициативы фреймворка: битая ссылка недопустима при любом статусе
+      - name: Check reference initiatives strictly
+        if: github.repository == 'Karfev/Product-base-Spec-Kit'
+        run: python tools/scripts/check-trace.py --strict
 
       - name: Check .specify docs structure (blocking)
         run: python tools/scripts/check-spec-structure.py
@@ -87,6 +95,26 @@ jobs:
           if [ -f AGENTS.md ]; then
             python tools/scripts/check-agents-md.py
           fi
+
+  check-all-linux:
+    name: Run make check-all from a clean checkout (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install tools
+        run: make install-tools
+
+      - name: Run all checks
+        run: make check-all
 
   validate-enterprise:
     name: Validate Enterprise IS classification (blocking)

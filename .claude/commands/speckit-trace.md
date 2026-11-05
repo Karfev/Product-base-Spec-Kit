@@ -61,7 +61,8 @@ You are building the Requirements Traceability Matrix for `.specify/specs/$ARGUM
 - Every REQ-ID in `spec.md` MUST appear in `trace.md`
 - A REQ-ID with all `—` links MUST NOT be marked as `implemented` in `requirements.yml`
 - `make check-trace` MUST pass with zero errors before reporting success
-- Do NOT fabricate test file paths — only link tests that actually exist
+- Do NOT fabricate test file paths — only link tests that actually exist. A test in another repository is written as `ext:<repo>/<path>::REQ-XXX-NNN`
+- `make check-trace` fails on unresolved links and empty evidence when the status is `implemented` or `verified`
 - For Standard/Extended profile: every REQ-ID MUST have ≥1 trace link
 
 ## Session Update

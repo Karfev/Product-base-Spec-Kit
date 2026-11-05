@@ -20,7 +20,7 @@ requirements:
       event, activity) to a UTF-8 encoded CSV file via REST API. For datasets up to
       100 000 rows the response MUST be returned synchronously in a single HTTP call.
     acceptance_criteria:
-      - "Given an authenticated user with N records (N ≤ 100 000), when they POST /export with entity_type and format=csv, then HTTP 200 is returned with text/csv body and Content-Disposition: attachment"
+      - "Given an authenticated user with N records (N ≤ 100 000), when they POST /export with entity_type and format=csv, then HTTP 200 returns a text/csv body with Content-Disposition: attachment"
       - "Given records contain Cyrillic or emoji, when exported, then the resulting file is valid UTF-8 (BOM optional) and characters are preserved"
       - "Given the user is unauthenticated, when they POST /export, then HTTP 401 is returned"
     trace:

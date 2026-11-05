@@ -72,7 +72,8 @@ You are managing the requirements registry for initiative `$ARGUMENTS`.
 - `nfr` requirements MUST have `metrics`
 - Every REQ-ID in `prd.md` MUST exist in `requirements.yml` — no dangling references
 - MUST run `make validate` and confirm zero errors before reporting success
-- Do NOT add trace links that don't yet exist — leave `trace: {}` or partial trace for now
+- Prefer `trace: {}` or a partial trace until artifacts exist. `make check-trace` warns about unresolved links and fails on them once the status is `implemented` or `verified`
+- A test in another repository is written as `ext:<repo>/<path>::REQ-XXX-NNN`; only its format and REQ-ID are checked
 
 ## Index Generation (post-write hook)
 

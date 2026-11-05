@@ -183,13 +183,13 @@ components:
               value:
                 code: FORBIDDEN_COLUMN
                 message: "Column 'password_hash' is on the sensitive-fields blocklist (REQ-EXPORT-005)"
-                details: { column: password_hash }
+                details: {column: password_hash}
             unknownColumn:
               summary: "Column does not exist"
               value:
                 code: UNKNOWN_COLUMN
                 message: "Column 'nonexistent_field' does not exist on entity_type=contact"
-                details: { column: nonexistent_field }
+                details: {column: nonexistent_field}
     RateLimited:
       description: "Account exceeded export rate-limit (10 / hour)"
       content:

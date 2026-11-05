@@ -54,14 +54,14 @@ components:
         required: [job_id, account_id, entity_type, record_count, download_url, completed_at]
         additionalProperties: false
         properties:
-          job_id:        { type: string, format: uuid }
-          account_id:    { type: string, format: uuid }
-          requested_by:  { type: string, format: uuid, description: "User who initiated the export" }
-          entity_type:   { type: string, enum: [contact, deal, event, activity] }
-          record_count:  { type: integer, minimum: 0 }
-          file_size_bytes: { type: integer, minimum: 0 }
-          download_url:  { type: string, format: uri, description: "Signed URL, expires in 24h" }
-          completed_at:  { type: string, format: date-time }
+          job_id: {type: string, format: uuid}
+          account_id: {type: string, format: uuid}
+          requested_by: {type: string, format: uuid, description: "User who initiated the export"}
+          entity_type: {type: string, enum: [contact, deal, event, activity]}
+          record_count: {type: integer, minimum: 0}
+          file_size_bytes: {type: integer, minimum: 0}
+          download_url: {type: string, format: uri, description: "Signed URL, expires in 24h"}
+          completed_at: {type: string, format: date-time}
 
     ExportJobFailed:
       name: ExportJobFailed
@@ -72,11 +72,11 @@ components:
         required: [job_id, account_id, reason, failed_at]
         additionalProperties: false
         properties:
-          job_id:      { type: string, format: uuid }
-          account_id:  { type: string, format: uuid }
-          requested_by: { type: string, format: uuid }
-          entity_type: { type: string, enum: [contact, deal, event, activity] }
-          reason:      { type: string, enum: [timeout, db_error, storage_error, internal_error] }
-          error_message: { type: string }
-          attempts:    { type: integer, minimum: 1 }
-          failed_at:   { type: string, format: date-time }
+          job_id: {type: string, format: uuid}
+          account_id: {type: string, format: uuid}
+          requested_by: {type: string, format: uuid}
+          entity_type: {type: string, enum: [contact, deal, event, activity]}
+          reason: {type: string, enum: [timeout, db_error, storage_error, internal_error]}
+          error_message: {type: string}
+          attempts: {type: integer, minimum: 1}
+          failed_at: {type: string, format: date-time}
