@@ -189,9 +189,9 @@ paths:
       ...
 ```
 
-> **💡 Зачем ссылка на REQ-ID в summary.** `make check-trace` парсит контракты и сверяет,
-> что каждый REQ-ID, объявленный в `trace.contracts` в requirements.yml, реально присутствует
-> в OpenAPI. Без ссылки traceability считается сломанной.
+> **💡 Зачем ссылка на REQ-ID в summary.** `make check-trace` проверяет, что ссылка
+> из `trace.contracts` в requirements.yml ведёт на существующий path в OpenAPI. REQ-ID в summary
+> помогает человеку пройти по связи в обратную сторону, скрипт его не сверяет.
 
 ---
 

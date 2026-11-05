@@ -1,8 +1,8 @@
 # INIT-2026-099-csv-export
 
 > **Учебная инициатива** для туториала [`docs/tutorial/`](../../docs/tutorial/INDEX.md).
-> НЕ настоящая инициатива в производстве. Лежит в `examples/`, не в `initiatives/`,
-> чтобы не учитываться `make validate` / `make check-trace`.
+> НЕ настоящая инициатива в производстве. Лежит в `examples/`, не в `initiatives/`:
+> `make validate` её не проверяет, а `make check-trace` проверяет только ссылки в `trace`.
 
 ## TL;DR
 
