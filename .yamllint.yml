@@ -6,3 +6,5 @@ rules:
     allowed-values: ['true', 'false', 'on', 'off', 'yes', 'no']
   document-start: disable
   comments-indentation: disable
+ignore: |
+  tools/node_modules/
