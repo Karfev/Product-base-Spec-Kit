@@ -1,0 +1,9 @@
+{
+  "name": "speckit-tools",
+  "private": true,
+  "dependencies": {
+    "markdownlint-cli2": "^0.14.0",
+    "@redocly/cli": "^1.25.0",
+    "@asyncapi/cli": "^2.12.0"
+  }
+}

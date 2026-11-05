@@ -17,7 +17,7 @@ All skills are in `.claude/commands/`. Invoke them by name: `/speckit-start`, `/
 - **Architecture overview:** [README.md](README.md#architecture--five-layers)
 - **Quick Start (5 min):** [docs/QUICKSTART.md](docs/QUICKSTART.md)
 - **Governance rules:** [.specify/memory/constitution.md](.specify/memory/constitution.md)
-- **Full workflow:** [README.md](README.md#full-workflow--14-steps)
+- **Full workflow:** [README.md](README.md#full-workflow--step-by-step)
 
 ## All skills (32)
 

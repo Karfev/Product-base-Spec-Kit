@@ -1,0 +1,100 @@
+# SLO for EXAMPLE-VM-HOSTING — OpenSLO v1 format.
+# Source: External Specification v0.6
+
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "example-vm-hosting-availability"
+  displayName: "EXAMPLE-VM-HOSTING Availability"
+  labels:
+    service: "EXAMPLE-VM-HOSTING"
+    product: "platform"
+
+spec:
+  description: "EXAMPLE-VM-HOSTING availability target: minimum 99.5% per billing period. Availability: 24x7x365."
+  service: "EXAMPLE-VM-HOSTING"
+  indicator:
+    metadata:
+      name: "example-vm-hosting-availability-sli"
+    spec:
+      ratioMetric:
+        counter: true
+        good:
+          metricSource:
+            type: "Custom"
+            spec:
+              query: "sum(service_up_minutes{service='example-vm-hosting'}) / sum(total_minutes)"
+        total:
+          metricSource:
+            type: "Custom"
+            spec:
+              query: "sum(total_minutes{service='example-vm-hosting'})"
+  objectives:
+    - displayName: "Доступность >= 99.5%"
+      target: 0.995
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "Occurrences"
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "example-vm-hosting-incident-p1-reaction"
+  displayName: "P1 Incident Response Time — EXAMPLE-VM-HOSTING"
+  labels:
+    service: "EXAMPLE-VM-HOSTING"
+    priority: "P1"
+
+spec:
+  description: "P95 response time for priority 1 incidents: max 10 minutes (24x7)."
+  service: "EXAMPLE-VM-HOSTING"
+  indicator:
+    metadata:
+      name: "example-vm-hosting-incident-p1-reaction-sli"
+    spec:
+      thresholdMetric:
+        metricSource:
+          type: "ServiceDesk"
+          spec:
+            query: "incident_reaction_time_minutes{service='example-vm-hosting', priority='P1'}"
+  objectives:
+    - displayName: "Время реакции P1 <= 10 мин (P95)"
+      target: 0.95
+      timeSliceTarget: 600
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "TimeSlices"
+
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: "example-vm-hosting-incident-p1-resolution"
+  displayName: "P1 Incident Resolution Time — EXAMPLE-VM-HOSTING"
+  labels:
+    service: "EXAMPLE-VM-HOSTING"
+    priority: "P1"
+
+spec:
+  description: "P95 resolution time for priority 1 incidents: max 1.5 hours (24x7)."
+  service: "EXAMPLE-VM-HOSTING"
+  indicator:
+    metadata:
+      name: "example-vm-hosting-incident-p1-resolution-sli"
+    spec:
+      thresholdMetric:
+        metricSource:
+          type: "ServiceDesk"
+          spec:
+            query: "incident_resolution_time_hours{service='example-vm-hosting', priority='P1'}"
+  objectives:
+    - displayName: "Время решения P1 <= 1.5 ч (P95)"
+      target: 0.95
+      timeSliceTarget: 5400
+      window:
+        duration: "30d"
+        isRolling: false
+  budgetingMethod: "TimeSlices"

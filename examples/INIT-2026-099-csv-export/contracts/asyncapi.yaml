@@ -1,0 +1,82 @@
+asyncapi: "3.0.0"
+info:
+  title: CSV Export Events
+  version: "1.0.0"
+  description: |
+    Notification events for asynchronous CSV exports. Covers REQ-EXPORT-002.
+    Producer: export-worker. Consumer: any internal service that wants to react to job
+    completion (e.g. notification-service for in-app/email notifications).
+
+defaultContentType: application/json
+
+servers:
+  platform-bus:
+    host: platform-bus.platform.internal:9092
+    protocol: kafka
+    description: Internal Kafka bus
+
+channels:
+  export.job.completed:
+    address: export.job.completed
+    description: "Fired when an async export job completes successfully"
+    messages:
+      ExportJobCompleted:
+        $ref: "#/components/messages/ExportJobCompleted"
+
+  export.job.failed:
+    address: export.job.failed
+    description: "Fired when an async export job fails permanently (after retries)"
+    messages:
+      ExportJobFailed:
+        $ref: "#/components/messages/ExportJobFailed"
+
+operations:
+  receiveExportJobCompleted:
+    action: receive
+    channel:
+      $ref: "#/channels/export.job.completed"
+    summary: "Subscribe to successful export completions"
+
+  receiveExportJobFailed:
+    action: receive
+    channel:
+      $ref: "#/channels/export.job.failed"
+    summary: "Subscribe to failed export jobs"
+
+components:
+  messages:
+    ExportJobCompleted:
+      name: ExportJobCompleted
+      title: Export job completed
+      summary: "Async export finished, file ready for download"
+      payload:
+        type: object
+        required: [job_id, account_id, entity_type, record_count, download_url, completed_at]
+        additionalProperties: false
+        properties:
+          job_id:        { type: string, format: uuid }
+          account_id:    { type: string, format: uuid }
+          requested_by:  { type: string, format: uuid, description: "User who initiated the export" }
+          entity_type:   { type: string, enum: [contact, deal, event, activity] }
+          record_count:  { type: integer, minimum: 0 }
+          file_size_bytes: { type: integer, minimum: 0 }
+          download_url:  { type: string, format: uri, description: "Signed URL, expires in 24h" }
+          completed_at:  { type: string, format: date-time }
+
+    ExportJobFailed:
+      name: ExportJobFailed
+      title: Export job failed
+      summary: "Async export failed permanently"
+      payload:
+        type: object
+        required: [job_id, account_id, reason, failed_at]
+        additionalProperties: false
+        properties:
+          job_id:      { type: string, format: uuid }
+          account_id:  { type: string, format: uuid }
+          requested_by: { type: string, format: uuid }
+          entity_type: { type: string, enum: [contact, deal, event, activity] }
+          reason:      { type: string, enum: [timeout, db_error, storage_error, internal_error] }
+          error_message: { type: string }
+          attempts:    { type: integer, minimum: 1 }
+          failed_at:   { type: string, format: date-time }

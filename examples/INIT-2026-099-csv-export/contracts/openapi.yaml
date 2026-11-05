@@ -1,0 +1,198 @@
+openapi: "3.1.0"
+info:
+  title: CSV Export API
+  version: "1.0.0"
+  description: |
+    Export of platform records to CSV.
+    Covers REQ-EXPORT-001 (sync), REQ-EXPORT-002 (async), REQ-EXPORT-003 (column filter),
+    REQ-EXPORT-005 (sensitive fields exclusion).
+  contact:
+    name: Platform Team
+    email: platform-team@example.local
+
+servers:
+  - url: https://api.platform.example.local/v1
+    description: Production
+  - url: http://localhost:8080/v1
+    description: Local dev
+
+tags:
+  - name: exports
+    description: CSV export operations
+
+security:
+  - BearerAuth: []
+
+paths:
+  /export:
+    post:
+      summary: "Export records to CSV (REQ-EXPORT-001, REQ-EXPORT-002, REQ-EXPORT-003, REQ-EXPORT-005)"
+      operationId: createExport
+      tags: [exports]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExportRequest"
+            examples:
+              syncSmallExport:
+                summary: "Sync export of contacts (small dataset)"
+                value:
+                  entity_type: contact
+                  columns: [id, name, email, created_at]
+              asyncLargeExport:
+                summary: "Async export of all activities"
+                value:
+                  entity_type: activity
+                  async: true
+      responses:
+        "200":
+          description: |
+            Synchronous export — entire CSV in body. Returned for datasets ≤ 100 000 rows
+            and `async=false` (default). See REQ-EXPORT-001.
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+              example: 'attachment; filename="contact-export-2026-04-28.csv"'
+          content:
+            text/csv:
+              schema:
+                type: string
+                format: binary
+        "202":
+          description: |
+            Asynchronous export — job queued, poll GET /export/jobs/{jobId}.
+            Returned for datasets > 100 000 rows OR explicit `async=true`. See REQ-EXPORT-002.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportJob"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/ValidationError"
+        "429":
+          $ref: "#/components/responses/RateLimited"
+
+  /export/jobs/{jobId}:
+    get:
+      summary: "Get async export job status (REQ-EXPORT-002)"
+      operationId: getExportJob
+      tags: [exports]
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: "Current job state"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExportJob"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ExportRequest:
+      type: object
+      required: [entity_type]
+      additionalProperties: false
+      properties:
+        entity_type:
+          type: string
+          enum: [contact, deal, event, activity]
+          description: "Which entity collection to export"
+        columns:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          description: |
+            Optional. Whitelist of columns to include. If omitted, all non-sensitive
+            columns are exported. Sensitive fields (per REQ-EXPORT-005) MUST NOT be
+            requested — server returns HTTP 422 if they are.
+          example: [id, name, email, created_at]
+        filter:
+          type: object
+          additionalProperties: true
+          description: "Optional server-side filter (e.g. {created_after: '2026-01-01'})"
+        async:
+          type: boolean
+          default: false
+          description: "Force async mode even for small datasets (REQ-EXPORT-002)"
+        bom:
+          type: boolean
+          default: false
+          description: "Prepend UTF-8 BOM (useful for Excel)"
+
+    ExportJob:
+      $ref: "./schemas/export-job.schema.json"
+
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: FORBIDDEN_COLUMN
+        message:
+          type: string
+        details:
+          type: object
+          additionalProperties: true
+
+  responses:
+    Unauthorized:
+      description: "Missing or invalid Bearer token"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: "Job not found or not owned by caller"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    ValidationError:
+      description: |
+        Request validation failed. Examples: unknown column (REQ-EXPORT-003),
+        forbidden column (REQ-EXPORT-005), unsupported entity_type.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+          examples:
+            forbiddenColumn:
+              summary: "Sensitive field requested"
+              value:
+                code: FORBIDDEN_COLUMN
+                message: "Column 'password_hash' is on the sensitive-fields blocklist (REQ-EXPORT-005)"
+                details: { column: password_hash }
+            unknownColumn:
+              summary: "Column does not exist"
+              value:
+                code: UNKNOWN_COLUMN
+                message: "Column 'nonexistent_field' does not exist on entity_type=contact"
+                details: { column: nonexistent_field }
+    RateLimited:
+      description: "Account exceeded export rate-limit (10 / hour)"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"

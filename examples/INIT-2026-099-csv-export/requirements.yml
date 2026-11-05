@@ -1,0 +1,116 @@
+# Реестр требований инициативы.
+# Команда валидации: make validate
+# Учебная инициатива для туториала docs/tutorial/.
+metadata:
+  initiative: "INIT-2026-099-csv-export"
+  product: "platform"
+  owner: "@platform-team"
+  profile: "standard"
+  version: "0.1.0"
+  last_updated: "2026-04-28"
+
+requirements:
+  - id: "REQ-EXPORT-001"
+    title: "Synchronous CSV export"
+    type: "functional"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      An authenticated user MUST be able to export platform records (contact, deal,
+      event, activity) to a UTF-8 encoded CSV file via REST API. For datasets up to
+      100 000 rows the response MUST be returned synchronously in a single HTTP call.
+    acceptance_criteria:
+      - "Given an authenticated user with N records (N ≤ 100 000), when they POST /export with entity_type and format=csv, then HTTP 200 is returned with text/csv body and Content-Disposition: attachment"
+      - "Given records contain Cyrillic or emoji, when exported, then the resulting file is valid UTF-8 (BOM optional) and characters are preserved"
+      - "Given the user is unauthenticated, when they POST /export, then HTTP 401 is returned"
+    trace:
+      adr:
+        - "INIT-2026-099-ADR-0001-sync-vs-async"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1export/post"
+      tests:
+        - "tests/api/export.spec.ts::REQ-EXPORT-001"
+
+  - id: "REQ-EXPORT-002"
+    title: "Asynchronous CSV export for large datasets"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      For datasets larger than 100 000 rows the system MUST switch to an asynchronous
+      job pattern: return job_id immediately and notify the caller when the file is
+      ready. This avoids HTTP timeouts on long exports and protects the API from
+      head-of-line blocking.
+    acceptance_criteria:
+      - "Given a dataset of > 100 000 rows, when the user POSTs /export, then HTTP 202 is returned with a body containing job_id and status='pending'"
+      - "Given a job_id, when the user GETs /export/jobs/{jobId}, then current status (pending|processing|completed|failed) is returned"
+      - "Given a completed job, when the user GETs /export/jobs/{jobId}, then a signed download_url is returned that expires in 24 hours"
+    trace:
+      adr:
+        - "INIT-2026-099-ADR-0001-sync-vs-async"
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1export/post"
+        - "contracts/openapi.yaml#/paths/~1export~1jobs~1{jobId}/get"
+        - "contracts/asyncapi.yaml#/channels/export.job.completed"
+      schemas:
+        - "contracts/schemas/export-job.schema.json"
+      tests:
+        - "tests/api/export.spec.ts::REQ-EXPORT-002"
+
+  - id: "REQ-EXPORT-003"
+    title: "Column filtering"
+    type: "functional"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      A user SHOULD be able to specify which columns to include in the export.
+      If columns are omitted, all non-sensitive columns for the entity_type are
+      exported (see REQ-EXPORT-005 for the exclusion policy).
+    acceptance_criteria:
+      - "Given POST /export with columns=[id, name, email], when the file is generated, then the CSV header row contains exactly those three columns in the requested order"
+      - "Given POST /export with an unknown column, when validated, then HTTP 422 is returned with field-level error (code=UNKNOWN_COLUMN, column=<value>)"
+    trace:
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1export/post"
+      tests:
+        - "tests/api/export.spec.ts::REQ-EXPORT-003"
+
+  - id: "REQ-EXPORT-004"
+    title: "Synchronous export latency SLO"
+    type: "nfr"
+    priority: "P1"
+    status: "proposed"
+    description: >
+      For synchronous exports (≤ 100 000 rows) the end-to-end response time SHOULD
+      not exceed 5 seconds at the 95th percentile under standard load (50 rps).
+      Measured at the API gateway, server-timing only (excludes client network).
+    metrics:
+      - name: "export_sync_latency_p95_s"
+        target: 5
+        measurement: "apm:histogram_quantile(0.95, http_request_duration_seconds_bucket{endpoint=\"/export\",mode=\"sync\"})"
+        iso_characteristic: "performance_efficiency"
+        iso_sub_characteristic: "time_behaviour"
+    trace:
+      slo: "ops/slo.yaml#csv-export-sync-latency"
+      tests:
+        - "tests/perf/export-latency.k6.js::REQ-EXPORT-004"
+
+  - id: "REQ-EXPORT-005"
+    title: "Sensitive fields exclusion"
+    type: "constraint"
+    priority: "P0"
+    status: "proposed"
+    description: >
+      Exported CSV files MUST NOT contain any of the following fields, regardless
+      of the requested columns: password_hash, api_token, mfa_secret, recovery_code,
+      session_token, oauth_refresh_token. Requesting these columns explicitly MUST
+      return HTTP 422.
+    acceptance_criteria:
+      - "Given POST /export with columns containing password_hash, when validated, then HTTP 422 is returned with code=FORBIDDEN_COLUMN"
+      - "Given POST /export with no columns specified, when the file is generated, then none of the forbidden fields appear in the header row or any data row"
+      - "Given a regression test on the exclusion list, when the test is run, then it FAILS if a new sensitive field is added to the entity model without being added to the exclusion list"
+    trace:
+      contracts:
+        - "contracts/openapi.yaml#/paths/~1export/post"
+      tests:
+        - "tests/api/export-security.spec.ts::REQ-EXPORT-005"

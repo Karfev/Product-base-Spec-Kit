@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.local/schemas/export-job.schema.json",
+  "title": "ExportJob",
+  "description": "Async CSV export job. Returned from POST /export (202) and GET /export/jobs/{jobId}.",
+  "type": "object",
+  "required": ["id", "status", "entity_type", "created_at"],
+  "additionalProperties": false,
+  "properties": {
+    "id":          { "type": "string", "format": "uuid" },
+    "status":      { "type": "string", "enum": ["pending", "processing", "completed", "failed"] },
+    "entity_type": { "type": "string", "enum": ["contact", "deal", "event", "activity"] },
+    "created_at":  { "type": "string", "format": "date-time" },
+    "started_at":  { "type": ["string", "null"], "format": "date-time" },
+    "completed_at": { "type": ["string", "null"], "format": "date-time" },
+    "record_count": { "type": ["integer", "null"], "minimum": 0 },
+    "file_size_bytes": { "type": ["integer", "null"], "minimum": 0 },
+    "download_url": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Signed URL with 24h expiration. Present only when status=completed."
+    },
+    "error": {
+      "type": ["object", "null"],
+      "description": "Present only when status=failed.",
+      "required": ["code", "message"],
+      "properties": {
+        "code":    { "type": "string", "enum": ["TIMEOUT", "DB_ERROR", "STORAGE_ERROR", "INTERNAL_ERROR"] },
+        "message": { "type": "string" }
+      }
+    }
+  }
+}

@@ -9,3 +9,7 @@
 .specify/session/*
 !.specify/session/TEMPLATE.md
 !.specify/session/protocol.md
+
+# Local tools and editor state
+.obsidian/
+tools/node_modules/
