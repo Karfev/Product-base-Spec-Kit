@@ -1,0 +1,92 @@
+---
+apiVersion: openslo/v1
+kind: DataSource
+metadata:
+  name: platform-prometheus
+spec:
+  type: Prometheus
+  connectionDetails:
+    url: http://prometheus.platform.internal:9090
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: csv-export-sync-latency-sli
+spec:
+  description: "P95 of synchronous CSV export latency"
+  thresholdMetric:
+    metricSource:
+      metricSourceRef: platform-prometheus
+      type: Prometheus
+      spec:
+        query: >
+          histogram_quantile(0.95,
+            sum(rate(http_request_duration_seconds_bucket{
+              endpoint="/export", mode="sync"}[5m])) by (le)
+          )
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: csv-export-sync-latency
+  labels:
+    req: REQ-EXPORT-004
+spec:
+  description: "Sync CSV export P95 latency stays below 5 seconds (REQ-EXPORT-004)."
+  service: platform-export-service
+  indicator:
+    metadata:
+      name: csv-export-sync-latency-sli
+  objectives:
+    - displayName: "P95 < 5s"
+      target: 0.95
+      op: lte
+      value: 5
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences
+---
+apiVersion: openslo/v1
+kind: SLI
+metadata:
+  name: csv-export-availability-sli
+spec:
+  description: "Successful (non-5xx) responses on /export endpoints"
+  ratioMetric:
+    counter: true
+    good:
+      metricSource:
+        metricSourceRef: platform-prometheus
+        type: Prometheus
+        spec:
+          query: >
+            sum(rate(http_requests_total{
+              endpoint=~"/export.*", code!~"5.."}[5m]))
+    total:
+      metricSource:
+        metricSourceRef: platform-prometheus
+        type: Prometheus
+        spec:
+          query: >
+            sum(rate(http_requests_total{endpoint=~"/export.*"}[5m]))
+---
+apiVersion: openslo/v1
+kind: SLO
+metadata:
+  name: csv-export-availability
+  labels:
+    req: PRR
+spec:
+  description: "CSV export API availability ≥ 99.5% over 30-day rolling window."
+  service: platform-export-service
+  indicator:
+    metadata:
+      name: csv-export-availability-sli
+  objectives:
+    - displayName: "Availability 99.5%"
+      target: 0.995
+  timeWindow:
+    - duration: 30d
+      isRolling: true
+  budgetingMethod: Occurrences

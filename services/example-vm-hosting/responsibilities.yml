@@ -1,0 +1,103 @@
+# Responsibility matrix for EXAMPLE-VM-HOSTING.
+# Schema: tools/schemas/responsibilities.schema.json
+
+metadata:
+  service_code: "EXAMPLE-VM-HOSTING"
+  version: "0.1.0"
+  last_updated: "2026-03-02"
+
+# Matrix by architectural component
+architectural_blocks:
+  - name: "Compute Infrastructure"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Storage Infrastructure"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Virtualization Platform"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Network Infrastructure"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Security Subsystem"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Monitoring Subsystem"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Infrastructure Services"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Management Portal"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Backup Subsystem"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Data Center Engineering Infrastructure"
+    responsible: "@infra-team"
+    operate: "@infra-team"
+    transform: "@infra-team"
+
+  - name: "External Connectivity"
+    responsible: "@infra-team"
+    operate: "@infra-team"
+    transform: "@infra-team"
+
+  - name: "Support System"
+    responsible: "@platform-team"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+# Matrix by platform component
+kts_components:
+  - name: "Compute Infrastructure"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Storage Infrastructure"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Virtualization Platform"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Network Infrastructure"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Security Subsystem"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Monitoring Subsystem"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Infrastructure Services"
+    operate: "@platform-team"
+    transform: "@platform-team"
+
+  - name: "Backup Subsystem"
+    operate: "@platform-team"
+    transform: "@platform-team"

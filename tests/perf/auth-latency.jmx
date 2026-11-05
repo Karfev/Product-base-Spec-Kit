@@ -1,0 +1,17 @@
+<!--
+  Performance Test Plan — API Key Auth Latency
+
+  This is a STUB demonstrating how perf test files link to REQ-IDs
+  in the SpecKit traceability model.
+
+  REQ-AUTH-004: API key auth latency P95 < 10ms overhead at 1000 req/s
+  Initiative: INIT-2026-000-api-key-management
+  SLO:        ops/slo.yaml#api-key-auth-latency
+
+  In a real project, this would be a JMeter test plan.
+-->
+<jmeterTestPlan version="1.2">
+  <hashTree>
+    <TestPlan testname="REQ-AUTH-004: Auth Latency SLO Validation" enabled="true"/>
+  </hashTree>
+</jmeterTestPlan>
