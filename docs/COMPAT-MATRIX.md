@@ -8,6 +8,7 @@ Status of SpecKit skills across AI coding agents.
 
 | Skill | Claude Code | OpenCode | Kilo Code | Risk |
 |-------|:-----------:|:--------:|:---------:|------|
+| /speckit-tutorial | ✅ | ⏳ | ⏳ | MEDIUM |
 | /speckit-start | ✅ | ⏳ | ⏳ | HIGH |
 | /speckit-profile | ✅ | ⏳ | ⏳ | HIGH |
 | /speckit-init | ✅ | ⏳ | ⏳ | MEDIUM |
@@ -54,8 +55,8 @@ Status of SpecKit skills across AI coding agents.
 ## Portability Risk Levels
 
 - **LOW** (4 commands): Read-only reporting, no dialogue, simple file I/O
-- **MEDIUM** (16 commands): Multi-turn dialogue, YAML generation, make validate calls
-- **HIGH** (11 commands): Complex reasoning, decision trees, GSD integration, 16-question flows
+- **MEDIUM** (18 commands): Multi-turn dialogue, YAML generation, make validate calls
+- **HIGH** (10 commands): Complex reasoning, decision trees, GSD integration, 16-question flows
 
 ## How to Run a Smoke Test
 

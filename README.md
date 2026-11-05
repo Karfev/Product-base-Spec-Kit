@@ -39,7 +39,7 @@ SpecKit skills use the [SKILL.md](https://github.com/anthropics/skill-md) standa
 | Kilo Code (VS Code / JetBrains) | ✅ Native | ✅ | ✅ Ollama/vLLM | [Setup](docs/SETUP-KILOCODE.md) |
 | Codex CLI | ❌ | ✅ | ❌ Cloud only | — |
 
-27 of 31 commands are fully portable (file I/O + bash). 4 GSD commands require optional GSD installation.
+29 of 32 commands are fully portable (file I/O + bash). 3 GSD commands require optional GSD installation.
 See [AGENTS.md](AGENTS.md) for the complete skill catalog and [docs/COMPAT-MATRIX.md](docs/COMPAT-MATRIX.md) for detailed compatibility.
 
 ---

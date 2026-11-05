@@ -1,8 +1,11 @@
 # Product-base-Spec-Kit — local task runner
 # Run `make help` to see available commands
 
-PYTHON := python3
+PYTHON ?= python3
 SHELL  := /bin/bash
+
+# Node tools from `make install-tools` take priority over global ones
+export PATH := $(CURDIR)/tools/node_modules/.bin:$(PATH)
 
 TEST_UNIT_CMD ?= echo "Set TEST_UNIT_CMD, e.g. 'pytest -m unit'" && exit 1
 TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && exit 1
@@ -169,7 +172,7 @@ restore: ## Restore an archived initiative (usage: make restore INIT=INIT-2026-x
 
 install-tools: ## Install all required validation tools
 	@echo "==> Installing Python tools..."
-	pip install -r tools/requirements.txt
+	$(PYTHON) -m pip install -r tools/requirements.txt
 	@echo "==> Installing Node.js tools..."
 	cd tools && npm install
 	@echo "==> Note: install oasdiff from https://github.com/oasdiff/oasdiff"
