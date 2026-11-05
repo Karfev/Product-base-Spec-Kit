@@ -369,6 +369,7 @@ make lint-docs             # Lint YAML and Markdown files
 make lint-contracts        # Validate OpenAPI and AsyncAPI contracts
 make check-trace           # Check REQ-ID consistency (L3 <-> L4)
 make check-deltas          # Find requirement conflicts with the product registry
+make status INIT=<INIT>    # Show the state of an initiative and its next step
 make check-spec-quality    # Check .specify specs quality gates
 make check-release-rollout # Validate rollout/migration vs SLO/PRR
 make collect-evidence      # Collect GSD execution evidence into RTM
@@ -505,6 +506,23 @@ To copy the golden reference into your project for side-by-side comparison:
 **INIT-2026-000** demonstrates the full traceability chain: `requirements.yml` → `contracts/openapi.yaml` → `decisions/ADR-0001` → `tests/api/api-keys.spec.ts` → `ops/slo.yaml` → `evidence/`.
 
 ---
+
+## Updating a Fork
+
+The kit version is in [`VERSION`](VERSION), changes are in [`CHANGELOG.md`](CHANGELOG.md), releases are tagged `kit-vX.Y.Z`.
+
+```bash
+tools/kit-update.sh <remote-or-path> kit-vX.Y.Z
+```
+
+The script replaces only the paths listed in `tools/kit-paths.txt` and leaves the result uncommitted, so local changes to framework files show up in `git diff --cached`. The source can be a local clone. For a repository that does not have the script yet:
+
+```bash
+git fetch --no-tags <remote-or-path> refs/tags/kit-vX.Y.Z
+git show FETCH_HEAD:tools/kit-update.sh | bash -s -- <remote-or-path> kit-vX.Y.Z
+```
+
+See [PLAT-0006](decisions/PLAT-0006-kit-versioning-and-updates.md).
 
 ## Governance
 

@@ -1,0 +1,36 @@
+# Framework paths that tools/kit-update.sh takes from a tagged kit version.
+# One path per line, a directory covers everything inside it.
+# Everything else (initiatives, products, services, domains, decisions) is project content.
+VERSION
+CHANGELOG.md
+AGENTS.md
+CLAUDE.md
+Makefile
+.yamllint.yml
+.markdownlint.yml
+.markdownlintignore
+redocly.yaml
+.claude/commands
+.opencode/skills
+.github/workflows
+.specify/memory/constitution.md
+.specify/memory/presets
+.specify/memory/consilium-roles.yml
+.specify/memory/risk-keywords.yml
+.specify/memory/architecture-rationale.md
+.specify/session/TEMPLATE.md
+.specify/session/protocol.md
+.specify/specs/README.md
+.specify/specs/{NNN}-{slug}
+initiatives/{INIT-YYYY-NNN-slug}
+products/{product}
+domains/{domain}
+services/{service-code}
+templates
+tools
+docs/tutorial
+docs/QUICKSTART.md
+docs/COMPAT-MATRIX.md
+docs/SETUP-KILOCODE.md
+docs/SETUP-OPENCODE.md
+examples/INIT-2026-099-csv-export

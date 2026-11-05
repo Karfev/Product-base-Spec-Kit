@@ -12,6 +12,18 @@ All skills are in `.claude/commands/`. Invoke them by name: `/speckit-start`, `/
 2. **Or run `/speckit-tutorial`** — interactive 20-minute tour through a sample initiative.
 3. **Or run `/speckit-start`** to jump straight to creating your first initiative.
 
+## Short path (Minimal profile)
+
+Most small changes need only this. The other commands are for higher profiles and special tasks.
+
+1. `/speckit-quick <task>` — create the initiative (or `/speckit-start` for a guided version).
+2. `/speckit-prd <INIT>`, then `/speckit-requirements <INIT>`.
+3. `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-implement`.
+4. `/speckit-trace`, `/speckit-rtm`, then `make check-all`.
+5. `/speckit-graduate <INIT>` — merge the result into the product registry.
+
+Lost? `/speckit-continue` or `make status INIT=<INIT>` shows the next step. When you need contracts or a design: `tools/upgrade.sh <INIT> --profile standard`.
+
 ## Quick orientation
 
 - **Architecture overview:** [README.md](README.md#architecture--five-layers)
