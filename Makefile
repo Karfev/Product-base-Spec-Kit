@@ -12,7 +12,7 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-deltas check-agents-md test-tools test-lifecycle graduate check-spec-quality check-release-rollout check-index-stale check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
+.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-deltas check-agents-md test-tools test-lifecycle graduate status kit-update check-spec-quality check-release-rollout check-index-stale check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -180,6 +180,14 @@ check-all: test-tools validate validate-services validate-registry validate-cont
 graduate: ## Graduate an initiative into the product layer (usage: make graduate INIT=INIT-2026-xxx [ARGS='--dry-run'])
 	@[ -z "$(INIT)" ] && echo "Usage: make graduate INIT=INIT-2026-xxx [ARGS='--dry-run']" && exit 1 || true
 	@$(PYTHON) tools/scripts/graduate.py $(INIT) $(ARGS)
+
+status: ## Show the state of an initiative and its next step (usage: make status INIT=INIT-2026-xxx)
+	@[ -z "$(INIT)" ] && echo "Usage: make status INIT=INIT-2026-xxx" && exit 1 || true
+	@$(PYTHON) tools/scripts/speckit-status.py $(INIT) $(ARGS)
+
+kit-update: ## Update framework files from a tagged kit version (usage: make kit-update SOURCE=upstream TAG=kit-vX.Y.Z)
+	@[ -z "$(SOURCE)" ] || [ -z "$(TAG)" ] && echo "Usage: make kit-update SOURCE=<remote-or-path> TAG=kit-vX.Y.Z" && exit 1 || true
+	@bash tools/kit-update.sh $(SOURCE) $(TAG)
 
 archive: ## Archive a completed initiative (usage: make archive INIT=INIT-2026-xxx)
 	@[ -z "$(INIT)" ] && echo "Usage: make archive INIT=INIT-2026-xxx [ARGS='--force']" && exit 1 || true

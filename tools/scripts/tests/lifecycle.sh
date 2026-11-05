@@ -71,6 +71,7 @@ expect_field() {
 }
 
 new_initiative() {
+  mkdir -p products/platform
   bash tools/init.sh "$1" --profile standard --product platform --owner @platform-team > /dev/null
 }
 

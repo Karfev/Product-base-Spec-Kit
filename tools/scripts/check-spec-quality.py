@@ -62,10 +62,10 @@ def is_unfilled_placeholder(token: str) -> bool:
 
     if "…" in value or "..." in value:
         return True
-    if any(ch in value for ch in ("|", "/", "@")):
-        return True
     if ":" in value:
         return False
+    if any(ch in value for ch in ("|", "/", "@")):
+        return True
     if " " in value:
         return True
     if any(hint in lower for hint in TEMPLATE_HINTS):
@@ -74,6 +74,22 @@ def is_unfilled_placeholder(token: str) -> bool:
         return True
 
     return False
+
+
+def find_placeholders(text: str, skip_code_blocks: bool = False) -> list[tuple[int, str]]:
+    """Unfilled template placeholders as (line number, token)."""
+    found: list[tuple[int, str]] = []
+    in_code_block = False
+    for line_no, line in enumerate(text.splitlines(), start=1):
+        if skip_code_blocks and line.strip().startswith("```"):
+            in_code_block = not in_code_block
+            continue
+        if in_code_block or ("<!--" in line and "-->" in line):
+            continue
+        for match in PLACEHOLDER_PATTERN.finditer(line):
+            if is_unfilled_placeholder(match.group(1)):
+                found.append((line_no, match.group(1)))
+    return found
 
 
 def collect_yaml_req_ids(path: Path) -> set[str]:
@@ -161,22 +177,10 @@ def main() -> int:
             continue
 
         # 1) Unfilled placeholders in non-template specs.
-        in_code_block = False
-        for line_no, line in enumerate(spec_text.splitlines(), start=1):
-            stripped = line.strip()
-            if stripped.startswith("```"):
-                in_code_block = not in_code_block
-                continue
-            if in_code_block:
-                continue
-            if "<!--" in line and "-->" in line:
-                continue
-            for match in PLACEHOLDER_PATTERN.finditer(line):
-                token = match.group(1)
-                if is_unfilled_placeholder(token):
-                    errors.append(
-                        f"[ERROR] {spec_md}:{line_no}: unfilled placeholder '{{{token}}}'"
-                    )
+        for line_no, token in find_placeholders(spec_text, skip_code_blocks=True):
+            errors.append(
+                f"[ERROR] {spec_md}:{line_no}: unfilled placeholder '{{{token}}}'"
+            )
 
         # 2) Open clarifications.
         for line_no, line in enumerate(spec_text.splitlines(), start=1):
@@ -212,15 +216,10 @@ def main() -> int:
                     if is_template(contract_file):
                         continue
                     contract_text = contract_file.read_text(encoding="utf-8")
-                    for line_no, line in enumerate(contract_text.splitlines(), start=1):
-                        if "<!--" in line and "-->" in line:
-                            continue
-                        for match in PLACEHOLDER_PATTERN.finditer(line):
-                            token = match.group(1)
-                            if is_unfilled_placeholder(token):
-                                warnings.append(
-                                    f"[WARNING] {contract_file}:{line_no}: unfilled placeholder '{{{token}}}' in contract"
-                                )
+                    for line_no, token in find_placeholders(contract_text):
+                        warnings.append(
+                            f"[WARNING] {contract_file}:{line_no}: unfilled placeholder '{{{token}}}' in contract"
+                        )
 
         # 5) RED -> GREEN sequence in tasks.md: T2a before T2b.
         tasks_text = tasks_md.read_text(encoding="utf-8")
