@@ -6,7 +6,7 @@ Checks:
   1. Every REQ-ID referenced in a trace.md exists in some L3 requirements.yml
   2. Every link in requirement.trace resolves (file, YAML fragment, SLO name, ADR, test tag)
   3. Every requirement has at least one trace evidence entry
-  4. Every requirement appears in some trace.md (L3 or L4)
+  4. Every requirement appears in a trace.md of its own initiative (L3 or L4)
 
 Severity (status of the requirement):
   implemented, verified — broken link and empty evidence are errors,
@@ -64,16 +64,20 @@ def has_evidence(req: dict) -> bool:
     return any(trace.get(field) for field in EVIDENCE_FIELDS)
 
 
-def is_archived_spec(spec_dir: Path, root: Path) -> bool:
-    """Check if a spec's parent initiative is archived."""
+def spec_initiative(spec_dir: Path):
+    """Initiative named in the spec.md of an L4 spec, or None."""
     spec_md = spec_dir / 'spec.md'
     if not spec_md.exists():
-        return False
+        return None
+    m = re.search(r'\*\*Initiative:\*\*\s*(\S+)', spec_md.read_text())
+    return m.group(1).strip() if m else None
+
+
+def is_archived_spec(spec_dir: Path, root: Path) -> bool:
+    """Check if a spec's parent initiative is archived."""
     try:
-        text = spec_md.read_text()
-        m = re.search(r'\*\*Initiative:\*\*\s*(\S+)', text)
-        if m:
-            init_id = m.group(1).strip()
+        init_id = spec_initiative(spec_dir)
+        if init_id:
             req_yml = root / 'initiatives' / init_id / 'requirements.yml'
             if req_yml.exists():
                 with open(req_yml) as f:
@@ -264,7 +268,8 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
     errors = []
     warnings = []
 
-    # Build L3 registry: {req_id: (requirement, profile)}
+    # Build L3 registry: {(initiative, req_id): (requirement, profile)}.
+    # An ID may live in several initiatives (delta: modified), each needs its own trace row.
     registry = {}
     for req_file in root.glob('initiatives/*/requirements.yml'):
         if is_template(req_file.parent):
@@ -275,7 +280,8 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
             errors.append(f"[ERROR] Cannot parse {req_file}: {e}")
             continue
         for req in requirements:
-            registry[req['id']] = (req, metadata.get('profile', 'minimal'))
+            registry[(req_file.parent.name, req['id'])] = (req, metadata.get('profile', 'minimal'))
+    known_req_ids = {req_id for _, req_id in registry}
 
     # Examples are checked for links only, their REQ-IDs do not join the registry
     for req_file in root.glob('examples/*/requirements.yml'):
@@ -285,7 +291,7 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
             errors.append(f"[ERROR] Cannot parse {req_file}: {e}")
 
     # Check REQ-IDs from L3 initiative trace.md files
-    traced_req_ids = set()
+    traced = set()
     total_l3_req_refs = 0
     for trace_file in root.glob('initiatives/*/trace.md'):
         if is_template(trace_file.parent):
@@ -300,9 +306,9 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
         try:
             l3_ids = parse_trace_md(trace_file)
             total_l3_req_refs += len(l3_ids)
-            traced_req_ids.update(l3_ids)
+            traced.update((trace_file.parent.name, req_id) for req_id in l3_ids)
             for req_id in l3_ids:
-                if req_id not in registry:
+                if req_id not in known_req_ids:
                     errors.append(
                         f"[ERROR] {trace_file}: REQ-ID '{req_id}' not found "
                         f"in any initiatives/*/requirements.yml"
@@ -318,9 +324,11 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
         try:
             l4_req_ids = parse_trace_md(trace_file)
             total_l4_req_refs += len(l4_req_ids)
-            traced_req_ids.update(l4_req_ids)
+            owner = spec_initiative(trace_file.parent)
             for req_id in l4_req_ids:
-                if req_id not in registry:
+                # A spec that names no initiative counts for every initiative with this ID
+                traced.update(key for key in registry if key[1] == req_id and owner in (None, key[0]))
+                if req_id not in known_req_ids:
                     errors.append(
                         f"[ERROR] {trace_file}: REQ-ID '{req_id}' not found "
                         f"in any initiatives/*/requirements.yml"
@@ -329,11 +337,11 @@ def run_checks(root: Path, strict: bool = False) -> tuple:
             errors.append(f"[ERROR] Cannot parse {trace_file}: {e}")
 
     # Check L3→L4 reverse: every REQ-ID from requirements.yml should appear in some trace.md
-    for req_id, (req, profile) in registry.items():
+    for (initiative, req_id), (req, profile) in registry.items():
         status = req.get('status')
-        if req_id in traced_req_ids or status == 'deprecated':
+        if (initiative, req_id) in traced or status == 'deprecated':
             continue
-        message = f"REQ-ID '{req_id}' ({status}) from requirements.yml has no entry in any trace.md (L3 or L4)"
+        message = f"REQ-ID '{req_id}' ({status}) from {initiative} has no entry in a trace.md of this initiative (L3 or L4)"
         if status in TERMINAL_STATUSES and profile != 'minimal':
             errors.append(f"[ERROR] {message}")
         else:

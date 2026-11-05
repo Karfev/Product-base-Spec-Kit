@@ -28,11 +28,15 @@ You are managing the requirements registry for initiative `$ARGUMENTS`.
    - `<SCOPE>` = 2–16 uppercase chars derived from domain/area (e.g., `AUTH`, `BILLING`, `EXPORT`)
    - `NNN` = zero-padded sequential number within the scope
    - Check existing IDs in the file and across `initiatives/*/requirements.yml` to avoid collisions
-   - Also check `products/{product}/requirements-registry.yml` (if it exists) to ensure no collision with graduated REQ-IDs. Graduated IDs are immutable and MUST NOT be reassigned. If a collision is found, warn:
+   - Also check `products/{product}/requirements-registry.yml` (if it exists). Graduated IDs are immutable and MUST NOT be reassigned to something else. If a new requirement collides, warn:
      ```
-     WARNING: REQ-AUTH-001 already exists in the product registry (graduated from INIT-2026-000).
-     Choose a different ID or increment the sequence number.
+     WARNING: REQ-AUTH-001 already exists in the product registry at rev 2 (last changed by INIT-2026-000).
+     Choose a different ID, or set delta: modified if this initiative changes that requirement.
      ```
+   - A requirement that changes existing product behaviour keeps its ID and states the change:
+     - `delta: modified` and `base_rev: <rev from the registry>`, with the full new text;
+     - `delta: removed`, `base_rev: <rev from the registry>`, `removal_reason`, `status: deprecated` to retire it.
+     A requirement without `delta` is new (`added`). `make check-deltas` reports a stale `base_rev`.
 
 8. Write updated `requirements.yml` — each requirement MUST include:
    ```yaml

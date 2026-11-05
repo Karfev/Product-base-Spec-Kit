@@ -21,6 +21,9 @@
 #     - nfr MUST иметь metrics
 #     - quality MUST иметь metrics + iso_characteristic
 #     - REQ-ID immutable после status=approved
+#     - delta ∈ {added, modified, removed}; если поля нет, считается added
+#     - modified MUST иметь base_rev (rev записи в requirements-registry.yml)
+#     - removed MUST иметь base_rev и removal_reason
 #
 # КОНВЕНЦИИ ОПИСАНИЙ (BCP 14 / RFC 2119):
 #   MUST / SHALL — обязательное требование

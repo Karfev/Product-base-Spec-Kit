@@ -37,7 +37,8 @@ PYEOF
 # --- Remove from INDEX.md ---
 INDEX="archive/INDEX.md"
 if [ -f "$INDEX" ]; then
-  sed -i '' "/\[$INIT\]/d" "$INDEX"
+  sed -i.bak "/\[$INIT\]/d" "$INDEX"
+  rm -f "$INDEX.bak"
 fi
 
 echo ""

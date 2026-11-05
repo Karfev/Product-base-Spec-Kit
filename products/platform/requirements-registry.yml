@@ -1,35 +1,82 @@
-# Product requirements registry.
-# Auto-maintained by /speckit-graduate. Do not edit manually.
+# Product requirements registry: how the product works now.
+# Auto-maintained by tools/scripts/graduate.py. Do not edit manually.
 metadata:
-  product: "platform"
-  owner: "@smoke-tester"
-  last_updated: "2026-04-12"
-
+  schema_version: 2
+  product: platform
+  owner: '@platform-team'
+  last_updated: '2026-11-05'
 entries:
-  - id: "REQ-EXPORT-001"
-    title: "Create export request via REST API"
-    type: "functional"
-    final_status: "implemented"
-    source_initiative: "INIT-2026-009-smoke-test"
-    graduated_date: "2026-04-12"
-
-  - id: "REQ-EXPORT-002"
-    title: "Support JSON and CSV export formats"
-    type: "functional"
-    final_status: "implemented"
-    source_initiative: "INIT-2026-009-smoke-test"
-    graduated_date: "2026-04-12"
-
-  - id: "REQ-EXPORT-003"
-    title: "Async export with completion notification"
-    type: "functional"
-    final_status: "implemented"
-    source_initiative: "INIT-2026-009-smoke-test"
-    graduated_date: "2026-04-12"
-
-  - id: "REQ-EXPORT-004"
-    title: "Export latency P95 under 30 seconds"
-    type: "nfr"
-    final_status: "implemented"
-    source_initiative: "INIT-2026-009-smoke-test"
-    graduated_date: "2026-04-12"
+  - id: REQ-DEMO-001
+    title: Create export request via REST API
+    type: functional
+    priority: P0
+    status: implemented
+    rev: 1
+    description: Пользователь MUST иметь возможность создать запрос на экспорт проектного отчёта через
+      REST API endpoint POST /exports с указанием project_id и формата.
+    acceptance_criteria:
+      - Given authenticated user When POST /exports with valid project_id Then return 202 with export_id
+      - Given unauthenticated request When POST /exports Then return 401
+    source_initiative: INIT-2026-009-smoke-test
+    graduated_date: '2026-04-12'
+    history:
+      - rev: 1
+        initiative: INIT-2026-009-smoke-test
+        date: '2026-04-12'
+        change: added
+  - id: REQ-DEMO-002
+    title: Support JSON and CSV export formats
+    type: functional
+    priority: P1
+    status: implemented
+    rev: 1
+    description: Система MUST поддерживать экспорт в форматах JSON и CSV. Формат указывается в параметре
+      format при создании запроса.
+    acceptance_criteria:
+      - Given export request with format=json When export completes Then result file is valid JSON
+      - Given export request with format=csv When export completes Then result file is valid CSV with
+        headers
+    source_initiative: INIT-2026-009-smoke-test
+    graduated_date: '2026-04-12'
+    history:
+      - rev: 1
+        initiative: INIT-2026-009-smoke-test
+        date: '2026-04-12'
+        change: added
+  - id: REQ-DEMO-003
+    title: Async export with completion notification
+    type: functional
+    priority: P1
+    status: implemented
+    rev: 1
+    description: Экспорт MUST выполняться асинхронно. По завершении система MUST публиковать событие export.completed
+      с ссылкой на скачивание.
+    acceptance_criteria:
+      - Given export request When processing completes Then export.completed event is published
+      - Given export_id When GET /exports/{id} Then return current status (pending|completed|failed)
+    source_initiative: INIT-2026-009-smoke-test
+    graduated_date: '2026-04-12'
+    history:
+      - rev: 1
+        initiative: INIT-2026-009-smoke-test
+        date: '2026-04-12'
+        change: added
+  - id: REQ-DEMO-004
+    title: Export latency P95 under 30 seconds
+    type: nfr
+    priority: P1
+    status: implemented
+    rev: 1
+    description: API endpoint для экспорта SHOULD завершать генерацию за P95 < 30s при стандартной нагрузке
+      до 100 concurrent exports.
+    metrics:
+      - name: export_duration_p95_seconds
+        target: 30
+        measurement: apm
+    source_initiative: INIT-2026-009-smoke-test
+    graduated_date: '2026-04-12'
+    history:
+      - rev: 1
+        initiative: INIT-2026-009-smoke-test
+        date: '2026-04-12'
+        change: added

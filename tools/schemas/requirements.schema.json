@@ -46,6 +46,21 @@
         },
         "priority":    { "type": "string", "enum": ["P0", "P1", "P2", "P3"] },
         "status":      { "type": "string", "enum": ["draft", "proposed", "approved", "implemented", "verified", "deprecated"] },
+        "delta": {
+          "type": "string",
+          "enum": ["added", "modified", "removed"],
+          "description": "Как требование меняет реестр продукта. Если поля нет, считается added."
+        },
+        "base_rev": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Ревизия записи в requirements-registry.yml, на которой основано изменение. Обязательно для modified и removed."
+        },
+        "removal_reason": {
+          "type": "string",
+          "minLength": 5,
+          "description": "Почему требование убрано. Обязательно для removed."
+        },
         "description": { "type": "string", "minLength": 10 },
         "acceptance_criteria": {
           "type": "array",
@@ -112,6 +127,14 @@
         }
       },
       "allOf": [
+        {
+          "if":   { "properties": { "delta": { "const": "modified" } }, "required": ["delta"] },
+          "then": { "required": ["base_rev"] }
+        },
+        {
+          "if":   { "properties": { "delta": { "const": "removed" } }, "required": ["delta"] },
+          "then": { "required": ["base_rev", "removal_reason"] }
+        },
         {
           "if":   { "properties": { "type": { "const": "functional" } } },
           "then": { "required": ["acceptance_criteria"] }

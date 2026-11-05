@@ -116,6 +116,22 @@ jobs:
       - name: Run all checks
         run: make check-all
 
+  lifecycle:
+    name: Run the initiative lifecycle (blocking)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: python -m pip install -r tools/requirements.txt
+
+      - name: Run init, graduate, archive, restore and a second graduation
+        run: make test-lifecycle
+
   validate-enterprise:
     name: Validate Enterprise IS classification (blocking)
     runs-on: ubuntu-latest
@@ -179,6 +195,9 @@ jobs:
             echo "No requirements-registry.yml files found — skipping"
           fi
           exit $failed
+
+      - name: Find conflicts between requirement deltas and registries
+        run: python3 tools/scripts/check-deltas.py
 
   validate-contracts:
     name: Validate product contracts (L2) — smart-scope

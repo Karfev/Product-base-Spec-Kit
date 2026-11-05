@@ -126,7 +126,7 @@ class SeverityTests(RepositoryTestCase):
         self.write_initiative({'tests': [f'tests/a.spec.ts::{REQ_ID}']}, status='implemented')
         errors, _ = self.run_checks()
         self.assertEqual(len(errors), 1)
-        self.assertIn('no entry in any trace.md', errors[0])
+        self.assertIn('no entry in a trace.md of this initiative', errors[0])
 
     def test_missing_trace_row_is_warning_for_implemented_minimal(self):
         self.write('initiatives/%s/tests/a.spec.ts' % INIT, REQ_ID)
@@ -162,6 +162,57 @@ class SeverityTests(RepositoryTestCase):
         errors, warnings = self.run_checks()
         self.assertTrue(any('REQ-DEMO-002' in e and 'not found in any' in e for e in errors))
         self.assertTrue(any('examples' in w and 'test file not found' in w for w in warnings))
+
+
+class PerInitiativeCoverageTests(RepositoryTestCase):
+    OTHER = 'INIT-2026-011-other'
+    EVIDENCE = {'tests': [f'ext:other/test.ts::{REQ_ID}']}
+
+    def write_other(self, trace_row=True, status='implemented'):
+        self.write(f'initiatives/{self.OTHER}/requirements.yml', yaml.safe_dump({
+            'metadata': {'initiative': self.OTHER, 'product': 'platform', 'profile': 'standard'},
+            'requirements': [{'id': REQ_ID, 'status': status, 'delta': 'modified', 'base_rev': 1, 'trace': self.EVIDENCE}],
+        }))
+        if trace_row:
+            self.write(f'initiatives/{self.OTHER}/trace.md', f'| {REQ_ID} | row |')
+
+    def test_row_of_another_initiative_does_not_count(self):
+        self.write_initiative(self.EVIDENCE, status='implemented')
+        self.write_trace_md()
+        self.write_other(trace_row=False)
+        errors, _ = self.run_checks()
+        self.assertEqual(len(errors), 1)
+        self.assertIn(self.OTHER, errors[0])
+
+    def test_each_initiative_has_its_own_row(self):
+        self.write_initiative(self.EVIDENCE, status='implemented')
+        self.write_trace_md()
+        self.write_other()
+        self.assertEqual(self.run_checks(), ([], []))
+
+    def test_l4_row_counts_for_the_initiative_named_in_the_spec(self):
+        self.write_initiative(self.EVIDENCE, status='implemented')
+        self.write_trace_md()
+        self.write_other(trace_row=False)
+        self.write('.specify/specs/011-other/spec.md', f'**Initiative:** {self.OTHER}\n')
+        self.write('.specify/specs/011-other/trace.md', f'| {REQ_ID} | row |')
+        self.assertEqual(self.run_checks()[0], [])
+
+    def test_l4_row_of_another_initiative_does_not_count(self):
+        self.write_initiative(self.EVIDENCE, status='implemented')
+        self.write_trace_md()
+        self.write_other(trace_row=False)
+        self.write('.specify/specs/010-demo/spec.md', f'**Initiative:** {INIT}\n')
+        self.write('.specify/specs/010-demo/trace.md', f'| {REQ_ID} | row |')
+        errors, _ = self.run_checks()
+        self.assertEqual(len(errors), 1)
+        self.assertIn(self.OTHER, errors[0])
+
+    def test_l4_row_without_named_initiative_counts_for_all(self):
+        self.write_initiative(self.EVIDENCE, status='implemented')
+        self.write_other(trace_row=False)
+        self.write('.specify/specs/010-demo/trace.md', f'| {REQ_ID} | row |')
+        self.assertEqual(self.run_checks()[0], [])
 
 
 class LinkResolutionTests(RepositoryTestCase):

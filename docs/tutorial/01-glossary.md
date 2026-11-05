@@ -58,6 +58,16 @@
 | **check-trace** | `make check-trace` — CI-валидатор, проверяющий, что каждый REQ-ID в `trace.md` существует в `requirements.yml` и наоборот. Blocking. |
 | **Evidence report** | `evidence/<INIT>-evidence-report.md`. Сводный отчёт перед релизом: RTM coverage %, PRR status, SLO readiness, gaps. Генерируется `/speckit-evidence`. |
 
+## Изменение требований
+
+| Термин | Что значит |
+|---|---|
+| **Реестр продукта** | `products/<product>/requirements-registry.yml`. Описывает, как продукт работает сейчас. Меняется только через `tools/scripts/graduate.py`. |
+| **delta** | Поле требования в инициативе: `added` (по умолчанию), `modified`, `removed`. Говорит, что требование делает с реестром. |
+| **rev / base_rev** | `rev` — ревизия записи в реестре, растёт с каждым изменением. `base_rev` — ревизия, от которой отталкивалась инициатива. Если они разошлись, это конфликт. |
+
+---
+
 ## L4 Spec-Driven Workflow
 
 | Термин | Что это |

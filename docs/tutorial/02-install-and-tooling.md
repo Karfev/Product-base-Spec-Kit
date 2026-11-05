@@ -128,6 +128,7 @@ make help
 #   help                 Show available commands
 #   validate             Validate all active requirements.yml...
 #   check-trace          Check REQ-ID consistency (L3 <-> L4)
+#   check-deltas         Find requirement conflicts with the product registry
 #   ...
 
 # 2. Валидация существующих инициатив (должно пройти)

@@ -9,7 +9,7 @@ graduated_date: "2026-04-12"
 - **Status:** accepted
 - **Date:** 2026-04-12
 - **Deciders:** @smoke-tester
-- **Technical Story:** REQ-EXPORT-003, REQ-EXPORT-004
+- **Technical Story:** REQ-DEMO-003, REQ-DEMO-004
 
 ## Context and Problem Statement
 
@@ -17,7 +17,7 @@ graduated_date: "2026-04-12"
 
 ## Decision Drivers
 
-- P95 latency < 30s (REQ-EXPORT-004)
+- P95 latency < 30s (REQ-DEMO-004)
 - Масштабируемость до 100 concurrent exports
 - Простота реализации и мониторинга
 

@@ -2,19 +2,37 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.local/schemas/requirements-registry.schema.json",
   "title": "requirements-registry.yml schema (L2 Product)",
-  "description": "Product-level registry of graduated requirements from L3 initiatives. Auto-maintained by /speckit-graduate.",
+  "description": "How the product works now: requirements graduated from L3 initiatives. Maintained by tools/scripts/graduate.py.",
   "type": "object",
-  "required": ["metadata", "entries"],
+  "required": [
+    "metadata",
+    "entries"
+  ],
   "additionalProperties": false,
   "properties": {
     "metadata": {
       "type": "object",
-      "required": ["product", "last_updated"],
+      "required": [
+        "schema_version",
+        "product",
+        "last_updated"
+      ],
       "additionalProperties": true,
       "properties": {
-        "product":      { "type": "string", "minLength": 1 },
-        "owner":        { "type": "string" },
-        "last_updated": { "type": "string", "format": "date" }
+        "schema_version": {
+          "const": 2
+        },
+        "product": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date"
+        }
       }
     },
     "entries": {
@@ -22,8 +40,19 @@
       "minItems": 0,
       "items": {
         "type": "object",
-        "required": ["id", "title", "type", "final_status", "source_initiative", "graduated_date"],
-        "additionalProperties": true,
+        "required": [
+          "id",
+          "title",
+          "type",
+          "priority",
+          "status",
+          "rev",
+          "description",
+          "source_initiative",
+          "graduated_date",
+          "history"
+        ],
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
@@ -35,21 +64,189 @@
           },
           "type": {
             "type": "string",
-            "enum": ["functional", "nfr", "quality", "constraint", "compliance"]
+            "enum": [
+              "functional",
+              "nfr",
+              "quality",
+              "constraint",
+              "compliance"
+            ]
           },
-          "final_status": {
+          "priority": {
             "type": "string",
-            "enum": ["implemented", "verified", "deprecated"],
-            "description": "Only terminal statuses qualify for graduation"
+            "enum": [
+              "P0",
+              "P1",
+              "P2",
+              "P3"
+            ]
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "implemented",
+              "verified",
+              "deprecated"
+            ],
+            "description": "Only terminal statuses reach the registry. A deprecated entry stays and its ID is not reused."
+          },
+          "rev": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Grows by one with every graduated change."
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10
+          },
+          "acceptance_criteria": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 5
+            }
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "name",
+                "target",
+                "measurement"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "target": {
+                  "type": [
+                    "number",
+                    "string"
+                  ]
+                },
+                "measurement": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "iso_characteristic": {
+                  "type": "string",
+                  "enum": [
+                    "functional_suitability",
+                    "performance_efficiency",
+                    "compatibility",
+                    "usability",
+                    "reliability",
+                    "security",
+                    "maintainability",
+                    "portability"
+                  ],
+                  "description": "Характеристика качества по ГОСТ Р ИСО/МЭК 25020-2023"
+                },
+                "iso_sub_characteristic": {
+                  "type": "string",
+                  "enum": [
+                    "functional_completeness",
+                    "functional_correctness",
+                    "functional_appropriateness",
+                    "time_behaviour",
+                    "resource_utilisation",
+                    "capacity",
+                    "co_existence",
+                    "interoperability",
+                    "appropriateness_recognisability",
+                    "learnability",
+                    "operability",
+                    "user_error_protection",
+                    "user_interface_aesthetics",
+                    "accessibility",
+                    "maturity",
+                    "availability",
+                    "fault_tolerance",
+                    "recoverability",
+                    "confidentiality",
+                    "integrity",
+                    "non_repudiation",
+                    "accountability",
+                    "authenticity",
+                    "modularity",
+                    "reusability",
+                    "analysability",
+                    "modifiability",
+                    "testability",
+                    "adaptability",
+                    "installability",
+                    "replaceability"
+                  ],
+                  "description": "Подхарактеристика качества по ГОСТ Р ИСО/МЭК 25020-2023 / ISO 25010:2023. Допустимые значения соответствуют подхарактеристикам родительской iso_characteristic."
+                }
+              }
+            }
+          },
+          "removal_reason": {
+            "type": "string",
+            "minLength": 5
           },
           "source_initiative": {
             "type": "string",
-            "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$"
+            "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$",
+            "description": "Initiative of the latest revision."
           },
           "graduated_date": {
             "type": "string",
-            "format": "date"
+            "format": "date",
+            "description": "Date of the latest revision."
+          },
+          "history": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "required": [
+                "rev",
+                "initiative",
+                "date",
+                "change"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "rev": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "initiative": {
+                  "type": "string",
+                  "pattern": "^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "change": {
+                  "type": "string",
+                  "enum": [
+                    "added",
+                    "modified",
+                    "removed"
+                  ]
+                }
+              }
+            }
           }
+        },
+        "if": {
+          "properties": {
+            "status": {
+              "const": "deprecated"
+            }
+          }
+        },
+        "then": {
+          "required": [
+            "removal_reason"
+          ]
         }
       }
     }
