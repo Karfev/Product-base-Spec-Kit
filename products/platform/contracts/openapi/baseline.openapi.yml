@@ -3,12 +3,12 @@ openapi: "3.1.0"
 info:
   title: Export Project Reports API
   version: "1.0.0"
-  description: Export project reports in JSON/CSV format (REQ-EXPORT-001–004)
+  description: Export project reports in JSON/CSV format (REQ-DEMO-001–004)
 
 paths:
   /exports:
     post:
-      summary: Create export request (REQ-EXPORT-001, REQ-EXPORT-002)
+      summary: Create export request (REQ-DEMO-001, REQ-DEMO-002)
       operationId: createExport
       tags: [exports]
       security:
@@ -33,7 +33,7 @@ paths:
 
   /exports/{id}:
     get:
-      summary: Get export status (REQ-EXPORT-003)
+      summary: Get export status (REQ-DEMO-003)
       operationId: getExport
       tags: [exports]
       security:

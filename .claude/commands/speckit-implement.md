@@ -56,7 +56,7 @@ After completing **T2b (GREEN)** — all tests pass:
 After completing **T5 (trace update)** — if all REQ-IDs have `status: implemented` and full trace links:
 - Optionally set `status: verified` for fully traced REQ-IDs
 
-This ensures graduation (`/speckit-graduate`) finds requirements with terminal status (`implemented` or `verified`), which is required by the requirements-registry schema.
+This ensures graduation (`/speckit-graduate`) finds requirements with terminal status (`implemented` or `verified`), which is required by the requirements-registry schema. A requirement with `delta: modified` replaces the text in the product registry at graduation: run `make check-deltas` to see that its `base_rev` is still current.
 
 ## Rules
 - Never skip T2a — write failing tests BEFORE implementing

@@ -1,7 +1,7 @@
 # Spec Constitution
 
 > Операционная система изменений для B2B SaaS-платформы.
-> Версия: 2.1.0 | Последнее обновление: 2026-11-05
+> Версия: 3.0.0 | Последнее обновление: 2026-11-05
 
 ---
 
@@ -17,7 +17,8 @@
 
 | Артефакт | Канонический файл |
 |---|---|
-| Требования | `requirements.yml` |
+| Текущее поведение продукта | `products/<product>/requirements-registry.yml` |
+| Предлагаемое изменение требований | `requirements.yml` инициативы |
 | Интерфейсы REST | `contracts/openapi.yaml` |
 | Интерфейсы событий | `contracts/asyncapi.yaml` |
 | SLO | `ops/slo.yaml` |
@@ -109,6 +110,18 @@ Narrative-документы (`prd.md`, `design.md`, `runbooks`) MUST ссыла
 
 ID MUST быть короткими, стабильными, ASCII-совместимыми и сортируемыми.
 
+### Изменение требований
+
+Изменённое требование MUST сохранять свой `REQ-ID`. Реестр продукта меняется только через `tools/scripts/graduate.py`, по `delta` требования в инициативе:
+
+| `delta` | Статус в инициативе | Условие | Результат в реестре |
+|---|---|---|---|
+| `added` (или поля нет) | `implemented`, `verified` | ID свободен | новая запись, `rev: 1` |
+| `modified` | `implemented`, `verified` | `base_rev` равен `rev` | `rev + 1`, текст заменён |
+| `removed` | `deprecated` | `base_rev` равен `rev` | `rev + 1`, `status: deprecated`; ID не используется повторно |
+
+Любое другое сочетание условий — конфликт: реестр не меняется. Требование с другим статусом остаётся в инициативе. `check-deltas` считает конфликт ошибкой при статусах из таблицы и предупреждением при остальных. Обоснование: [PLAT-0005](../../decisions/PLAT-0005-requirements-delta-model.md).
+
 ## Языковое соглашение
 
 | Тип контента | Язык | Пример |
@@ -151,6 +164,7 @@ ID MUST быть короткими, стабильными, ASCII-совмес�
 | PRR gate | чек-лист + парсер | warn (PR) | block (release) | Standard+ |
 | Changelog discipline | Keep a Changelog + SemVer | warn→block | blocking | все |
 | Enterprise IS classification | check-jsonschema | blocking | blocking | Enterprise |
+| Конфликты требований с реестром | `check-deltas` | blocking | blocking | все |
 
 ### Серьёзность `check-trace`
 

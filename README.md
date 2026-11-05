@@ -62,7 +62,7 @@ Supporting tooling:
 
 ```text
 tools/schemas/          JSON Schema validators (requirements, services, billing, etc.)
-tools/scripts/          CI scripts (check-trace, check-spec-quality, check-release-rollout)
+tools/scripts/          CI scripts (check-trace, check-deltas, graduate, check-spec-quality, check-release-rollout)
 tools/init.sh           Bootstrap: scaffold a full initiative + L4 spec
 .github/workflows/      CI: validate.yml + contracts.yml
 .claude/commands/       32 slash commands (SKILL.md standard)
@@ -140,6 +140,7 @@ All placeholders (`{INIT-YYYY-NNN-slug}`, `{YYYY-MM-DD}`, `{product}`, `{team}`,
 # Validate:
 make validate          # blocks on schema errors
 make check-trace       # checks REQ-ID consistency L3 <-> L4
+make check-deltas      # finds requirement conflicts with the product registry
 ```
 
 ### 5. Run the L4 spec-driven workflow
@@ -342,6 +343,7 @@ REQ-ID rules:
 |---|---|---|
 | `requirements.yml` JSON Schema | `check-jsonschema` | Blocking |
 | REQ-ID traceability (L3 <-> L4) | `check-trace.py` | Blocking |
+| Requirement conflicts with the product registry | `check-deltas.py` | Blocking |
 | Spec quality (placeholders, T2a<T2b) | `check-spec-quality.py` | Blocking |
 | Enterprise classification | `check-jsonschema` | Blocking (enterprise only) |
 | YAML hygiene | `yamllint` | Warning -> blocking |
@@ -366,6 +368,7 @@ make validate-services     # Validate all service artifacts (L2.5)
 make lint-docs             # Lint YAML and Markdown files
 make lint-contracts        # Validate OpenAPI and AsyncAPI contracts
 make check-trace           # Check REQ-ID consistency (L3 <-> L4)
+make check-deltas          # Find requirement conflicts with the product registry
 make check-spec-quality    # Check .specify specs quality gates
 make check-release-rollout # Validate rollout/migration vs SLO/PRR
 make collect-evidence      # Collect GSD execution evidence into RTM

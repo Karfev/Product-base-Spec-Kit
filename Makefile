@@ -12,7 +12,7 @@ TEST_CONTRACT_CMD ?= echo "Set TEST_CONTRACT_CMD, e.g. 'pytest -m contract'" && 
 TEST_INTEGRATION_CMD ?= echo "Set TEST_INTEGRATION_CMD, e.g. 'pytest -m integration'" && exit 1
 TEST_PERF_CMD ?= echo "Set TEST_PERF_CMD, e.g. 'k6 run tests/perf/smoke.js'" && exit 1
 
-.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-agents-md test-tools check-spec-quality check-release-rollout check-index-stale check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
+.PHONY: help validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-deltas check-agents-md test-tools test-lifecycle graduate check-spec-quality check-release-rollout check-index-stale check-all collect-evidence install-tools test-unit test-contract test-integration test-perf archive restore
 
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -126,6 +126,10 @@ check-trace: ## Check REQ-ID consistency and trace links (L3 requirements.yml <-
 	@echo "==> Checking REQ-ID consistency..."
 	@$(PYTHON) tools/scripts/check-trace.py
 
+check-deltas: ## Find conflicts between requirement deltas and product registries
+	@echo "==> Checking requirement deltas..."
+	@$(PYTHON) tools/scripts/check-deltas.py
+
 check-agents-md: ## Check AGENTS.md skill catalog against .claude/commands
 	@echo "==> Checking AGENTS.md skill references..."
 	@$(PYTHON) tools/scripts/check-agents-md.py
@@ -133,6 +137,9 @@ check-agents-md: ## Check AGENTS.md skill catalog against .claude/commands
 test-tools: ## Run unit tests for validation scripts
 	@echo "==> Running tool tests..."
 	@$(PYTHON) -m unittest discover -s tools/scripts/tests -p 'test_*.py'
+
+test-lifecycle: ## Run the initiative lifecycle on a temporary copy of the repository
+	@bash tools/scripts/tests/lifecycle.sh
 
 check-spec-quality: ## Check .specify specs quality gates
 	@echo "==> Checking .specify specs quality..."
@@ -166,9 +173,13 @@ test-integration: ## Run integration tests (override TEST_INTEGRATION_CMD)
 test-perf: ## Run performance tests (override TEST_PERF_CMD)
 	@bash -lc '$(TEST_PERF_CMD)'
 
-check-all: test-tools validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-agents-md check-spec-quality check-spec-structure check-index-stale check-release-rollout ## Run all validation checks
+check-all: test-tools validate validate-services validate-registry validate-contracts lint-docs lint-contracts check-trace check-deltas check-agents-md check-spec-quality check-spec-structure check-index-stale check-release-rollout ## Run all validation checks
 	@echo ""
 	@echo "==> All checks complete"
+
+graduate: ## Graduate an initiative into the product layer (usage: make graduate INIT=INIT-2026-xxx [ARGS='--dry-run'])
+	@[ -z "$(INIT)" ] && echo "Usage: make graduate INIT=INIT-2026-xxx [ARGS='--dry-run']" && exit 1 || true
+	@$(PYTHON) tools/scripts/graduate.py $(INIT) $(ARGS)
 
 archive: ## Archive a completed initiative (usage: make archive INIT=INIT-2026-xxx)
 	@[ -z "$(INIT)" ] && echo "Usage: make archive INIT=INIT-2026-xxx [ARGS='--force']" && exit 1 || true

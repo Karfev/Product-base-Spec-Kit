@@ -5,7 +5,7 @@ asyncapi: "3.0.0"
 info:
   title: "Export Events"
   version: "1.0.0"
-  description: "Events for export project reports (REQ-EXPORT-003)"
+  description: "Events for export project reports (REQ-DEMO-003)"
 
 channels:
   export.report.completed:

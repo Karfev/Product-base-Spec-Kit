@@ -2,6 +2,11 @@
 # Реестр требований инициативы. Валидируется JSON Schema:
 #   tools/schemas/requirements.schema.json
 # Команда: check-jsonschema --schemafile ../../tools/schemas/requirements.schema.json requirements.yml
+#
+# Новое требование пишется без delta. Если инициатива меняет требование из
+# products/{product}/requirements-registry.yml, ID сохраняется и добавляются поля:
+#   delta: "modified"          + base_rev: <rev из реестра>
+#   delta: "removed"           + base_rev: <rev из реестра>, removal_reason, status: "deprecated"
 
 metadata:
   initiative: "{INIT-YYYY-NNN-slug}"

@@ -136,8 +136,9 @@ print(d.get('metadata', {}).get('profile', 'unknown'))
 ")
 
 # Append new entry after header separator row
-sed -i '' "/^|---|---|---|---|---|$/a\\
+sed -i.bak "/^|---|---|---|---|---|$/a\\
 | [$INIT]($INIT/prd.md) | $TITLE | $OWNER | $DATE | $PROF |" "$INDEX"
+rm -f "$INDEX.bak"
 
 echo ""
 echo "✅ Archived: $INIT → archive/$INIT"

@@ -7,94 +7,48 @@ argument-hint: <INIT-YYYY-NNN-slug> (e.g., INIT-2026-000-api-key-management)
 
 You are graduating knowledge from initiative `$ARGUMENTS` to the product layer (L2).
 
-Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 initiatives into `products/{product}/` so that knowledge persists after archiving.
+Requirements, ADRs, the knowledge log and the `graduated: true` mark are handled by `tools/scripts/graduate.py`: do not edit `requirements-registry.yml` by hand. This prompt runs the dialog and merges contracts.
 
 ## Your job
 
-### 1. Load and validate initiative context
+### 1. Check product and outcome
 
 1. Validate `$ARGUMENTS` matches `^INIT-[0-9]{4}-[0-9]{3}-[a-z0-9-]+$`. Abort if invalid.
-2. Read `initiatives/$ARGUMENTS/requirements.yml` — extract `metadata.product`, `metadata.initiative`, `metadata.profile`.
-3. Check `metadata.graduated`:
-   - If `true` — inform user: "This initiative has already been graduated. Use `--force` in arguments to re-graduate." Stop unless user explicitly requests re-graduation.
-4. Read `initiatives/$ARGUMENTS/prd.md` — extract the one-line **Outcome** from "Цель (Outcome)" or the first sentence of "Цель и ожидаемый эффект".
-5. Verify `products/{product}/` directory exists. If not — instruct user: "Product directory not found. Run `/speckit-product-init {product}` first." Stop.
+2. Read `metadata.product` from `initiatives/$ARGUMENTS/requirements.yml`. If `products/{product}/` does not exist, instruct the user: "Run `/speckit-product-init {product}` first." Stop.
 
-### 2. REQ-ID graduation (REQ-GRAD-001, REQ-GRAD-002)
+### 2. Preview the plan
 
-**Index loading:** Read `initiatives/$ARGUMENTS/requirements-index.md` for initial scan of eligible requirements. If index is missing, fall back to full `requirements.yml` and warn: "Run /speckit-requirements to generate index." For the actual graduation data (full fields), read targeted entries from `requirements.yml`.
+Run:
+```
+python3 tools/scripts/graduate.py $ARGUMENTS --dry-run --json
+```
 
-1. Scan all requirements in `initiatives/$ARGUMENTS/requirements-index.md` (or full `requirements.yml` per above) where `status` is `implemented` or `verified`.
-2. Present candidate list to user:
+The output is one JSON document:
 
-   ```
-   Requirements eligible for graduation:
-   | # | ID           | Title              | Status      | Type       | Priority |
-   |---|------------- |--------------------|-------------|------------|----------|
-   | 1 | REQ-AUTH-001 | Create API key     | implemented | functional | P0       |
-   | 2 | REQ-AUTH-002 | Revoke API key     | implemented | functional | P0       |
-   ...
-   
-   Confirm graduation of all N requirements? (or specify numbers to skip)
-   ```
+- `already_graduated: true` — inform the user. Stop unless they ask to re-run; then add `--force` to every call. Re-running is safe: what is already merged is a no-op.
+- `conflicts` is not empty — show every `code`, `message` and `fix`. Stop: nothing can be applied until the initiative is corrected.
+- otherwise present `merged`, `adrs` and `pending`:
 
-3. After user confirms:
-   - Read `products/{product}/requirements-registry.yml` if it exists. If not, create with stub:
-     ```yaml
-     # Product requirements registry.
-     # Auto-maintained by /speckit-graduate. Do not edit manually.
-     metadata:
-       product: "{product}"
-       owner: "{owner from initiative}"
-       last_updated: "{today}"
-     
-     entries: []
-     ```
-   - For each confirmed REQ-ID:
-     - Check if `id` already exists in registry entries — if yes, warn user and skip (or ask to update if `--force`)
-     - Append entry:
-       ```yaml
-       - id: "{REQ-ID}"
-         title: "{title}"
-         type: "{type}"
-         final_status: "{status}"
-         source_initiative: "{INIT-ID}"
-         graduated_date: "{today YYYY-MM-DD}"
-       ```
-   - Update `metadata.last_updated` to today.
+  ```
+  Requirements to merge:
+  | # | ID           | Title          | Change         | Status      |
+  |---|--------------|----------------|----------------|-------------|
+  | 1 | REQ-AUTH-001 | Create API key | added, rev 1   | implemented |
+  | 2 | REQ-AUTH-002 | Revoke API key | modified, rev 3| implemented |
 
-### 3. ADR graduation (REQ-GRAD-004)
+  ADRs to copy:
+  | # | Source                            | Product ADR       | Title                  |
+  |---|-----------------------------------|-------------------|------------------------|
+  | 1 | INIT-2026-000-ADR-0001-storage    | PLAT-0004-storage | Bcrypt hashing for ... |
 
-1. Scan `initiatives/$ARGUMENTS/decisions/` for `.md` files (ADRs).
-2. If no ADR files found — skip this step, inform user: "No ADRs found in this initiative."
-3. Present each ADR to user:
+  Stay in the initiative (status not eligible): REQ-AUTH-003
 
-   ```
-   ADRs eligible for graduation:
-   | # | Source File                          | Title (from H1)                    |
-   |---|--------------------------------------|------------------------------------|
-   | 1 | INIT-2026-000-ADR-0001-storage.md    | Bcrypt hashing for API key secrets |
-   
-   Confirm graduation of all N ADRs? (or specify numbers to skip)
-   ```
+  Confirm? (or specify numbers to skip)
+  ```
 
-4. After user confirms, for each ADR:
-   - Scan `products/{product}/decisions/` for existing files matching `{PRODUCT}-NNNN-*.md` (case-insensitive product prefix)
-   - Find the maximum NNNN — set next number = max + 1 (start at 0001 if none exist)
-   - Determine `{PRODUCT}` prefix: uppercase product name (e.g., `platform` → `PLAT`, or first 4+ chars uppercase). Use the same prefix as existing ADRs if any; otherwise derive from product name.
-   - Extract `slug` from original filename: `INIT-xxx-ADR-NNNN-{slug}.md` → keep `{slug}`
-   - Target filename: `products/{product}/decisions/{PRODUCT}-{NNNN}-{slug}.md`
-   - **Verify** no file with target name exists (safety check)
-   - Copy the ADR file (do NOT move the original)
-   - In the copied file, add YAML frontmatter fields (or update existing frontmatter):
-     ```yaml
-     graduated_from: "{INIT-ID}"
-     original_id: "{original ADR filename without .md}"
-     graduated_date: "{today YYYY-MM-DD}"
-     ```
-   - Update the H1 heading from the initiative-scoped ID to the product-scoped ID
+Skipped requirements become `--only <the rest>`, skipped ADRs become `--skip-adr <source>`.
 
-### 3b. Contract graduation (REQ-CONTR-001–005)
+### 3. Contract graduation (REQ-CONTR-001–005)
 
 1. Scan `initiatives/$ARGUMENTS/contracts/` for contract files:
    - OpenAPI: `*.openapi.yml`, `*.openapi.json`, `openapi.yaml`
@@ -202,64 +156,36 @@ Graduation extracts valuable artifacts (implemented requirements, ADRs) from L3 
          - "POST /api-keys"
          - "DELETE /api-keys/{id}"
        graduated_at: "{ISO 8601 date-time, e.g. 2026-04-12T00:00:00Z}"
-       git_commit: "pending"
+       git_commit: "{output of git rev-parse --short HEAD: the base commit of this merge}"
        forced: false
        breaking_changes_detected: false
      ```
 
-### 4. Knowledge log (REQ-GRAD-005)
+### 4. Apply
 
-1. Read or create `products/{product}/knowledge-log.md`. If creating, add header:
-   ```markdown
-   # Knowledge Log: {product}
-   
-   Graduation history — newest first. Auto-maintained by `/speckit-graduate`.
-   ```
+Run contracts first, so a contract conflict stops the graduation before anything else changes. Then:
+```
+python3 tools/scripts/graduate.py $ARGUMENTS [--only ID,...] [--skip-adr ADR,...] [--force]
+```
 
-2. Prepend (newest first) a detailed section:
+If the script exits with 1, nothing was written: show the conflicts and stop.
 
-   ```markdown
-   ---
-   
-   ## {YYYY-MM-DD} — {INIT-ID}
-   
-   **Outcome:** {one-line summary from prd.md}
-   
-   ### Requirements graduated
-   
-   | REQ-ID | Title | Final Status | Type |
-   |--------|-------|--------------|------|
-   | REQ-AUTH-001 | Create API key | implemented | functional |
-   | REQ-AUTH-002 | Revoke API key | implemented | functional |
-   
-   ### ADRs graduated
-   
-   | Source | Product ADR | Title |
-   |--------|-------------|-------|
-   | INIT-2026-000-ADR-0001-storage | PLAT-0001-storage | Bcrypt hashing for API key secrets |
-   
-   ### Key learnings
-   
-   {placeholder — add key insights from this initiative}
-   ```
+### 5. Complete the knowledge log
 
-   If no ADRs were graduated, omit the "ADRs graduated" sub-section.
-   
-   If contracts were graduated, add a "Contracts graduated" sub-section:
+The script adds a section for this initiative to the top of `products/{product}/knowledge-log.md`. In that section:
+
+1. If contracts were graduated, add before "Key learnings":
 
    ```markdown
    ### Contracts graduated
-   
+
    | Format | Artifacts | Paths/Channels Added |
    |--------|-----------|---------------------|
    | OpenAPI | baseline.openapi.yml | GET /api-keys, POST /api-keys, DELETE /api-keys/{id} |
    | AsyncAPI | baseline.asyncapi.yml | audit.event.recorded |
    ```
 
-### 5. Mark initiative as graduated
-
-1. Set `graduated: true` in `initiatives/$ARGUMENTS/requirements.yml` under `metadata`.
-2. Update `metadata.last_updated` to today.
+2. Ask the user for key learnings and replace the placeholder under "Key learnings".
 
 ### 6. Validate
 
@@ -267,48 +193,42 @@ Run:
 ```
 make validate
 make validate-registry
+make check-deltas
 make validate-contracts
 ```
 
 Fix ALL errors before proceeding. All commands MUST pass.
 
-### 7. Update git_commit in contract-registry
-
-After the graduation commit succeeds:
-1. Get commit hash: `HASH=$(git rev-parse --short HEAD)`
-2. Replace `git_commit: "pending"` with the actual hash in `products/{product}/contracts/contract-registry.yml`
-3. Amend the commit: `git add products/{product}/contracts/contract-registry.yml && git commit --amend --no-edit`
-
-### 8. Report
+### 7. Report
 
 Summarize:
 ```
 Graduation complete for {INIT-ID} → products/{product}/
 
-  REQ-IDs graduated:  N
+  REQ-IDs merged:     N (added A, modified M, removed R)
   ADRs graduated:     M
   Contracts graduated: K (OpenAPI: X paths, AsyncAPI: Y channels, Protobuf: Z files)
+  Stayed in initiative: P
   Knowledge log:      updated
 
 Next steps:
-  1. Review products/{product}/knowledge-log.md — add key learnings
+  1. Commit the result
   2. Archive: tools/archive.sh {INIT-ID}  (or: make archive INIT={INIT-ID})
   3. Reflect: /speckit-reflect {INIT-ID}  — generate lessons learned and evolution proposals
 ```
 
 ## Rules
 
+- **The registry is the current behaviour of the product; `requirements.yml` of an initiative is a proposed change.** Merge rules live in `tools/scripts/graduate.py`.
 - **Graduation = COPY, never move.** Initiative artifacts remain until archive.
-- **Only `implemented` and `verified` requirements qualify.** `draft`, `proposed`, `approved` stay in initiative.
-- **REQ-IDs are immutable.** Same ID in registry as in initiative — never rename.
-- **ADR numbering** in product scope is independent of initiative ADR numbering. Always scan `products/{product}/decisions/` to find the next sequential number.
+- **Only `implemented` and `verified` requirements merge** (`deprecated` for `delta: removed`). Others stay in the initiative.
+- **REQ-IDs are immutable.** A changed requirement keeps its ID and gets a new `rev`; a deprecated ID is not reused.
 - **If `products/{product}/` does not exist**, do NOT create it — direct user to `/speckit-product-init`.
 - **Do NOT touch L1 (domains/) artifacts.** Domain knowledge graduation is a manual process.
 - **Contract graduation = COPY + MERGE.** Source contracts remain in initiative. Baseline in `products/{product}/contracts/` is the merged result.
 - **Contract conflicts block by default.** Use `--force` to override. Forced overrides are logged in contract-registry.yml.
 - **Protobuf uses strict namespace isolation.** Each `.proto` file MUST have a unique package within the product scope.
-- **MUST run `make validate` and `make validate-registry`** before reporting success.
-- **Backward compatible**: `products/` without `requirements-registry.yml` continue to work. The registry is created on first graduation.
+- **MUST run `make validate`, `make validate-registry` and `make check-deltas`** before reporting success.
 
 ## Preset Loading
 

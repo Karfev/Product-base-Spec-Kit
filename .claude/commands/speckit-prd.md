@@ -38,6 +38,7 @@ You are helping write the Product Requirements Document for initiative `$ARGUMEN
    - REQ-AUTH-001 (Create API key) — graduated from INIT-2026-000 on 2026-06-15
    - REQ-AUTH-003 (Rate limiting) — graduated from INIT-2026-000 on 2026-06-15
    These are already implemented. Consider referencing or building upon them rather than re-specifying.
+   To change one of them, keep its ID and use delta: modified in requirements.yml.
    ```
 
 4c. **Scan product contract registry**: If `products/{product}/contracts/contract-registry.yml` exists, scan it for graduated API endpoints. If found, present to the user:

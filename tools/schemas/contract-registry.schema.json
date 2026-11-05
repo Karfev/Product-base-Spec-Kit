@@ -44,7 +44,7 @@
           "git_commit": {
             "type": "string",
             "minLength": 1,
-            "description": "Git commit hash after graduation commit, or 'pending' if not yet committed"
+            "description": "Base commit: HEAD at the time of the merge. The graduation commit itself is not recorded."
           },
           "forced": {
             "type": "boolean"
